@@ -1,0 +1,324 @@
+### [作品情報]
+### タイトル=WEBGL API関数群(nako3プラグイン)
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=BSD
+### 説明=WEBGLのAPIを直接利用する為のプラグインです。ほぼ、APIと1:1の命令を定義しています。
+### 対象バージョン=3.2.13
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2021-06-16 20:29:43
+###
+
+# WEBGL API関数群
+# webgl.nako3
+#
+# GLで始める命令を追加する
+
+# WebGLRenderContextをGLという名のグローバルな変数で保持する
+GLは空
+
+●(CANVASから)GLコンテキスト作成とは
+　GLはCANVASの"getContext"を["webgl"]でJSメソッド実行
+　GLで戻る
+ここまで
+
+# シェーダ系の命令
+
+●(SRCからTYPEの)GLシェーダ作成とは
+　typeは""
+　TYPEで条件分岐
+　　「頂点」ならば、typeは"VERTEX_SHADER"。ここまで。
+　　「バーテックス」ならば、typeは"VERTEX_SHADER"。ここまで。
+　　「フラグメント」ならば、typeは"FRAGMENT_SHADER"。ここまで。
+　ここまで
+　SHADERはGLの"createShader"を[GL[type]]でJSメソッド実行
+　GLの"shaderSource"を[SHADER,SRC]でJSメソッド実行
+　GLの"compileShader"を[SHADER]でJSメソッド実行
+　結果はGLの"getShaderParameter"を[SHADER, GL["COMPILE_STATUS"]]でJSメソッド実行
+　もし、結果でなければ
+　　「Can not compile shader source」を表示
+　　GLの"getShaderInfoLog"を[SHADER]でJSメソッド実行を表示
+　　ソースはGLの"getShaderSource"を[SHADER]でJSメソッド実行
+　　ソースの"\n"を"<br>\n"に置換を表示
+　　GLの"deleteShader"を[SHADER]でJSメソッド実行
+　　NULLで戻る
+　ここまで
+　SHADERで戻る
+ここまで
+
+# プログラム系の命令
+
+●(VとFから)GLプログラム作成とは
+　PROGRAMはGLの"createProgram"を[]でJSメソッド実行
+　GLの"attachShader"を[PROGRAM, V]でJSメソッド実行
+　GLの"attachShader"を[PROGRAM, F]でJSメソッド実行
+　GLの"linkProgram"を[PROGRAM]でJSメソッド実行
+　GLの"validateProgram"を[PROGRAM]でJSメソッド実行
+　結果はGLの"getProgramParameter"を[PROGRAM, GL["LINK_STATUS"]]でJSメソッド実行
+　もし、結果でなければ
+　　「Can not link program」を表示
+　　GLの"getProgramInfoLog"を[PROGRAM]でJSメソッド実行を表示
+　　NULLで戻る
+　ここまで
+　PROGRAMで戻る
+ここまで
+
+●(PROGRAMを)GLプログラム使用とは
+　GLの"useProgram"を[PROGRAM]でJSメソッド実行
+ここまで
+
+●(PROGRAMを)GLプログラム削除とは
+　GLの"deleteProgram"を[PROGRAM]でJSメソッド実行
+ここまで
+
+# フレームバッファ系の命令
+
+●(OPTSの)GLフレームバッファ作成とは
+　TEX_COLORはNULL
+　TEX_DEPTHはNULL
+　TEX_STENCILはNULL
+　OPTSを反復する
+　　もし、(対象キー＝"COLOR")または(対象キー＝"カラー")ならば、
+　　　TEX_COLORはOPTS[対象キー]
+　　ここまで
+　　もし、(対象キー＝"DEPTH")または(対象キー＝"深度")ならば、
+　　　TEX_DEPTHはOPTS[対象キー]
+　　ここまで
+　　もし、(対象キー＝"STELCIL")または(対象キー＝"ステンシル")または(対象キー＝"マスク")ならば、
+　　　TEX_STENCILはOPTS[対象キー]
+　　ここまで
+　ここまで
+　FBはGLの"createFramebuffer"を[]でJSメソッド実行
+　GLの"bindFramebuffer"を[GL["FRAMEBUFFER"], FB]でJSメソッド実行
+　もし、TEX_COLOR＝NULLでなければ、
+　　GLの"framebufferTexture2D"を[GL["FRAMEBUFFER"], GL["COLOR_ATTACHMENT0"], GL["TEXTURE_2D"], TEX_COLOR, 0]でJSメソッド実行
+　ここまで
+　もし、TEX_DEPTH＝NULLでなければ、
+　　GLの"framebufferTexture2D"を[GL["FRAMEBUFFER"], GL["DEPTH_ATTACHMENT"], GL["TEXTURE_2D"], TEX_DEPTH, 0]でJSメソッド実行
+　ここまで
+　もし、TEX_STENCIL＝NULLでなければ、
+　　GLの"framebufferTexture2D"を[GL["FRAMEBUFFER"], GL["STENCIL_ATTACHMENT"], GL["TEXTURE_2D"], TEX_STENCIL, 0]でJSメソッド実行
+　ここまで
+　FBステータスはGLの"checkFramebufferStatus"を[GL["FRAMEBUFFER"]]でJSメソッド実行
+　もし、FBステータス≠GL["FRAMEBUFFER_COMPLETE"]ならば、
+　　「作成したフレームバッファは無効です」でエラー発生
+　ここまで
+　GLの"bindFramebuffer"を[GL["FRAMEBUFFER"], NULL]でJSメソッド実行
+　FBで戻る
+ここまで
+
+●(FBを)GLフレームバッファ設定とは
+　GLの"bindFramebuffer"を[GL["FRAMEBUFFER"], FB]でJSメソッド実行
+ここまで
+
+●(FBを)GLフレームバッファ削除とは
+　GLの"deleteFramebuffer"を[FB]でJSメソッド実行
+ここまで
+
+# テクスチャ系の命令
+
+●(DATAからTYPEでWHの)GLテクスチャ作成とは
+　もし、TYPEでなければ、
+　　TYPEは"UNSIGNED_BYTE"
+　ここまで
+　もし、(TYPEの変数型確認)が"string"ならば、
+　　TYPEはGL[TYPE]
+　ここまで
+　TEXはGLの"createTexture"を[]でJSメソッド実行
+　GLの"bindTexture"を[GL["TEXTURE_2D"], TEX]でJSメソッド実行
+　GLの"texImage2D"を[GL["TEXTURE_2D"], 0, GL["RGBA"], WH[0], WH[1], 0, GL["RGBA"], TYPE, DATA]でJSメソッド実行
+　GLの"texParameteri"を[GL["TEXTURE_2D"], GL["TEXTURE_MAG_FILTER"], GL["NEAREST"]]でJSメソッド実行
+　GLの"texParameteri"を[GL["TEXTURE_2D"], GL["TEXTURE_MIN_FILTER"], GL["NEAREST"]]でJSメソッド実行
+　GLの"texParameteri"を[GL["TEXTURE_2D"], GL["TEXTURE_WRAP_S"], GL["CLAMP_TO_EDGE"]]でJSメソッド実行
+　GLの"texParameteri"を[GL["TEXTURE_2D"], GL["TEXTURE_WRAP_T"], GL["CLAMP_TO_EDGE"]]でJSメソッド実行
+　GLの"bindTexture"を[GL["TEXTURE_2D"], NULL]でJSメソッド実行
+　TEXで戻る
+ここまで
+
+●(TEXを)GLテクスチャ設定とは
+　GLの"bindTexture"を[GL["TEXTURE_2D"], TEX]でJSメソッド実行
+ここまで
+
+●(TEXを)GLテクスチャ削除とは
+　GLの"deleteTexture"を[TEX]でJSメソッド実行
+ここまで
+
+●(Nを)GLテクスチャ枠指定とは
+　GLの"activeTexture"を[GL["TEXTURE0"]+N]でJSメソッド実行
+ここまで
+
+# バッファ系の命令
+
+●(ARRAYからTYPEで)GL静的配列バッファ作成とは
+　もし、TYPEでなければ、
+　　TYPEは"UNSIGNED_BYTE"
+　ここまで
+　BUFFERはGLの"createBuffer"を[]でJSメソッド実行
+　GLの"bindBuffer"を[GL["ARRAY_BUFFER"], BUFFER]でJSメソッド実行
+　型付配列はARRAYのF32配列
+　GLの"bufferData"を[GL["ARRAY_BUFFER"], 型付配列, GL["STATIC_DRAW"]]でJSメソッド実行
+　GLの"bindBuffer"を[GL["ARRAY_BUFFER"], NULL]でJSメソッド実行
+　BUFFERで戻る
+ここまで
+
+●(BUFFERをARRAYで)GLバッファ配列更新とは
+　GLの"bindBuffer"を[GL["ARRAY_BUFFER"], BUFFER]でJSメソッド実行
+　型付配列はARRAYのF32配列
+　GLの"bufferSubData"を[GL["ARRAY_BUFFER"], 0, 型付配列]でJSメソッド実行
+　GLの"bindBuffer"を[GL["ARRAY_BUFFER"], NULL]でJSメソッド実行
+　BUFFERで戻る
+ここまで
+
+●(BUFFERを)GLバッファ設定とは
+　GLの"bindBuffer"を[GL["ARRAY_BUFFER"], BUFFER]でJSメソッド実行
+ここまで
+
+●(BUFFERを)GLバッファ削除とは
+　GLの"deleteBuffer"を[BUFFER]でJSメソッド実行
+ここまで
+
+# 属性系の命令
+
+●(PROGRAMからATTRの)GL属性ロケーション取得とは
+　GLの"getAttribLocation"を[PROGRAM, ATTR]でJSメソッド実行で戻る
+ここまで
+
+●(VLOCを)GL頂点属性有効とは
+　GLの"enableVertexAttribArray"を[VLOC]でJSメソッド実行
+ここまで
+
+●(VLOCを)GL頂点属性無効とは
+　GLの"disableVertexAttribArray"を[VLOC]でJSメソッド実行
+ここまで
+
+●(VLOCにOPTSで)GL頂点属性書式設定とは
+　NUMは4
+　TYPEは"FLOAT"
+　NORMALIZEはオフ
+　STRIDEは0
+　OFFSETは0
+　OPTSを反復する
+　　もし、対象キーが"オフセット"ならば、
+　　　OFFSETはOPTS[対象キー]
+　　ここまで
+　　もし、対象キーが"レコード長"ならば、
+　　　STRIDEはOPTS[対象キー]
+　　ここまで
+　　もし、対象キーが"正規化"ならば、
+　　　NORMALIZEはOPTS[対象キー]
+　　ここまで
+　　もし、(対象キー＝"型")または(対象キー＝"タイプ")ならば、
+　　　TYPEはOPTS[対象キー]
+　　ここまで
+　　もし、(対象キー＝"数")または(対象キー＝"個数")ならば、
+　　　NUMはOPTS[対象キー]
+　　ここまで
+　ここまで
+　メソッド引数は[VLOC, NUM, GL[TYPE], NORMALIZE, STRIDE, OFFSET]
+　GLの"vertexAttribPointer"をメソッド引数でJSメソッド実行
+ここまで
+
+# 共有データ(uniform)系の命令
+
+●(PROGRAMからUNIFORMの)GL共有データロケーション取得とは
+　GLの"getUniformLocation"を[PROGRAM, UNIFORM]でJSメソッド実行で戻る
+ここまで
+
+●(OBJをLOCにTYPEで)GL共有データ設定とは
+　GLの"uniform{TYPE}"を[LOC, OBJ]でJSメソッド実行
+ここまで
+
+# 描画指示命令
+
+●(TYPEでNUMを)GL配列描画とは
+　GLの"drawArrays"を[GL[TYPE], 0, NUM]でJSメソッド実行
+ここまで
+
+# シザー(はさみ)系命令
+
+●(XYWHに)GLシザー設定とは
+　GLの"scissor"をXYWHでJSメソッド実行
+ここまで
+
+# 個々の命令
+
+●(XYWHに)GLビューポート設定とは
+　GLの"viewport"をXYWHでJSメソッド実行
+ここまで
+
+●(COLORに)GLクリア色設定とは
+　GLの"clearColor"をCOLORでJSメソッド実行
+ここまで
+
+●(OPTSで)GLクリアとは
+　FLGは0
+　もし、OPTS["COLOR"]ならば、
+　　FLGはFLG＋GL["COLOR_BUFFER_BIT"]
+　ここまで
+　もし、OPTS["DEPTH"]ならば、
+　　FLGはFLG＋GL["COLOR_DEPTH_BIT"]
+　ここまで
+　GLの"clear"を[FLG]でJSメソッド実行
+ここまで
+
+●GLフラッシュとは
+　GLの"flush"を[]でJSメソッド実行
+ここまで
+
+●(KEYの)GLパラメータ取得とは
+　GLの"getParameter"を[GL[KEY]]でJSメソッド実行で戻る
+ここまで
+
+●(KEYの)GL拡張機能取得とは
+　GLの"getExtension"を[KEY]でJSメソッド実行で戻る
+ここまで
+
+●(KEYの)GL有効化とは
+　GLの"enable"を[GL[KEY]]でJSメソッド実行で戻る
+ここまで
+
+●(KEYの)GL無効化とは
+　GLの"disable"を[GL[KEY]]でJSメソッド実行で戻る
+ここまで
+
+# 補助命令
+
+●GL浮動小数点数カラーバッファ拡張とは
+　浮動小数点数カラーバッファは"WEBGL_color_buffer_float"のGL拡張機能取得
+　もし、浮動小数点数カラーバッファ＝NULLならば、
+　　FBはGLの"createFramebuffer"を[]でJSメソッド実行
+　　FBをGLフレームバッファ設定
+　　TEX_COLORはNULLから"FLOAT"で[1,1]のGLテクスチャ作成
+　　GLの"framebufferTexture2D"を[GL["FRAMEBUFFER"], GL["COLOR_ATTACHMENT0"], GL["TEXTURE_2D"], TEX_COLOR, 0]でJSメソッド実行
+　　FBステータスはGLの"checkFramebufferStatus"を[GL["FRAMEBUFFER"]]でJSメソッド実行
+　　もし、FBステータス＝GL["FRAMEBUFFER_COMPLETE"]ならば、
+　　　浮動小数点数カラーバッファはオン
+　　違えば、
+　　　浮動小数点数カラーバッファはオフ
+　　ここまで
+　　GLの"bindFramebuffer"を[GL["FRAMEBUFFER"], NULL]でJSメソッド実行
+　　TEX_COLORをGLテクスチャ削除
+　　FBをGLフレームバッファ削除
+　違えば、
+　　浮動小数点数カラーバッファはオン
+　ここまで
+　浮動小数点数カラーバッファで戻る
+ここまで
+
+# 型付配列のヘルパー命令
+
+●(ARGの)UI8配列とは
+　『(function (a) {return new Uint8Array(a)})』を[ARG]でJS関数実行で戻る
+ここまで
+
+●(ARGの)F32配列とは
+　『(function (a) {return new Float32Array(a)})』を[ARG]でJS関数実行で戻る
+ここまで
+
+もし、プラグイン名が「メイン」ならば、
+    『このプラグインは「WEBGL API関数群」を定義します』を表示する
+    『このプラグインで定義している命令は一部を除いて「GL」で始まります』を表示する
+    『このプラグインでは、「GL」というグローバル変数が定義され使用されています』を表示する
+    『このプラグインでは、動作の補助に「UI8配列」と「F32配列」の２命令を追加で定義しています』を表示する
+ここまで

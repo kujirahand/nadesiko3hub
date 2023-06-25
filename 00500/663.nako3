@@ -1,0 +1,23 @@
+### [作品情報]
+### タイトル=ch4/hanpuku_hairetu.nako3
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=MIT
+### 説明=「なでしこ3本」4章のサンプル「hanpuku_hairetu.nako3」です。
+### 対象バージョン=3.2.23
+### URL=https://nadesi.com/top/go.php?46
+### 種類=wnako
+### タグ=なでしこ3本
+### 更新日時=2023-06-25 23:26:22
+###
+
+### なでしこ3本 4章 のサンプル ###
+# [file] ../src/ch4/hanpuku_hairetu.nako3
+# [説明URL] https://nadesi.com/top/go.php?46
+
+# 変数Aの内容を初期化
+A = [30, 50, 20, 80]
+
+# Aの各要素を全て表示
+Aを反復
+　　対象を表示。
+ここまで。

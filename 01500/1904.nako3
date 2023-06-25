@@ -1,0 +1,131 @@
+### [作品情報]
+### タイトル=2D物理エンジンのPlanckのテスト
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=2D物理エンジンのPlanckのテスト。平面があっていくつかの四角形が回りながら落ちるだけ。Planck本体の他にPlanck-Redererを利用。どちらのライブラリもMITライセンス。
+### 対象バージョン=3.3.80
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2022-11-19 13:29:02
+###
+
+!「https://n3s.nadesi.com/plain/1899.js」を取り込む
+
+PLANCKとは変数
+RENDERERとは変数
+RUNNERとは変数
+
+ワールドとは変数
+レンダラとは変数
+ランナーとは変数
+
+PLANCKライブラリ準備
+ワールドはPLテスト
+レンダラはレンダラ作成
+ランナーはランナー作成開始
+
+●(Sを)動的インポートとは
+　『(function(s) {return import(s);})』を[S]でJS関数実行で戻る
+ここまで
+
+●PLANCKライブラリ準備とは
+　「https://cdn.jsdelivr.net/npm/planck-js@0.4.0-alpha.1/dist/planck.min.js」を動的インポートをAWAIT
+　PLANCKはWINDOW["planck"]
+　MODULEとは変数
+　MODULEは「https://weyk.sakura.ne.jp/storage/planck-renderer/renderer.min.js」を動的インポートをAWAIT
+　RENDERERはMODULE["default"]
+　RUNNERはMODULE["Runner"]
+ここまで
+
+●(X,Y)Vec2とは
+　PLANCKの"Vec2"を[X,Y]でJSメソッド実行で戻る
+ここまで
+
+●(OPTSで)NewWorldとは
+　『(function(pl,o){return new pl.World(o);})』を[PLANCK,OPTS]でJS関数実行で戻る
+ここまで
+
+●(WORLDをCTXにOPTSで)NewRendererとは
+　『(function(pr,w,c,o){return new pr(w,c,o);})』を[RENDERER,WORLD,CTX,OPTS]でJS関数実行で戻る
+ここまで
+
+●(WORLDをOPTSで)NewRunnerとは
+　『(function(run,w,o){return new run(w,o);})』を[RUNNER,WORLD,OPTS]でJS関数実行で戻る
+ここまで
+
+●(FUNCをRUNNERで)ランナー開始とは
+　RUNNERの"start"を[FUNC]でJSメソッド実行
+ここまで
+
+●PLテストとは
+　OPTSとは変数
+　OPTSは{
+　　"gravity":Vec2(0,10)
+　}
+　worldとは変数
+　worldはOPTSでNewWorld
+
+　Xとは変数
+　Yとは変数
+　Pとは変数
+　回転とは変数
+　回転速度とは変数
+　物とは変数
+　形とは変数
+　10回繰り返す
+　　Xは(描画中キャンバス["width"]/10)の乱数
+　　Yは(描画中キャンバス["height"]*2/3/10)の乱数
+　　Wは(30の乱数)/10+0.5
+　　Hは(30の乱数)/10+0.5
+　　PはVec2(X,Y)
+　　物はworldの"createDynamicBody"を[P]でJSメソッド実行
+　　形はPLANCKの"Box"を[W/2,H/2]でJSメソッド実行
+　　OPTSは{
+　　　"angle":回転,
+　　　"density":1.0,
+　　}
+　　物の"createFixture"を[形,OPTS]でJSメソッド実行
+　　回転はDEG2RAD((900の乱数)/10)
+　　物の"setAngle"を[回転]でJSメソッド実行
+　　回転速度はDEG2RAD((360の乱数)-180)
+　　物の"setAngularVelocity"を[回転速度]でJSメソッド実行
+　ここまで
+
+　groundとは変数
+　P1とは変数
+　P2とは変数
+　groundはworldの"createBody"を[]でJSメソッド実行
+　P1はVec2(0,描画中キャンバス["height"]*2/3/10)
+　P2はVec2(描画中キャンバス["width"]/10,描画中キャンバス["height"]*2/3/10)
+　形はPLANCKの"Edge"を[P1,P2]でJSメソッド実行
+　OPTSは{
+　　"denisity":0.0,
+　　"friction":2.5,
+　}
+　groundの"createFixture"を[形,OPTS]でJSメソッド実行
+
+　worldで戻る
+ここまで
+
+●レンダラ作成とは
+　OPTSとは変数
+　OPTSは{
+　　"scale": 10,
+　}
+　ワールドを描画中コンテキストにOPTSでNewRendererで戻る
+ここまで
+
+●ランナー作成開始
+　OPTSとは変数
+　OPTSは{
+　　"speed": 1,
+　　"fps": 50,
+　}
+　RUNとは変数
+　RUNはワールドをOPTSでNewRunner
+　RUNでランナー開始には
+　　レンダラの"renderWorld"を[]でJSメソッド実行
+　ここまで
+　RUNで戻る
+ここまで

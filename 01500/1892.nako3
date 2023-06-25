@@ -1,0 +1,239 @@
+### [作品情報]
+### タイトル=CertPoleのQ強化学習っぽいもの
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=OpenAI-GymのCertPoleのQ-Lerningっぽいものをなでしこで実装したもの。学習終了の条件を設けていないので学習の様子を眺める用。Gym自体はライブラリの形で取り込んで利用している。
+### 対象バージョン=3.3.76
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2022-12-10 12:52:12
+###
+
+# OpenAI Gym Certpole Q-Learning
+
+# なでしこv3版のOpen AI Gym Certpoleの環境を取り込む
+!「https://n3s.nadesi.com/plain/1927.nako3」を取り込む
+
+強化学習
+
+●強化学習とは
+　QENVとは変数
+　ENVとは変数
+　QENVはQENV作成
+　ENVはGYM作成
+
+　QENV["イテレーション数"]は0
+
+　# イテレーションを繰り返す
+　オンの間繰り返す
+
+　　QENV["ゲーム数"]は0
+
+　　# ゲームを繰り返す
+　　(QENV["ゲーム数"]＜QENV["イテレーションゲーム数"])の間繰り返す
+
+　　　QENV["STATE"]はGYMリセット
+　　　QENV["エピソード報酬"]は0
+　　　QENV["ステップ"]は0
+　　　続行フラグとは変数
+　　　続行フラグはオン
+
+　　　# 1ゲーム分のステップを行う
+　　　(続行フラグ=オン)の間繰り返す
+
+　　　　ACTIONとは変数
+　　　　ACTIONはQENVのACTION取得
+　　　　結果とは変数
+　　　　結果はACTIONでGYMステップ
+　　　　GYM描画
+
+　　　　次STATEとは変数
+　　　　REWARDとは変数
+　　　　DONEとは変数
+　　　　COMPLETEとは変数
+　　　　次STATEは結果[0]
+　　　　REWARDは結果[1]
+　　　　DONEは結果[2]
+　　　　COMPLETEは結果[3]
+　　　　QENV["エピソード報酬"]はQENV["エピソード報酬"]+REWARD
+
+　　　　REWARDは0
+　　　　もし、DONEならば、
+　　　　　もし、COMPLETEならば、
+　　　　　　REWARDは1.0
+　　　　　違えば
+　　　　　　REWARDは-1.0
+　　　　　ここまで
+　　　　　続行フラグはオフ
+　　　　違えば
+　　　　　REWARDは0.0
+　　　　ここまで
+　　　　QENVのACTIONを次STATEにREWARDでQTABLE更新
+
+　　　　QENV["STATE"]は次STATE
+　　　　QENVのACTIONで状態表示
+　　　　QENVの報酬グラフ描画
+　　　　QENV["ステップ"]はQENV["ステップ"]+1
+
+　　　　(1.0/QENV["FPS"])秒待つ
+　　　ここまで
+　　　QENV["ゲーム数"]はQENV["ゲーム数"]+1
+　　　QENV["エピソード"]はQENV["エピソード"]+1
+　　　QENV["エピソード報酬履歴"]にQENV["エピソード報酬"]を配列追加
+　　　もし、(QENV["エピソード報酬履歴"]の配列要素数)＞QENV["エピソード報酬履歴最大数"]ならば、
+　　　　QENV["エピソード報酬履歴"]の0を配列切取
+　　　　QENV["エピソード報酬履歴起点"]はQENV["エピソード報酬履歴起点"]+1
+　　　ここまで
+　　ここまで
+　　QENV["イテレーション数"]はQENV["イテレーション数"]+1
+　ここまで
+ここまで
+
+●(AからBまでXをNに)離散化とは
+　Cとは変数
+　Dとは変数
+　Dは(B-A)/N
+　Cは(X-A)/D
+　もし、C<0ならば
+　　0で戻る
+　ここまで
+　CはCの整数部分
+　もし、C>N-1ならば、
+　　N-1で戻る
+　ここまで
+　Cで戻る
+ここまで
+
+●QENV作成とは
+　QENVとは変数
+　QENVは{
+　　ETA:0.5,
+　　GAMMA:0.99,
+　　イテレーションゲーム数:20,
+　　イテレーション数:0,
+　　エピソード:0,
+　　ゲーム数:0,
+　　STATE:NULL,
+　　ステップ:0,
+　　FPS:50,
+　　エピソード報酬:0,
+　　離散値N:[10,10,10,10],
+　　エピソード報酬履歴:[],
+　　画面幅:描画中キャンバス["width"],
+　　画面高:描画中キャンバス["height"],
+　　エピソード報酬履歴起点:0
+　}
+　QENV["グラフX"]はQENV["画面幅"]/10
+　QENV["グラフY"]はQENV["画面高"]/3*2
+　QENV["グラフW"]はQENV["画面幅"]-QENV["グラフX"]*2
+　QENV["グラフH"]はQENV["画面高"]/3-20
+　QENV["エピソード報酬履歴最大数"]はQENV["グラフW"]
+　QENV["QTABLE"]はQENVのQTABLE作成
+　QENVで戻る
+ここまで
+
+●(QENVの)QTABLE作成とは
+　Qとは変数
+　Qは[]
+　(QENV["離散値N"][0]*QENV["離散値N"][1]*QENV["離散値N"][2]*QENV["離散値N"][3]*2)回繰り返す
+　　QにRNDを配列追加
+　ここまで
+　Qで戻る
+ここまで
+
+●(QENVのACTIONを次STATEにREWARDで)QTABLE更新とは
+　Iとは変数
+　次Iとは変数
+　IはQENVのQENV["STATE"]からQINDEX取得
+　次IはQENVの次STATEからQINDEX取得
+　次最大Qとは変数
+　もし、QENV["QTABLE"][次I*2+0]＞QENV["QTABLE"][次I*2+1]ならば、
+　　次最大QはQENV["QTABLE"][次I*2+0]
+　違えば
+　　次最大QはQENV["QTABLE"][次I*2+1]
+　ここまで
+　Jとは変数
+　JはI*2+ACTION
+　QENV["QTABLE"][J]はQENV["QTABLE"][J]+QENV["ETA"]*(REWARD+QENV["GAMMA"]*次最大Q-QENV["QTABLE"][J])
+ここまで
+
+●(QENVのSTATEから)QINDEX取得とは
+　DSTATEとは変数
+　DSTATEは[
+　　STATE[0]を-2.4から2.4までQENV["離散値N"][0]に離散化,
+　　STATE[1]を-3.0から3.0までQENV["離散値N"][1]に離散化,
+　　STATE[2]を-0.5から0.5までQENV["離散値N"][2]に離散化,
+　　STATE[3]を-2.0から2.0までQENV["離散値N"][3]に離散化
+　]
+　((DSTATE[0]*QENV["離散値N"][1]+DSTATE[1])*QENV["離散値N"][2]+DSTATE[2])*QENV["離散値N"][3]+DSTATE[3]で戻る
+ここまで
+
+●(QENVの)ACTION取得とは
+　Eとは変数
+　Eは0.5*(1/(QENV["エピソード"]+1))
+　もし、E<RNDならば、
+　　Iとは変数
+　　IはQENVのQENV["STATE"]からQINDEX取得
+　　もし、QENV["QTABLE"][I*2+0]＞QENV["QTABLE"][I*2+1]ならば、
+　　　0で戻る
+　　違えば
+　　　1で戻る
+　　ここまで
+　ここまで
+　2の乱数で戻る
+ここまで
+
+●(QENVの)報酬グラフ描画とは
+　1に線太さ設定
+　黒色に線色設定
+　空に塗り色設定
+　[QENV["グラフX"],QENV["グラフY"],QENV["グラフW"],QENV["グラフH"]]の四角描画
+　「12px sans-serif」に描画フォント設定
+　描画中コンテキスト["textAlign"]は"right"
+　描画中コンテキスト["textBaseline"]は"middle"
+　[QENV["グラフX"]-2,QENV["グラフY"]]に500を文字描画
+　[QENV["グラフX"]-2,QENV["グラフY"]+QENV["グラフH"]]に0を文字描画
+　描画中コンテキスト["textAlign"]は"center"
+　[QENV["グラフX"],QENV["グラフY"]+QENV["グラフH"]+8]に(1+QENV["エピソード報酬履歴起点"])を文字描画
+　[QENV["グラフX"]+QENV["グラフW"],QENV["グラフY"]+QENV["グラフH"]+8]に(QENV["エピソード報酬履歴起点"]+QENV["エピソード報酬履歴最大数"])を文字描画
+　Xとは変数
+　Yとは変数
+　報酬とは変数
+　Xは0
+　報酬でQENV["エピソード報酬履歴"]を反復する
+　　青色に塗り色設定
+　　青色に線色設定
+　　Yは報酬/500*QENV["グラフH"]
+　　[QENV["グラフX"]+X,QENV["グラフY"]+QENV["グラフH"]-Y,1,1]に四角描画
+　　XはX+1
+　ここまで
+ここまで
+
+●(QENVのACTIONで)状態表示とは
+　「16px sans-serif」に描画フォント設定
+　描画中コンテキスト["textAlign"]は"right"
+　描画中コンテキスト["textBaseline"]は"middle"
+　[120,10]に「エピソード:」を文字描画
+　[180,10]にQENV["エピソード"]を文字描画
+　[260,10]に「ステップ:」を文字描画 
+　[300,10]にQENV["ステップ"]を文字描画
+　[350,10]に「操作:」を文字描画
+　Mとは変数
+　ACTIONで条件分岐
+　　0ならば、
+　　　Mは「←」
+　　ここまで
+　　1ならば、
+　　　Mは「→」
+　　ここまで
+　　違えば、
+　　　Mは「？」
+　　ここまで
+　ここまで
+　[370,10]にMを文字描画
+ここまで
+
+●RNDとは
+　『Math.random』を[]でJS関数実行で戻る
+ここまで

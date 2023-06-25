@@ -1,0 +1,240 @@
+### [作品情報]
+### タイトル=ログエリア設定を動的に取得/設定するライブラリ
+### 作者=Meatwo(user_id=0)
+### ライセンス=CC0
+### 説明=関数でログエリアのフォント等、スタイル設定に干渉できます。
+### 対象バージョン=3.2.45
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2022-04-02 10:23:08
+###
+
+/**
+ * Meatwo's Log-area Settings
+ * 
+ * ひとまず完成。取り込むなり改造するなりしてください。
+ * 
+ * 『!「https://n3s.nadesi.com/plain/nako3mls.nako3」を取込。』で使えます。
+ */
+
+
+
+
+/*
+# ライブラリ取り込み
+
+!「https://n3s.nadesi.com/plain/nako3mes.nako3」を取込。
+
+
+
+
+#エディタ設定ライブラリ(https://n3s.nadesi.com/show/nako3mes)
+
+2にMESインデントサイズ設定。
+「ダーク」にMESカラーテーマ設定。
+オンをMES空白文字設定。
+オンをMESソフトタブ設定。
+オフをMES読取専用設定。
+*/
+
+
+
+
+# 関数
+
+関数　(Aを)MLS実行とは
+  「
+const l = document.getElementById("nako3_info");
+{A}
+」をJS実行して戻す。
+。。。
+
+
+
+関数　(Aの|Aを)MLS描画済み状態取得とは
+  「window.getComputedStyle(l).getPropertyValue("{A}");」をMLS実行して戻す。
+。。。
+
+
+
+関数　MLS高さ取得とは
+  「l.style.height ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS高さ設定とは
+  「l.style.height = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS最大高さ取得とは
+  「l.style.maxHeight ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS最大高さ設定とは
+  「l.style.maxHeight = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS最小高取得とは
+  「l.style.minHeight ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS最小高設定とは
+  「l.style.minHeight = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS幅取得とは
+  「l.style.width ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS幅設定とは
+  「l.style.width = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS最大幅取得とは
+  「l.style.maxWidth ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS最大幅設定とは
+  「l.style.maxWidth = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS最小幅取得とは
+  「l.style.minWidth ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS最小幅設定とは
+  「l.style.minWidth = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLSフォントファミリー取得とは
+  「l.style.fontFamily ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLSフォントファミリー設定とは
+  「l.style.fontFamily = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLSフォントサイズ取得とは
+  「l.style.fontSize ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLSフォントサイズ設定とは
+  「l.style.fontSize = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLSフォント太さ取得とは
+  「l.style.fontWeight ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLSフォント太さ設定とは
+  「l.style.fontWeight = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS行間取得とは
+  「l.style.lineHeight ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS行間設定とは
+  「l.style.lineHeight = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS文字色取得とは
+  「l.style.color ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS文字色設定とは
+  「l.style.color = "{A}";」をMLS実行。
+。。。
+
+
+
+関数　MLS背景色取得とは
+  「l.style.backgroundColor ?? null;」をMLS実行して戻す。
+。。。
+
+関数　(Aに|Aを)MLS背景色設定とは
+  「l.style.backgroundColor = "{A}";」をMLS実行。
+。。。
+
+
+
+
+# デモンストレーション
+
+もしプラグイン名=「メイン」ならば
+  「」をMLS高さ設定。#空にすることで初期値に
+  「15em」をMLS最大高設定。
+  「0」をMLS最小高設定。
+  「」をMLS幅設定。
+  「70%」をMLS最大幅設定。
+  「0」をMLS最小幅設定。
+  「monospace」をMLSフォントファミリー設定。
+  「16px」にMLSフォントサイズ設定。
+  「」にMLSフォント太設定。#「normal」「bold」など
+  「」にMLS行間設定。#大抵は1.2が初期値
+  「#000」にMLS文字色設定。
+  アリスブルー色にMLS背景色設定。
+  
+  「====== MLSとは ======
+
+MLS(Meatwo's Log-area Settings)は、
+名前の通りログエリアのサイズやフォント等を
+簡単に変更可能にするライブラリです。
+
+
+
+
+====== MLS設定内容 ======
+
+高さ　　　　　　　　{MLS高さ取得}
+高さ最大　　　　　　{MLS最大高取得}
+高さ最小　　　　　　{MLS最小高取得}
+幅　　　　　　　　　{MLS幅取得}
+幅最大　　　　　　　{MLS最大幅取得}
+幅最小　　　　　　　{MLS最小幅取得}
+フォントファミリー　{MLSフォントファミリー取得}
+フォントサイズ　　　{MLSフォントサイズ取得}
+フォント太さ　　　　{MLSフォント太取得}
+行間　　　　　　　　{MLS行間取得}
+文字色　　　　　　　{MLS文字色取得}
+背景色　　　　　　　{MLS背景色取得}
+」と表示。#「描画上の高さ/幅」を正しく取得できるように一旦表示しておく
+  「描画上の高さ　　　　{『height』のMLS描画済状態取得}
+描画上の幅　　　　　{『width』のMLS描画済状態取得}
+
+
+
+
+====== 注意 ======
+
+注:『MLS...取得』はスタイル上の値を返すため、
+　 実際に描画された値を取得する場合は
+　 『MLS描画済状態取得』を使用してください。
+
+例:『MLS高さ取得』はスタイル上のheightを返す。
+　 『"height"のMLS描画済状態取得』は
+　 実際の描画に適用されているheightを返す。
+　 ...取得なんか使わない? 知らんな()
+
+」と表示。
+。。。

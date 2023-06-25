@@ -1,0 +1,18 @@
+### [作品情報]
+### タイトル=csvのテスト
+### 作者=yy0931(user_id=19)
+### ライセンス=CC0
+### 説明=plugin_csvのテスト
+### 対象バージョン=3.1.19
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2021-05-05 05:03:26
+###
+
+!「https://cdn.jsdelivr.net/npm/nadesiko3@3.1.19/release/plugin_csv.js」を取り込む
+「1,2」のCSV取得して表示
+「1,2」のCSV取得して表示
+「1,2」のCSV取得して表示
+
+// プラグイン宣言: <script defer src="https://nadesi.com/v3/cdn.php?v=3.1.19&f=/release/wnako3.js"></script><script defer src="https://nadesi.com/v3/cdn.php?v=3.1.19&f=release/plugin_turtle.js"></script>

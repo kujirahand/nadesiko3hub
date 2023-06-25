@@ -1,0 +1,24 @@
+### [作品情報]
+### タイトル=html組み込み実行時の補助処理用JS
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=簡易エディタ等やなでしこ３貯蔵庫ではなくhtmlにscriptタグを書いてwnakoを読み込み実行している場合に、なでしこからloggerを経由して出力された内容を表示したりするJacascriptを補助するプログラム。wnako取り込みのsciprtタグに続く位置でこのプログラムをscriptタグで読み込むことで、wnakoと表示用のJavascriptの前後関係を意識しなくても良くなる。開発中の上表表示やエラーや警告の表示をする他のJSプログラムと合わせてどうぞ。埋め込むタグは『<script src="https://n3s.nadesi.com/plain/749.js"></script>』のような感じに。
+### 対象バージョン=3.2.27
+### URL=
+### 種類=js
+### タグ=
+### 更新日時=2021-10-04 23:19:42
+###
+
+(function(){
+  if (typeof navigator === 'object') {
+    if (typeof navigator.nako3 === 'object') {
+      if (typeof navigator.nako3loglistener !== 'undefined') {
+        navigator.nako3loglistener.forEach(function(obj){
+          navigator.nako3.logger.addListener(obj.type,obj.callback,obj.upperlevel)
+        })
+        navigator.nako3loglistener=[]
+      }
+    }
+  }
+})();

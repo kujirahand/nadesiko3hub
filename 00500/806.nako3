@@ -1,0 +1,33 @@
+### [作品情報]
+### タイトル=郵便番号住所変換
+### 作者=田中民生(user_id=0)
+### ライセンス=CC-BY-ND
+### 説明=郵便番号から住所を知る
+### 対象バージョン=3.2.27
+### URL=http://tonga.sub.jp
+### 種類=wnako
+### タグ=<br>
+### 更新日時=2021-11-08 19:05:53
+###
+
+A＝「郵便番号の下四桁がわかっていますか？」と二択。
+もしAがいいえならば
+a=「郵便番号を入力(上3桁で入力)」と尋ねる。
+ZIP=a×10000
+ API=「https://api.aoikujira.com/zip/zip.php?fmt=json&zn={ZIP}」
+ APIへGET送信した時には
+     J=対象をJSONデコード
+     J["result"]を表示。
+「入力した番号＝｛ZIP｝」を表示
+ ここまで。
+ここまで。
+もしAがはいならば
+a=「郵便番号を入力」と尋ねる。
+ZIP=a
+ API=「https://api.aoikujira.com/zip/zip.php?fmt=json&zn={ZIP}」
+ APIへGET送信した時には
+     J=対象をJSONデコード
+     J["result"]を表示。
+「入力した番号＝｛ZIP｝」を表示
+ ここまで。
+ここまで。

@@ -1,0 +1,26 @@
+### [作品情報]
+### タイトル=PluginAwait
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=AWAITするだけのPlugin
+### 対象バージョン=3.3.78
+### URL=
+### 種類=js
+### タグ=
+### 更新日時=2022-11-11 21:59:01
+###
+
+const PluginAwait = {
+    'AWAIT': { // @Promiseを実行を待機して結果を得る。 // @AWAIT
+        type: 'func',
+        josi: [['を']],
+        pure: true,
+        asyncFn: true,
+        fn: function (promise, sys) {
+            return promise
+        },
+        return_none: false
+    }
+}
+
+window.navigator.nako3.addPluginObject("PluginAwait", PluginAwait);

@@ -1,0 +1,241 @@
+### [作品情報]
+### タイトル=電子書籍(epub3)の作成
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=epub3形式の電子書籍をブラウザ上で生成したダウロードする。中身は、以前作成した「OpenAI Gym car-racing」。プログラムコードそのものは貯蔵庫から取得。その他の属性（タイトルとか著者とか）は本プログラムに直書き。
+### 対象バージョン=3.4.4
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2023-01-19 22:12:46
+###
+
+# AWAIT命令のプラグインを取り込む
+!「https://n3s.nadesi.com/plain/1899.js」を取り込む
+
+URL_JSZIPとは定数＝「https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js」
+URL_UUIDとは定数＝「https://cdn.jsdelivr.net/npm/uuid@9.0.0/dist/esm-browser/v4.js」
+
+データフォルダ名とは定数＝「OEBPS」
+BOOK_UUIDとは変数＝「」
+BOOK_TITLEとは定数＝「OpenAI-GymのCarRacingにDDQNによる機械学習っぽいもの」
+BOOK_AUTHORとは定数＝「てぃふと@うぇいく」
+BOOK_MODIFIEDとは定数＝「2022-12-11T11:18:00Z」
+BOOK_DESCとは定数＝「OpenAI-GymのCarRacingの強化学習をDDQN(Double Deep Q Netowrk)っぽいものをなでしこで実装したもの。学習終了の条件を設けていないので学習の様子を眺める用。DDQNではQ-Learningではテーブル参照で行っていたQ値の学習をDeep Learningで行う方法。CarRacingのGym機能自体は別のライブラリを取り込んで利用。」
+BOOK_CODEとは変数＝『』
+
+ZIPとは変数＝NULL
+UUIDとは変数＝NULL
+
+# container.xml
+containerXMLとは変数＝「<?xml version="1.0" encoding="UTF-8"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+    <rootfiles>
+        <rootfile full-path="{データフォルダ名}/standard.opf" media-type="application/oebps-package+xml" />
+    </rootfiles>
+</container>」
+# standard.opf
+standardOPFSとは変数＝「<?xml version="1.0" encoding="UTF-8"?>
+<package unique-identifier="pub-id" version="3.0" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <dc:title>{BOOK_TITLE}</dc:title>
+      <dc:creator id="creator">{BOOK_AUTHOR}</dc:creator>
+      <meta refines="#creator" property="role" scheme="marc:relators" id="role">aut</meta>
+      <dc:language>ja-JP</dc:language>
+      <dc:identifier id="pub-id">urn:uuid:<<uuid>></dc:identifier>
+      <meta property="dcterms:modified">{BOOK_MODIFIED}</meta>
+  </metadata>
+
+  <manifest>
+    <item id="toc" href="toc.xhtml" properties="nav" media-type="application/xhtml+xml" />
+    <item id="cover" href="images/cover.png" properties="cover-image" media-type="image/png" />
+    <item id="content000" href="text/content000.xhtml" media-type="application/xhtml+xml" />
+    <item id="content001" href="text/content001.xhtml" media-type="application/xhtml+xml" />
+    <item id="style001" href="styles/ebook_style.css" media-type="text/css" />
+  </manifest>
+
+  <spine page-progression-direction="ltr">
+    <itemref idref="content000" />
+    <itemref idref="content001" />
+  </spine>
+</package>」
+# toc.xhtml
+navigationとは変数＝「<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="ja">
+  <head>
+    <title>{BOOK_TITLE}</title>
+<style type="text/css">
+ol {波カッコ} list-style: none; {波カッコ閉じ}
+</style>
+  </head>
+  <body>
+    <nav epub:type="toc">
+      <h1>目 次</h1>
+       <ol>
+        <li><a href="text/content000.xhtml">説明</a></li>
+        <li><a href="text/content001.xhtml">コード</a></li>
+      </ol>
+    </nav>
+  </body>
+</html>」
+# cover.png
+coverとは変数＝『
+』
+# fixed-layout-jp.css
+layoutとは変数＝『code {
+  white-space: pre-wrap;
+}
+』
+# content000.xhtml
+page0とは変数＝「<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{BOOK_TITLE}</title>
+  </head>
+  <body>
+    <h5>説明</h5>
+<p><<description>></p>
+  </body>
+</html>」
+# content001.xhtml
+page1とは変数＝「<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="../styles/ebook_style.css" />
+    <title>{BOOK_TITLE}</title>
+  </head>
+  <body>
+    <h5>プログラムコード</h5>
+<code><<program>></code>
+  </body>
+</html>」
+
+●ライブラリ準備とは
+　URL_JSZIPを動的インポートをAWAIT
+　ZIPはWINDOW["JSZip"]
+　MODULEとは変数＝URL_UUIDを動的インポートをAWAIT
+　UUIDはMODULE["default"]
+ここまで
+
+●EPUBZIP生成とは
+　結果とは変数＝「https://n3s.nadesi.com/plain/1930.nako3」からAJAXテキスト取得
+　BOOK_CODEは結果
+　BOOK_UUIDはUUID()
+
+　zipとは変数＝JSZIP作成
+　OPTSとは変数
+　OPTSは{
+　　"compression": "STORE"
+　}
+　zipの"mimetype"に"application/epub+zip"をOPTSでJSZIPファイル作成
+
+　metaとは変数＝zipに"META-INF"を{}でJSZIPフォルダ作成
+　metaの"container.xml"にcontainerXMLを{}でJSZIPファイル作成
+
+　itemとは変数＝zipにデータフォルダ名を{}でJSZIPフォルダ作成
+　opfsとは変数
+　opfsはstandardOPFSの"<<uuid>>"をBOOK_UUIDの実態参照化に置換
+　itemの"standard.opf"にopfsを{}でJSZIPファイル作成
+　itemの"toc.xhtml"にnavigationを{}でJSZIPファイル作成
+
+　imagesとは変数＝zipに"{データフォルダ名}/images"を{}でJSZIPフォルダ作成
+　表紙は表紙画像BLOB生成をAWAIT
+　imagesの"cover.png"に表紙を{}でJSZIPファイル作成
+
+　styleとは変数＝zipに"{データフォルダ名}/styles"を{}でJSZIPフォルダ作成
+　styleの"ebook_style.css"にlayoutを{}でJSZIPファイル作成
+
+　xhtmlとは変数＝zipに"{データフォルダ名}/text"を{}でJSZIPフォルダ作成
+　textとは変数
+　textはpage0の"<<description>>"をBOOK_DESCの実態参照化に置換
+　xhtmlの"content000.xhtml"にtextを{}でJSZIPファイル作成
+　textはpage1の"<<program>>"をBOOK_CODEの実態参照化に置換
+　xhtmlの"content001.xhtml"にtextを{}でJSZIPファイル作成
+
+　zipで戻る
+ここまで
+
+●(zipから)コンテンツBLOB生成とは
+　OPTSとは定数＝{
+　　type:"blob",
+　　mimeType: "application/epub+zip",
+　}
+　contentとは変数＝zipからOPTSでJSZIP非同期生成をAWAIT
+　contentで戻る
+ここまで
+
+●(contentを)ダウンロード開始とは
+　Aとは変数＝"A"のDOM要素作成
+　A["download"]は"test.epub3"
+　A["href"]は"window.URL.createObjectURL"を[content]でJS関数実行
+　Aの『click』を[]でJSメソッド実行
+ここまで
+
+●JSZIP作成とは
+　『(function(JSZip){return new JSZip();})』を[ZIP]でJS関数実行で戻る
+ここまで
+
+●(ZIPのNAMEにDATAをOPTSで)JSZIPファイル作成とは
+　ZIPの"file"を[NAME, DATA, OPTS]でJSメソッド実行
+ここまで
+
+●(ZIPにNAMEをOPTSで)JSZIPフォルダ作成とは
+　ZIPの"folder"を[NAME, OPTS]でJSメソッド実行で戻る
+ここまで
+
+●(ZIPからOPTSで)JSZIP非同期生成とは
+　ZIPの"generateAsync"を[OPTS]でJSメソッド実行で戻る
+ここまで
+
+●(Sを)動的インポートとは
+　『(function(s) {return import(s);})』を[S]でJS関数実行で戻る
+ここまで
+
+●(Sの)実態参照化とは
+　SはSの「&」を「&amp;」に置換
+　SはSの「<」を「&lt;」に置換
+　SはSの「>」を「&gt;」に置換
+　# SはSの「"」を「&quot;」に置換
+　# SはSの「'」を「&apos;」に置換
+　Sで戻る
+ここまで
+
+●表紙画像BLOB生成とは
+　Wとは変数=600
+　Hとは変数=840
+　キャンバス退避とは変数＝描画中キャンバス
+　CANVASとは変数＝「CANVAS」をDOM要素作成
+　CANVAS["width"]はW
+　CANVAS["height"]はH
+　CANVASへ描画開始
+　描画中コンテキスト["textAlign"]は"center"
+　白色に塗り色設定
+　空に線色設定
+　[-0.5, -0.5 , W+1, H+1]に四角描画
+　黒色に塗り色設定
+　「24px」に描画フォント設定
+　BOOK_TITLEを[W/2, H/3*1]に文字描画
+　「18px」に描画フォント設定
+　BOOK_AUTHORを[W/2 H/3*2]に文字描画
+　BLOBとは変数＝描画中キャンバスからBLOB取得をAWAIT
+　キャンバス退避へ描画開始
+　BLOBで戻る
+ここまで
+
+●(CANVASから)BLOB取得とは
+　『(function (C) { return new Promise(r => {C.toBlob(b => { r(b) })})})』を[CANVAS]でJS関数実行で戻る
+ここまで
+
+●UUIDv4生成とは
+　WINDOW["Crypto"]の"randomUUID"を[]でJSメソッド実行で戻る
+ここまで
+
+ライブラリ準備
+zipとは変数＝EPUBZIP生成
+contentとは変数＝zipからコンテンツBLOB生成
+contentをダウンロード開始

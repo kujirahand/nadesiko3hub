@@ -1,0 +1,89 @@
+### [作品情報]
+### タイトル=nako3kvs.nako3 - なでしこ簡単保存API
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=MIT
+### 説明=なでしこ簡単保存API(nako3kvs)を使うライブラリ。
+### 対象バージョン=3.3.50
+### URL=https://nadesiko.net/index.php?nako3kvs
+### 種類=wnako
+### タグ=
+### 更新日時=2022-05-31 23:29:21
+###
+
+//---------------------------------------------------------
+/// ■ なでしこ簡単保存API (nako3kvs) のためのライブラリ
+/// 詳しくは以下をご覧ください。
+/// [URL] https://nadesiko.net/index.php?nako3kvs
+//---------------------------------------------------------
+
+//---------------------------------------------------------
+// 新API
+//---------------------------------------------------------
+// APIのURL
+KVS_API=「https://nadesiko.net/nako3kvs/api.php?」
+
+// 「キー:パスワード」を指定して値を取得
+●(KEY_PWから)KVS取得とは
+　　変数[KEY,PW]=「{KEY_PW}:」を「:」で区切る。
+　　KEY=KEYをURLエンコード。
+　　PW=PWをURLエンコード。
+　　定数 URL=「{KVS_API}mode=get&key={KEY}&password={PW}」
+　　定数 RES=URLからAJAX_JSON取得
+　　もし、RES["result"]="ok"ならば
+　　　　RES["value"]を戻す。
+　　違えば
+　　　　「」を戻す。
+　　ここまで。
+ここまで。
+
+●(KEY_PWへDATAを)KVS設定とは
+　　変数[KEY,PW]=「{KEY_PW}:」を「:」で区切る。
+　　KEY=KEYをURLエンコード。
+　　PW=PWをURLエンコード。
+　　DATA=DATAをURLエンコード。
+　　URL=「{KVS_API}mode=set&key={KEY}&password={PW}&value={DATA}&time={システム時間ミリ秒}」
+　　URLからAJAX_JSON取得
+ここまで。
+
+//---------------------------------------------------------
+// 旧API
+//---------------------------------------------------------
+KVS_CB=「」
+●(CALLBACKのKEYをPWで)KVS取得時とは
+    KEY=(KEYをURLエンコード)。
+    PW=(PWをURLエンコード)。
+    URL=KVS_API&「mode=get&key={KEY}&password={PW}」
+    KVS_CB=CALLBACK;
+    URLにAJAX送信した時には
+　　　　J=対象をJSONデコード
+　　　　対象＝J@「value」
+　　　　KVS_CBを実行。
+　　ここまで。
+ここまで。
+
+//---------------------------------------------------------
+●(CALLBACKのPWでKEYをVALUEに)KVS設定時とは
+    KEY=(KEYをURLエンコード)。
+    PW=(PWをURLエンコード)。
+    VALUE=(VALUEをURLエンコード)。
+    URL=KVS_API&「mode=set&key={KEY}&password={PW}&value={VALUE}」
+    KVS_CB=CALLBACK;
+    URLにAJAX送信した時には
+　　　　J=対象をJSONデコード
+　　　　対象＝J@「result」
+　　　　KVS_CBを実行。
+　　ここまで。
+ここまで。
+
+/*
+//--------------------------------------------------------
+// 使い方
+//--------------------------------------------------------
+!「https://n3s.nadesi.com/plain/nako3kvs.nako3」を取り込む。
+「test:abcd」をKVS取得して表示。
+*/
+もし、プラグイン名＝「メイン」ならば
+　　「test:abcd」へ「<<<病は気から！喜びは最高の治療薬>>>」をKVS設定。
+　　「test:abcd」からKVS取得して表示。
+ここまで。
+//--------------------------------------------------------

@@ -1,0 +1,105 @@
+### [作品情報]
+### タイトル=USB-IO2.0 でナイトライダー (WebHID API)
+### 作者=みけCAT(user_id=135)
+### ライセンス=CC0
+### 説明=USB-IO2.0 のポート1で「1」を出力する位置を往復させる。USB-IO2.0(AKI)にも対応。
+### 対象バージョン=3.4.1
+### URL=https://qiita.com/mikecat_mixc/items/78f1d186d1f75af8244a
+### 種類=wnako
+### タグ=アドベントカレンダー2022
+### 更新日時=2022-12-13 01:31:55
+###
+
+「navigator」をJS実行。
+もし、(それに「hid」が辞書キー存在)がいいえならば
+	「WebHID API 未対応のブラウザのようです。」を表示。
+	「Google Chrome なら動くかもしれません。」を表示。
+	終わり。
+ここまで。
+「document」をJS実行。
+もし、それに「featurePolicy」が辞書キー存在ならば
+	もし、(「document.featurePolicy」の「allowsFeature」を["hid"]でJSメソッド実行)がいいえならば
+		「WebHID API の実行が禁止されているようです。」と表示。
+		「iframe の設定で禁止される可能性があるので、iframe 内ではなく直接開いてください。」と表示。
+		URLは「location.href」をJS実行。
+		リンクテキストノードは「document」の「createTextNode」を["直接開く"]でJSメソッド実行。
+		「a」のDOM部品作成。
+		それの「href」にURLをDOM属性設定。
+		それの「target」に「_top」をDOM属性設定。
+		それにリンクテキストノードをDOM子要素追加。
+		終わり。
+	ここまで。
+ここまで。
+デバイスフィルタは{"filters":[
+	{"vendorId": 0x1352, "productId": 0x0120}, # USB-IO2.0
+	{"vendorId": 0x1352, "productId": 0x0121} # USB-IO2.0(AKI)
+]}。
+「(a) => navigator.hid.requestDevice(a)」をJS実行。
+デバイス配列はそれを[デバイスフィルタ]でAWAIT実行。
+もし、デバイス配列の配列要素数が0と等しいならば
+	「デバイスが選択されませんでした。」と表示。
+	終わり。
+ここまで。
+デバイスはデバイス配列[0]。
+「{デバイス["productName"]} に接続しました。」と表示。
+デバイスオープンは『(function(device) {
+	return async function() {
+		return device.open();
+	};
+})』を[デバイス]でJS関数実行。
+もし、デバイス["opened"]がいいえならば
+	デバイスオープンを[]でAWAIT実行。
+ここまで。
+レポート送信は『(function(device) {
+	return async function(reportId, data) {
+		return device.sendReport(reportId, data);
+	};
+})』を[デバイス]でJS関数実行。
+レポート受信は『(function(device) {
+	const resolveQueue = [];
+	const dataQueue = [];
+	device.oninputreport = function(event) {
+		if(resolveQueue.length > 0) {
+			resolveQueue.shift()(event.data);
+		} else {
+			dataQueue.push(event.data);
+		}
+	};
+	return function() {
+		return new Promise(function(resolve, reject) {
+			if (dataQueue.length > 0) {
+				resolve(dataQueue.shift());
+			} else {
+				resolveQueue.push(resolve);
+			}
+		});
+	};
+})』を[デバイス]でJS関数実行。
+
+● (出力値を) ポート1出力とは
+	入出力コマンド配列は0を64だけ配列要素作成。
+	入出力コマンド配列[0]は0x20。 # デジタル入出力
+	入出力コマンド配列[1]は1。 # ポート1に対する出力を指示
+	入出力コマンド配列[2]は出力値。 # ポート1に出力する値
+
+	入出力コマンドバッファは「(a) => new Uint8Array(a)」を[入出力コマンド配列]でJS関数実行。
+	レポート送信を[0, 入出力コマンドバッファ]でAWAIT実行。
+	レポート受信を[]でAWAIT実行。
+ここまで。
+
+「ナイトライダーを実行します。」を表示。
+「低速」のラベル作成。
+速度バーは[1,100,20]の値指定バー作成。
+「高速」のラベル作成。
+
+点灯位置は0。
+移動方向は1。
+永遠の間
+	(1<<点灯位置)をポート1出力。
+	点灯位置は点灯位置+移動方向。
+	もし、点灯位置<0 または 7<点灯位置 ならば
+		移動方向は-移動方向。
+		点灯位置は点灯位置+移動方向×2。
+	ここまで。
+	1÷(速度バーのテキスト取得)秒待つ。
+ここまで。

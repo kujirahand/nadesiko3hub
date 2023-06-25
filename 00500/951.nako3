@@ -1,0 +1,291 @@
+### [作品情報]
+### タイトル=エディタ設定を動的に設定/取得するライブラリ
+### 作者=Meatwo(user_id=0)
+### ライセンス=CC0
+### 説明=関数でエディタ設定に干渉できます。エディタサイズをさらに高くすることも。...使い道? 知らんな()
+### 対象バージョン=3.2.40
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2022-03-28 17:24:35
+###
+
+/**
+ * Meatwo's Editor Settings Library
+ * 
+ * 『!「https://n3s.nadesi.com/plain/nako3mes.nako3」を取込』で使えます。
+ */
+
+
+
+
+#========================================
+#定数
+#========================================
+
+定数　MESカラーテーマ辞書={
+  "light": "ace/theme/xcode"
+  "Light": "ace/theme/xcode"
+  "ライト": "ace/theme/xcode"
+  "xcode": "ace/theme/xcode"
+  "dark": "ace/theme/monokai"
+  "Dark": "ace/theme/monokai"
+  "ダーク": "ace/theme/monokai"
+  "monokai": "ace/theme/monokai"
+}
+
+
+
+
+#========================================
+#関数
+#========================================
+
+#チェック
+
+関数　MES_Aceエディタチェックとは
+  #Aceエディタならばtrue、でなければfalse。
+  ((「div#nako3code.ace_editor」をDOM要素取得)!=undefined)を戻す。
+。。。
+
+
+#Aceエディタ実行
+
+関数　(Aを)MES_Aceエディタ実行とは
+  それ=['{', '}']。
+  JS実行(「
+    (()=>{それ[0]}
+      const e=ace.edit("nako3code");
+      const s=e.getSession();
+      {A}
+    {それ[1]})();」)。
+。。。
+
+
+#取得
+
+関数　MESカラーテーマ取得とは
+  もしMES_Aceエディタチェックならば
+    「return (e.getTheme()==="ace/theme/monokai")?"Dark":"Light";」をMES_Aceエディタ実行して戻す。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　(Aを|Aに)MESカラーテーマ設定とは
+  もしMES_Aceエディタチェックならば
+    「e.setTheme("{MESカラーテーマ辞書[A]}");」をMES_Aceエディタ実行。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　MES文字サイズ取得とは
+  「#nako3code」をDOM要素取得。
+  それ=それ["style"]["fontSize"]。
+  もし!それならばそれ=NULL。
+  それを戻す。
+。。。
+
+関数　(Aを|Aに)MES文字サイズ設定とは
+  もしMES_Aceエディタチェックならば
+    「e.setFontSize("{A}");」をMES_Aceエディタ実行。
+  違えば
+    「#nako3code」をDOM要素取得して「font-size」に「{A}」をDOMスタイル設定。
+  。。。
+。。。
+
+関数　MES行折り返し取得とは
+  もしMES_Aceエディタチェックならば
+    「return s.getUseWrapMode();」をMES_Aceエディタ実行して戻す。
+  違えば
+    「document.querySelector("#nako3code").wrap !== "off"」をJS実行して戻す。
+  。。。
+。。。
+
+関数　(Aを|Aに)MES行折り返し設定とは
+  もしMES_Aceエディタチェックならば
+    「s.setUseWrapMode(!!{A});」をMES_Aceエディタ実行。
+  違えば
+   「document.querySelector("#nako3code").wrap = (!!{A} ? "soft" : "off");」をJS実行。
+  。。。
+。。。
+
+関数　MESソフトタブ取得とは
+  もしMES_Aceエディタチェックならば
+    「return s.getUseSoftTabs();」をMES_Aceエディタ実行して戻す。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　(Aを|Aに)MESソフトタブ設定とは
+  もしMES_Aceエディタチェックならば
+    「s.setUseSoftTabs(!!{A});」をMES_Aceエディタ実行。
+  違えば
+     NULLを戻す。
+  。。。
+。。。
+
+関数　MESインデントサイズ取得とは
+  もしMES_Aceエディタチェックならば
+    「return s.getTabSize();」をMES_Aceエディタ実行して戻す。
+  違えば
+    「document.querySelector("#nako3code").style.tabSize ?? null;」をJS実行して戻す。
+  。。。
+。。。
+
+関数　(Aを|Aに)MESインデントサイズ設定とは
+  もしMES_Aceエディタチェックならば
+    「s.setTabSize({A});」をMES_Aceエディタ実行。
+  違えば
+    「#nako3code」をDOM要素取得して「tab-size」に「{A}」をDOMスタイル設定。
+  。。。
+。。。
+
+関数　MES空白文字取得とは
+  もしMES_Aceエディタチェックならば
+    「return e.getShowInvisibles();」をMES_Aceエディタ実行して戻す。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　(Aを|Aに)MES空白文字設定とは
+  もしMES_Aceエディタチェックならば
+    「e.setShowInvisibles(!!{A});」をMES_Aceエディタ実行。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　MES高さ取得とは
+  JS実行(「document.querySelector("#nako3code").clientHeight;」)して戻す。
+。。。
+
+関数　(HEIGHTを|HEIGHTに)MES高さ設定とは
+  JS実行(「document.querySelector("#nako3code").style.height="{HEIGHT}"」)。
+。。。
+
+関数　MES助詞下線取得とは
+  もしMES_Aceエディタチェックならば
+    「return e.getOption("underlineJosi");」をMES_Aceエディタ実行して戻す。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　(Aを|Aに)MES助詞下線設定とは
+  もしMES_Aceエディタチェックならば
+    「e.setOption("underlineJosi",!!{A});」をMES_Aceエディタ実行。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　MES読取専用取得とは
+  もしMES_Aceエディタチェックならば
+    「return e.getReadOnly();」をMES_Aceエディタ実行して戻す。
+  違えば
+    「document.querySelector("#nako3code").readOnly;」をJS実行して戻す。
+  。。。
+。。。
+
+関数　(Aを|Aに)MES読取専用設定とは
+  もしMES_Aceエディタチェックならば
+    「e.setReadOnly(!!{A});」をMES_Aceエディタ実行。
+  違えば
+    「document.querySelector("#nako3code").readOnly = !!{A};」をJS実行。
+  。。。
+。。。
+
+関数　MESカーソル位置取得とは
+  もしMES_Aceエディタチェックならば
+    「return e.getCursorPosition();」をMES_Aceエディタ実行。
+    [それ["row"]+1,それ["column"]]を戻す。
+  違えば
+    [NULL,NULL]を戻す。
+  。。。
+。。。
+
+関数　(OBJに|OBJへ)MESカーソル位置移動とは
+  もしMES_Aceエディタチェックならば
+    「e.gotoLine({OBJ[0]},{OBJ[1]},false);」をMES_Aceエディタ実行。
+  違えば
+    NULLを戻す。
+  。。。
+。。。
+
+関数　MESプログラム取得とは
+  もしMES_Aceエディタチェックならば
+    「return e.getValue();」をMES_Aceエディタ実行して戻す。
+  違えば、
+    「#nako3code」をDOM要素取得してテキスト取得して戻す。
+  。。。
+。。。
+
+関数　(Aを)MESプログラム設定とは
+  もしMES_Aceエディタチェックならば
+    それ=Aの『\』を『\\』に置換して『`』を『\`』に置換。
+    「e.setValue(`{それ}`); e.clearSelection();」をMES_Aceエディタ実行。
+  違えば
+    「#nako3code」をDOM要素取得して「{A}」をテキスト設定。
+  。。。
+。。。
+
+
+
+#========================================
+#使用例
+#========================================
+
+もし(プラグイン名="メイン")ならば
+  #!「https://n3s.nadesi.com/plain/nako3mes.nako3」を取込。
+  
+  変数　ボタン設定1=「テスト設定1を適用」のボタン作成。
+  変数　ボタン設定2=「テスト設定2を適用」のボタン作成。
+  
+  関数　設定表示とは
+    「#nako3_info」をDOM要素取得して「」をテキスト設定。
+    「カラー: {MESカラーテーマ取得}」を表示。
+    「文字サイズ: {MES文字サイズ取得}」を表示。
+    「折り返し: {MES行折り返し取得}」を表示。
+    「ソフトタブ: {MESソフトタブ取得}」を表示。
+    「インデントサイズ: {MESインデントサイズ取得}」を表示。
+    「空白表示: {MES空白文字取得}」を表示。
+    「エディタ高さ: {MES高さ取得}」を表示。
+    「助詞下線: {MES助詞下線取得}」を表示。
+    「読取専用: {MES読取専用取得}」を表示。
+    「エディタカーソル: {MESカーソル位置取得}」を表示。
+  。。。
+  
+  ボタン設定1をクリック時には、
+    「ダーク」をMESカラーテーマ設定。
+    「16px」をMES文字サイズ設定。
+    オンをMES行折返設定。
+    オンをMESソフトタブ設定。
+    2をMESインデントサイズ設定。
+    オンをMES空白文字設定。
+    「60vh」をMES高さ設定。
+    オンをMES助詞下線設定。
+    オフをMES読取専用設定。
+    設定表示。
+    「
+テスト設定1: テーマをダークに, readonlyを解除(編集モード関係なく書き込み可), ...」と表示。
+  。。。
+  
+  ボタン設定2をクリック時には、
+    「ライト」をMESカラーテーマ設定。
+    「14px」をMES文字サイズ設定。
+    オフをMES行折返設定。
+    オンをMESソフトタブ設定。
+    2をMESインデントサイズ設定。
+    オフをMES空白文字設定。
+    「60vh」をMES高さ設定。
+    オフをMES助詞下線設定。
+    オンをMES読取専用設定。
+    設定表示。
+    「
+テスト設定2: テーマをライトに, readonlyを強制(編集モード関係なく書き込み禁止), ...」と表示。
+  。。。
+。。。

@@ -1,0 +1,64 @@
+### [作品情報]
+### タイトル=簡単TODO
+### 作者=MH(user_id=0)
+### ライセンス=CC0
+### 説明=簡単なTODOでーす使い方は見れべわかるように作りましたようつべやる予定でーす　https://www.youtube.com/channel/UCcUQqfLAwCX9HgM-4fjFnlw　
+### 対象バージョン=3.2.6
+### URL=https://www.youtube.com/channel/UC1RIFkIeX46PFh_ZbgA95LQ　https://www.youtube.com/channel/UCcUQqfLAwCX9HgM-4fjFnlw
+### 種類=wnako
+### タグ=
+### 更新日時=2021-05-06 10:00:49
+###
+
+# 初期設定
+ファイル名＝「todo.json」
+TODO = []
+
+# 前回の保存内容を読む 
+ファイル名を開いてTODOに代入。
+もし、TODOが未定義ならば、TODO=[]
+
+# 画面をHTMLで作成
+初期画面=『
+    <h1>ToDoリスト</h1>
+    <button id="追加ボタン">TODO追加</button>
+    <div id="表示エリア"></div>
+』
+DOM親要素に初期画面をHTML設定。
+
+「#追加ボタン」をクリックした時には
+　　TODO追加処理。
+ここまで。
+TODO表示。
+
+●TODO表示とは
+　　Sは「」
+　　TODOを反復
+　　　　ボタンID= 「todo{対象キー}」
+　　　　S=S&「<li><button id="{ボタンID}">❌</button>」
+　　　　S=S&「&nbsp;{対象}</li>」
+　　ここまで。
+　　「#表示エリア」に「<ul>{S}</ul>」をHTML設定。
+　　# ❌ボタンを押した時のイベントを設定
+　　TODOを反復
+　　　　ボタンID=「#todo{対象キー}」
+　　　　ボタンIDをクリックした時には
+　　　　　　対象@"id"のTODO削除。
+　　　　ここまで。
+　　ここまで。
+ここまで。
+
+●TODO追加処理とは
+　　「何をするべきですか？」と尋ねる。
+　　もし、それが空ならば戻る。
+　　TODOにそれを配列追加。
+　　TODOをファイル名に保存。
+　　TODO表示。
+ここまで。
+
+●(IDの)TODO削除とは
+　　IDの「todo」を「」に置換して整数変換してNOに代入。
+　　TODOのNOを配列切り取る。
+　　TODOをファイル名に保存。
+　　TODO表示。
+ここまで。

@@ -1,0 +1,235 @@
+### [作品情報]
+### タイトル=簡易オプション選択画面
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=ラジオボタンを並べた簡易的な設定画面を表示する。主にデモやゲームでのオプション選択向け。
+### 対象バージョン=3.3.68
+### URL=
+### 種類=wnako
+### タグ=w_noname
+### 更新日時=2022-09-09 20:42:20
+###
+
+# settingdialog
+
+DLG通常色は"#fff"
+DLG選択色は"#48f"
+
+DLGテンプレートは『<form method="dialog">
+ <table>
+    <tbody>
+    </tbody>
+  </table>
+  <div style="text-align: center">
+    <button value="cancel">CANCEL</button>
+    <button value="start">OK</button>
+  </div>
+</form>』
+
+DLG_OPTSはNULL
+DLG_ELEMはNULL
+DLG_PROMISEはNULL
+DLG_PROMISE_RESOLVEはNULL
+DLG_PROMISE_REJECTはNULL
+
+●(FUNCで)PROMISEとは
+　Pとは変数
+　Pは『(function() {return function(func) {return new Promise(func);}})』を[]でJS関数実行
+　DLG_PROMISEはP(FUNC)
+　DLG_PROMISEで戻る
+ここまで
+
+●(OPTSの|OPTSで)オプション設定画面表示とは
+　DLG_OPTSはOPTS
+　PROMISEには(RESOLVE,REJECT)
+　　対象テーブルとは変数
+　　DLG_PROMISE_RESOLVEはRESOLVE
+　　DLG_PROMISE_REJECTはREJECT
+　　もし、DLG使用可能でなければ、
+　　　DLG_PROMISE_REJECT({理由:"ダイアログ使用不可"})
+　　　戻る
+　　ここまで
+　　DLG_ELEMはDLGテンプレートでDLG作成する。
+　　DLG_ELEMを"body"にDOM子要素追加する
+　　DLG_ELEMの"close"に「DLG_DIALOG_CLOSE」をDOMイベント追加
+　　対象テーブルはDLG_ELEMの"table"をDOM子要素取得
+　　もし、DLG_OPTS["タイトル"]≠NULLならば、
+　　　対象テーブル["Caption"]はDLG_OPTS["タイトル"]
+　　ここまで
+　　もし、DLG_OPTS["OKボタン"]≠NULLならば、
+　　　(DLG_ELEMの「button[value=start]」をDOM子要素取得)にDLG_OPTS["OKボタン"]をDOMテキスト設定
+　　ここまで
+　　もし、DLG_OPTS["CANCELボタン"]≠NULLならば、
+　　　(DLG_ELEMの「button[value=cancel]」をDOM子要素取得)にDLG_OPTS["CANCELボタン"]をDOMテキスト設定
+　　ここまで
+　　TBODYとは変数
+　　ITEMとは変数
+　　SELとは変数
+　　TRとは変数
+　　THとは変数
+　　TDとは変数
+　　Lとは変数
+　　Iとは変数
+　　Tとは変数
+　　TBODYは対象テーブルの"tbody"をDOM子要素取得
+　　ITEMでDLG_OPTS["項目"]を反復する
+　　　TRは"tr"のDOM要素作成
+　　　THは"th"のDOM要素作成
+　　　もし、ITEM["タイトル"]＝NULLならば、
+　　　　THにITEM["名前"]をDOMテキスト設定
+　　　違えば
+　　　　THにITEM["タイトル"]をDOMテキスト設定
+　　　ここまで
+　　　TRにTHをDOM子要素追加
+　　　TDは"td"のDOM要素作成
+　　　SELでITEM["選択肢"]を反復する
+　　　　Lは"label"のDOM要素作成
+　　　　Iは"input"のDOM要素作成
+　　　　Tは""
+　　　　I["name"]はITEM["名前"]
+　　　　I["type"]は"radio"
+　　　　もし、(SELの変数型確認)＝"object"ならば、
+　　　　　I["value"]はSEL["値"]
+　　　　　TはSEL["テキスト"]のDOMテキスト作成
+　　　　違えば、
+　　　　　I["value"]はSEL
+　　　　　TはSELのDOMテキスト作成
+　　　　ここまで
+　　　　IをLにDOM子要素追加
+　　　　TをLにDOM子要素追加
+　　　　LをTDにDOM子要素追加
+　　　ここまで
+　　　TRにTDをDOM子要素追加
+　　　TBODYにTRをDOM子要素追加
+　　ここまで
+　　対象テーブルにDLG初期選択色設定
+　　対象テーブルの"change"に「DLG_RADIO_CLICK」をDOMイベント追加
+　　DLG_ELEMのDLGモーダル開く
+　ここまで
+　DLG_PROMISEで戻る
+ここまで
+
+●DLG_DIALOG_CLOSEとは
+　オプション群とは変数
+　全要素とは変数
+　全要素数とは変数
+　要素とは変数
+　値とは変数
+　結果とは変数
+　対象テーブルとは変数
+　オプション群は{}
+　全要素はDLG_ELEMの"input:checked"をDOM子要素全取得
+　全要素数は全要素の配列要素数
+　全要素数回、
+　　要素は全要素[回数-1]
+　　要素名は要素["name"]の大文字変換
+　　値は要素["value"]
+　　オプション群[要素名]は値
+　ここまで
+　結果はDLG_ELEM["returnValue"]
+　DLG_ELEMの"close"から「DLG_DIALOG_CLOSE」をDOMイベント削除
+　対象テーブルはDLG_ELEMの"table"をDOM子要素取得
+　対象テーブルの"change"から「DLG_RADIO_CLICK」をDOMイベント削除
+　DLG_ELEMを"body"からDOM子要素削除する
+　DLG_ELEMはNULL
+　もし、結果が「start」ならば、
+　　DLG_PROMISE_RESOLVE(オプション群)
+　違えば、
+　　DLG_PROMISE_REJECT({理由:"キャンセル"})
+　ここまで
+ここまで
+
+●(対象テーブルに)DLG初期選択色設定とは
+　LABELSとは変数
+　ラベル数とは変数
+　Lとは変数
+　Qとは変数
+　LABELSは対象テーブルの"label"をDOM子要素全取得
+　ラベル数はLABELSの配列要素数
+　ラベル数回、
+　　LはLABELS[回数-1]
+　　QはLの"input"をDOM子要素取得
+　　もし、Q["value"]＝DLG_OPTS["既定"][Q["name"]]ならば、
+　　　Qの"checked"に(1=1)をDOM属性設定
+　　　Lの"背景色"にDLG選択色をDOMスタイル設定
+　　違えば、
+　　　Lの"背景色"にDLG通常色をDOMスタイル設定
+　　ここまで
+　ここまで
+ここまで
+
+●DLG_RADIO_CLICKとは
+　EVTとは変数
+　対象とは変数
+　LABELとは変数
+　EVTはWINDOW["event"]
+　対象はEVT["target"]
+　もし、(対象["tagName"]を大文字変換)＝"INPUT"＆＆(対象["type"]を大文字変換)＝"RADIO"ならば、
+　　LABELは対象
+　　LABELの間、
+　　　もし、(LABEL["tagName"]を大文字変換)＝"LABEL"ならば、
+　　　　抜ける
+　　　ここまで
+　　　LABELはLABEL["parentNode"]
+　　ここまで
+　　もし、LABELでなければ、
+　　　戻る
+　　ここまで
+　　TDとは変数
+　　TDはLABEL
+　　TDの間、
+　　　もし、(TD["tagName"]を大文字変換)＝"TD"ならば、
+　　　　抜ける
+　　　ここまで
+　　　TDはTD["parentNode"]
+　　ここまで
+　　もし、TDでなければ、
+　　　戻る
+　　ここまで
+　　LABELSとは変数
+　　ラベル数とは変数
+　　Lとは変数
+　　LABELSはTDの"label"をDOM子要素全取得
+　　ラベル数はLABELSの配列要素数
+　　ラベル数回、
+　　　LはLABELS[回数-1]
+　　　Lの"背景色"にDLG通常色をDOMスタイル設定
+　　ここまで
+　　LABELの"背景色"にDLG選択色をDOMスタイル設定
+　ここまで
+ここまで
+
+●(TEXTの)DOMテキスト作成とは
+　DOCUMENTの『createTextNode』を[TEXT]でJSメソッド実行で戻る
+ここまで
+
+##### ダイアログ利用補助機能
+
+●DLG使用可能とは
+　DLGとは変数
+　DLGは"dialog"のDOM要素作成
+　(『(function (DLG) {return typeof DLG.open})』を[DLG]でJS関数実行)≠"undefined"で戻る。
+ここまで
+
+●(SRCで)DLG作成とは
+　eとは変数
+　eは"dialog"のDOM要素作成
+　eにSRCをDOM_HTML設定
+　eで戻る
+ここまで
+
+●(DLGの)DLG開くとは
+　もし、(『(function (DLG) {return typeof DLG.open})』を[DLG]でJS関数実行)＝"undefined"ならば、
+　　「ダイアログ機能は使えません」を表示する。
+　　戻る。
+　ここまで
+　DLGの"open"を[]でJSメソッド実行する。
+ここまで
+
+●(DLGの)DLGモーダル開くとは
+　もし、(『(function (DLG) {return typeof DLG.showModal})』を[DLG]でJS関数実行)＝"undefined"ならば、
+　　「ダイアログ機能は使えません」を表示する。
+　　戻る。
+　ここまで
+　DLGの"showModal"を[]でJSメソッド実行する。
+ここまで

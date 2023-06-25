@@ -1,0 +1,492 @@
+### [作品情報]
+### タイトル=OpenAI-GymのCarRacingにDDQNによる機械学習っぽいもの
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=OpenAI-GymのCarRacingの強化学習をDDQN(Double Deep Q Netowrk)っぽいものをなでしこで実装したもの。学習終了の条件を設けていないので学習の様子を眺める用。DDQNではQ-Learningではテーブル参照で行っていたQ値の学習をDeep Learningで行う方法。CarRacingのGym機能自体は別のライブラリを取り込んで利用。
+### 対象バージョン=3.3.83
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2022-12-11 21:37:04
+###
+
+# OpenAI Gym CarRacing DDQN
+
+# AWAIT命令のプラグインを取り込む
+!「https://n3s.nadesi.com/plain/1899.js」を取り込む
+
+# なでしこv3版のOpen AI Gym CarRacingの環境を取り込む
+!「https://n3s.nadesi.com/plain/1923.nako3」を取り込む
+
+TensorFlowJsURLとは変数
+TensorFlowJsURLは「https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0/dist/tf.fesm.min.js」
+
+TFとは変数
+TFはNULL
+
+強化学習
+
+●強化学習とは
+　TFはTFJSインポートをAWAIT
+　# TFの"enableDebugMode"を[]でJSメソッド実行
+　QENVとは変数
+　ENVとは変数
+　QENVはQENV作成
+　ENVはGYM作成
+
+　QENV["イテレーション数"]は0
+
+　# イテレーションを繰り返す
+　オンの間繰り返す
+
+　　QENV["ゲーム数"]は0
+
+　　# ゲームを繰り返す
+　　(QENV["ゲーム数"]＜QENV["イテレーションゲーム数"])の間繰り返す
+
+　　　STATEはGYMリセット
+　　　QENV["STATE"]はSTATEをRGBA2Gray正規化
+　　　QENV["エピソード報酬"]は0
+　　　QENV["ステップ"]は0
+　　　QENV["連続負報酬回数"]は0
+　　　続行フラグとは変数
+　　　続行フラグはオン
+
+　　　# 1ゲーム分のステップを行う
+　　　(続行フラグ=オン)の間繰り返す
+
+　　　　ACTIONインデックスとは変数
+　　　　ACTIONとは変数
+　　　　ACTIONインデックスはQENVのACTION取得
+　　　　ACTIONはQENV["アクションリスト"][ACTIONインデックス]
+　　　　結果とは変数
+　　　　REWARDとは変数
+　　　　DONEとは変数
+　　　　COMPLETEとは変数
+　　　　REWARDは0
+　　　　(QENV["スキップフレーム数"])回繰り返す
+　　　　　結果はACTIONでGYMステップ
+　　　　　REWARDはREWARD+結果[1]
+　　　　　DONEは結果[2]
+　　　　　COMPLETEは結果[3]
+　　　　　もし、DONEならば、
+　　　　　　抜ける
+　　　　　ここまで
+　　　　ここまで
+
+　　　　もし、QENV["ステップ"]>100&&REWARD＜0ならば、
+　　　　　QENV["連続負報酬回数"]はQENV["連続負報酬回数"]+1
+　　　　違えば、
+　　　　　QENV["連続負報酬回数"]は0
+　　　　ここまで
+　　　　元キャンバスとは変数
+　　　　元キャンバスは描画中キャンバス
+　　　　QENV["オフスクリーン"]へ描画開始
+　　　　GYM描画
+　　　　元キャンバスへ描画開始
+　　　　全描画クリア
+　　　　[0,0,QENV["オフスクリーン"]["width"],QENV["オフスクリーン"]["height"],QENV["画面位置X"],QENV["画面位置Y"],QENV["画面表示W"],QENV["画面表示H"]]にQENV["オフスクリーン"]を画像描画
+
+　　　　# アクセル踏んでブレーキ踏んでなかったら報酬にボーナス。
+　　　　もし、ACTION[1]=1&&ACTION[2]=0ならば、
+　　　　　REWARDはREWARD*1.5
+　　　　ここまで
+
+　　　　次STATEとは変数
+　　　　次STATEは結果[0]をRGBA2Gray正規化
+　　　　QENV["エピソード報酬"]はQENV["エピソード報酬"]+REWARD
+　　　　もし、DONE||QENV["連続負報酬回数"]>25||QENV["エピソード報酬"]<0ならば、
+　　　　　続行フラグはオフ
+　　　　ここまで
+
+　　　　QENVからQENV["STATE"]にACTIONで次STATEのREWARDをリプレイ登録
+
+　　　　QENV["STATE"]は次STATE
+　　　　QENVのACTIONで状態表示
+　　　　QENVの報酬グラフ描画
+　　　　QENVのバッチ学習
+
+　　　　QENV["ステップ"]はQENV["ステップ"]+1
+
+　　　　(1.0/QENV["FPS"])秒待つ
+　　　ここまで
+
+　　　QENV["ゲーム数"]はQENV["ゲーム数"]+1
+　　　QENV["エピソード"]はQENV["エピソード"]+1
+　　　QENV["エピソード報酬履歴"]にQENV["エピソード報酬"]を配列追加
+　　　もし、(QENV["エピソード報酬履歴"]の配列要素数)＞QENV["エピソード報酬履歴最大数"]ならば、
+　　　　QENV["エピソード報酬履歴"]の0を配列切取
+　　　　QENV["エピソード報酬履歴起点"]はQENV["エピソード報酬履歴起点"]+1
+　　　ここまで
+
+　　ここまで
+　　QENV["イテレーション数"]はQENV["イテレーション数"]+1
+　　QENVのバッチ学習
+　　QENV["主ネットワーク"]からQENV["対象ネットワーク"]にTFウェイト複製
+　ここまで
+ここまで
+
+
+●(イメージを)RGBA2Gray正規化とは
+　結果とは変数
+　Xとは変数
+　Yとは変数
+　Iとは変数
+　Aとは変数
+　結果は[]
+　96回繰り返す
+　　Yは回数-1
+　　結果[Y]は[]
+　　96回繰り返す
+　　　Xは回数-1
+　　　結果[Y][X]は[]
+　　　1回繰り返す
+　　　　Cは回数-1
+　　　　Iは(Y*96+X)*4
+　　　　Aは0.2989*イメージ[I+0]+0.5870*イメージ[I+1]+0.1140*イメージ[I+2]
+　　　　結果[Y][X][C]はA/255
+　　　ここまで
+　　ここまで
+　ここまで
+　結果で戻る
+ここまで
+
+●QENV作成とは
+　QENVとは変数
+　QENVは{
+　　GAMMA:0.99,
+　　学習率:0.0001,
+　　イテレーションゲーム数:20,
+　　エピソード:1,
+　　ゲーム数:1,
+　　ステップ:0,
+　　イテレーション数:1,
+　　スキップフレーム数:2,
+　　連続負報酬回数:0,
+　　STATE:NULL,
+　　エピソード報酬:0,
+　　エピソード報酬履歴:[],
+　　画面幅:描画中キャンバス["width"],
+　　画面高:描画中キャンバス["height"],
+　　エピソード報酬履歴起点:0,
+　　リセット猶予:0,
+　　リセット待機ステップ:0,
+　　バッチサイズ:32,
+　　リプレイバッファ:[],
+　　リプレイバッファ容量:500,
+　　アクションリスト:[
+　　　[-1, 1, 0.2], [0, 1, 0.2], [1, 1, 0.2],
+　　　[-1, 1, 0  ], [0, 1, 0  ], [1, 1, 0  ],
+　　　[-1, 0, 0.2], [0, 0, 0.2], [1, 0, 0.2],
+　　　[-1, 0, 0  ], [0, 0, 0  ], [1, 0, 0  ],
+　　],
+　}
+　QENV["グラフX"]はQENV["画面幅"]/10
+　QENV["グラフY"]はQENV["画面高"]/3*2
+　QENV["グラフW"]はQENV["画面幅"]-QENV["グラフX"]*2
+　QENV["グラフH"]はQENV["画面高"]/3-20
+　QENV["エピソード報酬履歴最大数"]はQENV["グラフW"]
+　QENV["アクション数"]はQENV["アクションリスト"]の配列要素数
+　QENV["オフスクリーン"]は"CANVAS"のDOM要素作成
+　QENV["オフスクリーン"]["width"]は800
+　QENV["オフスクリーン"]["height"]はQENV["画面高"]/QENV["画面幅"]*800
+　QENV["画面表示W"]はQENV["画面幅"]/5*3
+　QENV["画面表示H"]はQENV["画面高"]/5*3
+　QENV["画面位置X"]はQENV["画面幅"]/5
+　QENV["画面位置Y"]は20
+　QENVにモデルネットワーク準備
+　QENVで戻る
+ここまで
+
+●(入力SHAPEから出力数の)Qネットワーク作成とは
+　MODELとは変数
+　OPTSとは変数
+　LAYERとは変数
+　MODELはTFの"sequential"を[]でJSメソッド実行
+
+　OPTSは{
+　　"filters": 6,
+　　"kernelSize": [7, 7],
+　　"strides": 3,
+　　"activation": "relu",
+　　"inputShape": 入力SHAPE,
+　　"dataFormat": "channelsLast",
+　}
+　LAYERはTF["layers"]の"conv2d"を[OPTS]でJSメソッド実行
+　MODELの"add"を[LAYER]でJSメソッド実行
+
+　OPTSは{
+　　"poolSize": [2, 2],
+　}
+　LAYERはTF["layers"]の"maxPooling2d"を[OPTS]でJSメソッド実行
+　MODELの"add"を[LAYER]でJSメソッド実行
+
+　OPTSは{
+　　"filters": 12,
+　　"kernelSize": [4, 4],
+　　"activation": "relu",
+　}
+　LAYERはTF["layers"]の"conv2d"を[OPTS]でJSメソッド実行
+　MODELの"add"を[LAYER]でJSメソッド実行
+
+　OPTSは{
+　　"poolSize": [2, 2],
+　}
+　LAYERはTF["layers"]の"maxPooling2d"を[OPTS]でJSメソッド実行
+　MODELの"add"を[LAYER]でJSメソッド実行
+
+　OPTSは{
+　}
+　LAYERはTF["layers"]の"flatten"を[OPTS]でJSメソッド実行
+　MODELの"add"を[LAYER]でJSメソッド実行
+
+　OPTSは{
+　　"units": 216,
+　　"activation": "relu",
+　}
+　LAYERはTF["layers"]の"dense"を[OPTS]でJSメソッド実行
+　MODELの"add"を[LAYER]でJSメソッド実行
+
+　OPTSは{
+　　"units": 出力数,
+　}
+　LAYERはTF["layers"]の"dense"を[OPTS]でJSメソッド実行
+　MODELの"add"を[LAYER]でJSメソッド実行
+
+　MODELで戻る
+ここまで
+
+●(QENVに)モデルネットワーク準備とは
+　QENV["主ネットワーク"]は[96, 96, 1]からQENV["アクション数"]のQネットワーク作成
+　QENV["対象ネットワーク"]は[96, 96, 1]からQENV["アクション数"]のQネットワーク作成
+　OPTIMIZERとは変数
+　OPTSとは変数
+　OPTIMIZERはTF["train"]の"adam"を[QENV["学習率"]]でJSメソッド実行
+　OPTSは{
+　　"loss": TF["losses"]["meanSquaredError"],
+　　"optimizer": OPTIMIZER,
+　}
+　QENV["主ネットワーク"]の"compile"を[OPTS]でJSメソッド実行
+　QENV["主ネットワーク"]からQENV["対象ネットワーク"]にTFウェイト複製
+ここまで
+
+●(QENVからSTATEにACTIONでNEXT_STATEのREWARDを)リプレイ登録とは
+　[STATE,ACTION,NEXT_STATE,REWARD]をQENV["リプレイバッファ"]に配列追加
+　もし、(QENV["リプレイバッファ"]の配列要素数)≧QENV["リプレイバッファ容量"]ならば、
+　　QENV["リプレイバッファ"]の0から200を配列取出
+　ここまで
+ここまで
+
+●(QENVの)バッチ学習とは
+　もし、(QENV["リプレイバッファ"]の配列要素数)＜QENV["バッチサイズ"]ならば、
+　　戻る
+　ここまで
+　STATEリストとは変数
+　ACTIONリストとは変数
+　STATE_NEXTリストとは変数
+　REWARDリストとは変数
+　Lとは変数
+　Iとは変数
+　アイテムとは変数
+　STATEリストは[]
+　ACTIONリストは[]
+　STATE_NEXTリストは[]
+　REWARDリストは[]
+　LはQENV["リプレイバッファ"]の配列要素数
+　(QENV["バッチサイズ"])回繰り返す
+　　IはLの乱数
+　　アイテムはQENV["リプレイバッファ"][I]
+　　STATEリストにアイテム[0]を配列追加
+　　ACTIONリストにアイテム[1]を配列追加
+　　STATE_NEXTリストにアイテム[2]を配列追加
+　　REWARDリストにアイテム[3]を配列追加
+　ここまで
+
+　STATEとは変数
+　STATE_NEXTとは変数
+　NEXTQ推論とは変数
+　NEXTA推論とは変数
+　CURR推論とは変数
+　STATEはSTATEリストをTFtensor4d
+　STATE_NEXTはSTATE_NEXTリストをTFtensor4d
+　NEXTQ推論はQENV["対象ネットワーク"]の"predictOnBatch"を[STATE_NEXT]でJSメソッド実行
+　NEXTA推論はQENV["主ネットワーク"]の"predictOnBatch"を[STATE_NEXT]でJSメソッド実行
+　CURR推論はQENV["主ネットワーク"]の"predictOnBatch"を[STATE]でJSメソッド実行
+　STATE_NEXTをTFdispose
+
+　次Qとは変数
+　次Aとは変数
+　現Qとは変数
+　次QはNEXTQ推論の"data"を[]でJSメソッド実行をAWAIT
+　次AはNEXTA推論の"data"を[]でJSメソッド実行をAWAIT
+　現QはCURR推論の"data"を[]でJSメソッド実行をAWAIT
+　目標Qリストとは変数
+　Jとは変数
+　Kとは変数
+　REWARDとは変数
+　目標Qとは変数
+　次最大Qとは変数
+　目標Qリストは[]
+　(QENV["バッチサイズ"])回繰り返す
+　　Iは回数-1
+　　JはACTIONリスト[I]
+　　REWARDはREWARDリスト[I]
+　　目標Qは[]
+　　次最大QはNULL
+　　(QENV["アクション数"])回繰り返す
+　　　Kは回数-1
+　　　もし、次最大Q=NULL||次A[I*QENV["アクション数"]+K]>次最大Qならば、
+　　　　次最大Qは次Q[I*QENV["アクション数"]+K]
+　　　ここまで
+　　ここまで
+　　(QENV["アクション数"])回繰り返す
+　　　Kは回数-1
+　　　もし、J=Kならば、
+　　　　目標Q[K]はREWARD+QENV["GAMMA"]*次最大Q
+　　　違えば、
+　　　　目標Q[K]は現Q[I*QENV["アクション数"]+K]
+　　　ここまで
+　　ここまで
+　　目標Qリストに目標Qを配列追加
+　ここまで
+　NEXTQ推論をTFdispose
+　NEXTA推論をTFdispose
+　CURR推論をTFdispose
+
+　OPTSとは変数
+　OPTSは{
+　　"epochs":1,
+　}
+　目標Qは目標QリストをTFtensor2d
+　QENV["主ネットワーク"]の"fit"を[STATE,目標Q,OPTS]でJSメソッド実行をAWAIT
+
+　STATEをTFdispose
+　目標QをTFdispose
+ここまで
+
+●(QENVの)ACTION取得とは
+　Eとは変数
+　Eは0.5*(1/(QENV["イテレーション数"]+1))
+　もし、E<RNDならば、
+　　STATEとは変数
+　　STATEリストとは変数
+　　推論とは変数
+　　データとは変数
+　　STATEは[QENV["STATE"]]をTFtensor4d
+　　推論はQENV["主ネットワーク"]の"predictOnBatch"を[STATE]でJSメソッド実行
+　　データは推論の"data"を[]でJSメソッド実行をAWAIT
+　　STATEをTFdispose
+　　推論をTFdispose
+　　最大Qとは変数
+　　Iとは変数
+　　最大QIとは変数
+　　最大QはNULL
+　　最大QIはNULL
+　　(QENV["アクション数"])回繰り返す
+　　　Iは回数-1
+　　　もし、最大Q=NULL||データ[I]>最大Qならば、
+　　　　最大QIはI
+　　　　最大Qはデータ[I]
+　　　ここまで
+　　ここまで
+　　最大QIで戻る
+　ここまで
+　(QENV["アクション数"])の乱数で戻る
+ここまで
+
+●(QENVの)報酬グラフ描画とは
+　1に線太さ設定
+　黒色に線色設定
+　空に塗り色設定
+　[QENV["グラフX"],QENV["グラフY"],QENV["グラフW"],QENV["グラフH"]]の四角描画
+　「12px sans-serif」に描画フォント設定
+　描画中コンテキスト["textAlign"]は"right"
+　描画中コンテキスト["textBaseline"]は"middle"
+　[QENV["グラフX"]-2,QENV["グラフY"]]に500を文字描画
+　[QENV["グラフX"]-2,QENV["グラフY"]+QENV["グラフH"]]に0を文字描画
+　描画中コンテキスト["textAlign"]は"center"
+　[QENV["グラフX"],QENV["グラフY"]+QENV["グラフH"]+8]に(1+QENV["エピソード報酬履歴起点"])を文字描画
+　[QENV["グラフX"]+QENV["グラフW"],QENV["グラフY"]+QENV["グラフH"]+8]に(QENV["エピソード報酬履歴起点"]+QENV["エピソード報酬履歴最大数"])を文字描画
+　Xとは変数
+　Yとは変数
+　報酬とは変数
+　Xは0
+　報酬でQENV["エピソード報酬履歴"]を反復する
+　　青色に塗り色設定
+　　青色に線色設定
+　　Yは報酬/500*QENV["グラフH"]
+　　[QENV["グラフX"]+X,QENV["グラフY"]+QENV["グラフH"]-Y,1,1]に四角描画
+　　XはX+1
+　ここまで
+ここまで
+
+●(QENVのACTIONで)状態表示とは
+　「16px sans-serif」に描画フォント設定
+　描画中コンテキスト["textAlign"]は"right"
+　描画中コンテキスト["textBaseline"]は"middle"
+　黒色に塗り色設定
+　[120,10]に「エピソード:」を文字描画
+　[180,10]にQENV["エピソード"]を文字描画
+　[260,10]に「ステップ:」を文字描画 
+　[300,10]にQENV["ステップ"]を文字描画
+　[350,10]に「操作:」を文字描画
+　Mとは変数
+　Aとは変数
+　Bとは変数
+　もし、ACTION[0]<0ならば、
+　　Mは「←」
+　違えばもし、ACTION[0]>0ならば、
+　　Mは「→」
+　違えば、
+　　Mは「・」
+　ここまで
+　もし、ACTION[1]>0ならば、
+　　Aは「↑」
+　違えば、
+　　Aは「・」
+　ここまで
+　もし、ACTION[2]>0ならば、
+　　Bは「↓」
+　違えば、
+　　Bは「・」
+　ここまで
+　[400,10]に「{M}{A}{B}」を文字描画
+ここまで
+
+●TFJSインポートとは
+　TensorFlowJsURLを動的インポートで戻る
+ここまで
+
+●(Aを)TFtensor2dとは
+　TFの"tensor2d"を[A]でJSメソッド実行で戻る
+ここまで
+
+●(Aを)TFtensor4dとは
+　TFの"tensor4d"を[A]でJSメソッド実行で戻る
+ここまで
+
+●(Aを)TFdisposeとは
+　TFの"dispose"を[A]でJSメソッド実行
+ここまで
+
+●(SRCからDSTに)TFウェイト複製とは
+　学習フラグとは変数
+　学習フラグはNULL
+　もし、SRC["trainable"]がDST["trainable"]でなければ、
+　　学習フラグはDST["trainable"]
+　ここまで
+　WEIGHTとは変数
+　WEIGHTはSRCの"getWeights"を[]でJSメソッド実行
+　DSTの"setWeights"を[WEIGHT]でJSメソッド実行
+　もし、学習フラグ≠NULLならば、
+　　DST["trainable"]は学習フラグ
+　ここまで
+ここまで
+
+●(Sを)動的インポートとは
+　『(function(s) {return import(s);})』を[S]でJS関数実行で戻る
+ここまで
+
+●RNDとは
+　『Math.random』を[]でJS関数実行で戻る
+ここまで

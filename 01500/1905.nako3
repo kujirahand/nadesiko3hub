@@ -1,0 +1,1342 @@
+### [作品情報]
+### タイトル=OpenAI-GymのBipedalWalker
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=OpenAI-GymのBipedalWalker(二足歩行ロボ)シミュレータ。もともと付属している歩行ルーチンも持ってきたのでそれっぽく歩くところが見られる。説明などはソースの下の方参照。転ぶか一定距離歩くと自動的にリスタート。途中でスタックしてしまった場合は永遠にそのまま。GYMから受け取れる状態(STATE)を画面上に表示。
+### 対象バージョン=3.3.80
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2022-11-29 21:54:07
+###
+
+!「https://n3s.nadesi.com/plain/1899.js」を取り込む
+
+URL_PLANCKは「https://cdn.jsdelivr.net/npm/planck-js@0.4.0-alpha.1/dist/planck.min.js」
+
+PLとは変数
+GYMENVとは変数
+
+PLはNULL
+GYMENVはNULL
+
+表示SCALEは30
+SCALEは30
+
+機体性能仕様は{
+　MOTORS_TORQUE: 80,
+　SPEED_HIP: 4,
+　SPEED_KNEE: 6,
+　LIDAR_RANGE: 160/SCALE,
+}
+
+機体構造仕様は{
+　HULL_POLY:[
+　  {"x":-30 / SCALE,"y":9 / SCALE},
+　  {"x":6 / SCALE,"y":9 / SCALE},
+　  {"x":34 / SCALE,"y":1 / SCALE},
+　  {"x":34 / SCALE,"y":-8 / SCALE},
+　  {"x":-30 / SCALE,"y":-8 / SCALE}
+　],
+　LEG_DOWN: 8 / SCALE,
+　LEG_W: 8 / SCALE,
+　LEG_H: 34 / SCALE,
+}
+
+地形仕様は{
+　TERRAIN_STEP: 14 / SCALE,
+　TERRAIN_LENGTH: 200,  # in steps
+　TERRAIN_HEIGHT: 描画中キャンバス["height"] / 4 / 表示SCALE,
+　TERRAIN_GRASS: 10,    # low long are grass spots, in steps
+　TERRAIN_STARTPAD: 20, # in steps
+　FRICTION: 2.5,
+　CLOUD_HEIGHT: 描画中キャンバス["height"] * 3 / 4 / 表示SCALE,
+}
+
+●(worldのXYに仕様で)二足歩行ロボ作成とは
+　Xとは変数
+　Yとは変数
+　Pとは変数
+　座標リストとは変数
+　POSとは変数
+　形とは変数
+　OPTSとは変数
+　H仕様とは変数
+　S仕様とは変数
+
+　H仕様は仕様[0]
+　S仕様は仕様[1]
+
+　XはXY[0]
+　YはXY[1]
+
+　胴体とは変数
+　PはVec2(X,Y)
+　胴体はworldに[P]で動的Body作成
+　座標リストは[]
+　H仕様["HULL_POLY"]をPOSで反復する
+　　VはVec2(POS["x"],POS["y"])
+　　　座標リストにVを配列追加
+　ここまで
+　形は座標リストのPolygon作成
+　OPTSは{
+　　"density":5.0,
+　　"friction":0.1,
+　　"filterCategoryBits":32,
+　　"filterMaskBits":1,
+　　"restitution":0.0,
+　}
+　胴体に形をOPTSで造形登録
+　胴体["色L"]は"#7F33E4"
+　胴体["色F"]は"#4C4C7F"
+
+　右上脚とは変数
+　PはVec2(X,Y-H仕様["LEG_H"]/2-H仕様["LEG_DOWN"])
+　右上脚はworldに[P, -0.05]で動的Body作成
+　形は[H仕様["LEG_W"]/2, H仕様["LEG_H"]/2]のBox作成
+　OPTSは{
+　　"density":1.0,
+　　"filterCategoryBits":32,
+　　"filterMaskBits":1,
+　}
+　右上脚に形をOPTSで造形登録
+　右上脚["色L"]は"#B26598"
+　右上脚["色F"]は"#7F4C65"
+
+　右下脚とは変数
+　PはVec2(X,Y-H仕様["LEG_H"]*3/2-H仕様["LEG_DOWN"])
+　右下脚はworldに[P, -0.05]で動的Body作成
+　形は[H仕様["LEG_W"]/2*0.8, H仕様["LEG_H"]/2]のBox作成
+　OPTSは{
+　　"density":1.0,
+　　"filterCategoryBits":32,
+　　"filterMaskBits":1,
+　}
+　右下脚に形をOPTSで造形登録
+　右下脚["色L"]は"#B26598"
+　右下脚["色F"]は"#7F4C65"
+
+　右股関節とは変数
+　PはVec2(X+0,Y-H仕様["LEG_DOWN"])
+　OPTSは{
+　　"lowerAngle": -0.8,
+　　"upperAngle": 1.1,
+　　"enableLimit": (1=1),
+　　"maxMotorTorque": S仕様["MOTORS_TORQUE"],
+　　"motorSpeed": -1,
+　　"enableMotor": (1=1),
+　}
+　右股関節はOPTSで胴体から右上脚をPに回転Joint作成
+　worldに右股関節をJoint登録
+
+　右膝関節とは変数
+　PはVec2(X+0,Y-H仕様["LEG_DOWN"]-H仕様["LEG_H"])
+　OPTSは{
+　　"lowerAngle": -1.6,
+　　"upperAngle": -0.1,
+　　"enableLimit": (1=1),
+　　"maxMotorTorque": S仕様["MOTORS_TORQUE"],
+　　"motorSpeed": 1,
+　　"enableMotor": (1=1),
+　}
+　右膝関節はOPTSで右上脚から右下脚をPに回転Joint作成
+　worldに右膝関節をJoint登録
+
+　左上脚とは変数
+　PはVec2(X,Y-H仕様["LEG_H"]/2-H仕様["LEG_DOWN"])
+　左上脚はworldに[P, 0.05]で動的Body作成
+　形は[H仕様["LEG_W"]/2, H仕様["LEG_H"]/2]のBox作成
+　OPTSは{
+　　"density":1.0,
+　　"filterCategoryBits":32,
+　　"filterMaskBits":1,
+　}
+　左上脚に形をOPTSで造形登録
+　左上脚["色L"]は"#803396"
+　左上脚["色F"]は"#4D1A33"
+
+　左下脚とは変数
+　PはVec2(X,Y-H仕様["LEG_H"]*3/2-H仕様["LEG_DOWN"])
+　左下脚はworldに[P, 0.05]で動的Body作成
+　形は[H仕様["LEG_W"]/2*0.8, H仕様["LEG_H"]/2]のBox作成
+　OPTSは{
+　　"density":1.0,
+　　"filterCategoryBits":32,
+　　"filterMaskBits":1,
+　}
+　左下脚に形をOPTSで造形登録
+　左下脚["色L"]は"#803396"
+　左下脚["色F"]は"#4D1A33"
+
+　左股関節とは変数
+　PはVec2(X+0,Y-H仕様["LEG_DOWN"])
+　OPTSは{
+　　"lowerAngle": -0.8,  # 約45度
+　　"upperAngle": 1.1,   # 約63度
+　　"enableLimit": (1=1),
+　　"maxMotorTorque": S仕様["MOTORS_TORQUE"],
+　　"motorSpeed": 1,
+　　"enableMotor": (1=1),
+　}
+　左股関節はOPTSで胴体から左上脚をPに回転Joint作成
+　worldに左股関節をJoint登録
+
+　左膝関節とは変数
+　PはVec2(X+0,Y-H仕様["LEG_DOWN"]-H仕様["LEG_H"])
+　OPTSは{
+　　"lowerAngle": -1.6,  # 約90度
+　　"upperAngle": -0.1,  # 約5度
+　　"enableLimit": (1=1),
+　　"maxMotorTorque": S仕様["MOTORS_TORQUE"],
+　　"motorSpeed": 1,
+　　"enableMotor": (1=1),
+　}
+　左膝関節はOPTSで左上脚から左下脚をPに回転Joint作成
+　worldに左膝関節をJoint登録
+
+　機体情報とは変数
+　機体情報は{}
+　機体情報["胴体"]は胴体
+　機体情報["右上脚"]は右上脚
+　機体情報["右下脚"]は右下脚
+　機体情報["右股関節"]は右股関節
+　機体情報["右膝関節"]は右膝関節
+　機体情報["左上脚"]は左上脚
+　機体情報["左下脚"]は左下脚
+　機体情報["左股関節"]は左股関節
+　機体情報["左膝関節"]は左膝関節
+　機体情報で戻る
+ここまで
+
+●(ENVの)雲作成とは
+　仕様とは変数
+　雲数とは変数
+　Iとは変数
+　Jとは変数
+　Xとは変数
+　X1とは変数
+　X2とは変数
+　Yとは変数
+　Rとは変数
+　Pとは変数
+　POLYとは変数
+　雲リストとは変数
+
+　仕様はENV["T仕様"]
+　雲数は(仕様["TERRAIN_LENGTH"]/20)の整数部分
+　雲リストは[]
+　(雲数)回繰り返す
+　　Iは回数-1
+　　XはRND*仕様["TERRAIN_LENGTH"]*仕様["TERRAIN_STEP"]
+　　Yは仕様["CLOUD_HEIGHT"]
+　　X1はNULL
+　　X2はNULL
+　　POLYは[]
+　　5回繰り返す
+　　　Jは回数-1
+　　　Rは2*PI*J/5
+　　　Pは[
+　　　　X+15*仕様["TERRAIN_STEP"]*SIN(R)+RND*5*仕様["TERRAIN_STEP"],
+　　　　Y+5*仕様["TERRAIN_STEP"]*COS(R)+RND*5*仕様["TERRAIN_STEP"]
+　　　]
+　　　POLYにPを配列追加
+　　　もし、P[0]<X1||X1=NULLならば、
+　　　　X1はP[0]
+　　　ここまで
+　　　もし、P[0]>X2||X2=NULLならば、
+　　　　X2はP[0]
+　　　ここまで
+　　ここまで
+　　雲リストに[POLY,X1,X2]を配列追加
+　ここまで
+　雲リストで戻る
+ここまで
+
+●(ENVの)地形作成とは
+　worldとは変数
+　仕様とは変数
+　状態リストとは変数
+　Xとは変数
+　Iとは変数
+　Yとは変数
+　Cとは変数
+　元Yとは変数
+　座標リストとは変数
+　状態とは変数
+　速度とは変数
+　地形リストとは変数
+　地形Xリストとは変数
+　地形Yリストとは変数
+　地形OPTSとは変数
+　階段数とは変数
+　階段幅とは変数
+　階段高とは変数
+　一時とは変数
+　形とは変数
+　Pとは変数
+　物とは変数
+
+　worldはENV["World"]
+　仕様はENV["T仕様"]
+　状態リストは["GRASS","STUMP","STAIRS","PIT"]
+　Yは仕様["TERRAIN_HEIGHT"]
+　Cは仕様["TERRAIN_STARTPAD"]
+　一時はオフ
+　状態は"GRASS"
+　速度は0
+
+　地形リストは[]
+　地形Xリストは[]
+　地形Yリストは[]
+　地形OPTSは{
+　　"friction": 仕様["FRICTION"],
+　}
+　階段数は0
+　階段幅は0
+　階段高は0
+　元Yは0
+　(仕様["TERRAIN_LENGTH"])回繰り返す
+　　Iは回数-1
+　　XはI*仕様["TERRAIN_STEP"]
+　　地形XリストにXを配列追加
+　　もし、状態＝"GRASS"&&!一時ならば、
+　　　速度は0.8 * 速度 + 0.01 * SIGN(仕様["TERRAIN_HEIGHT"] - Y)
+　　　もし、I＞仕様["TERRAIN_STARTPAD"]ならば、
+　　　　速度は速度+(RND*2-1)*0.05
+　　　ここまで
+　　　YはY+速度
+　　違えばもし、状態＝"PIT"&&一時ならば、
+　　　Cは(2の乱数)+3
+　　　座標リストは[
+　　　　Vec2(0,0),
+　　　　Vec2(仕様["TERRAIN_STEP"], 0),
+　　　　Vec2(仕様["TERRAIN_STEP"], -4*仕様["TERRAIN_STEP"]),
+　　　　Vec2(0, -4*仕様["TERRAIN_STEP"])
+　　　]
+　　　形は座標リストのPolygon作成
+　　　PはVec2(X,Y)
+　　　物はworldに[P]でBody作成
+　　　物に形を地形OPTSで造形登録
+　　　物["色L"]は"#FFFFFF"
+　　　物["色F"]は"#959595"
+　　　地形リストに物を配列追加
+　　　PはVec2(X+仕様["TERRAIN_STEP"]*C,Y)
+　　　物はworldに[P]でBody作成
+　　　物に形を地形OPTSで造形登録
+　　　物["色L"]は"#FFFFFF"
+　　　物["色F"]は"#959595"
+　　　地形リストに物を配列追加
+　　　CはC+2
+　　　元YはY
+　　違えばもし、状態＝"PIT"&&!一時ならば、
+　　　Yは元Y
+　　　もし、C＞1ならば、
+　　　　YはY-4*仕様["TERRAIN_STEP"]
+　　　ここまで
+　　違えばもし、状態＝"STUMP"&&一時ならば、
+　　　Cは(2の乱数)+1
+　　　座標リストは[
+　　　　Vec2(0,0),
+　　　　Vec2(仕様["TERRAIN_STEP"]*C, 0),
+　　　　Vec2(仕様["TERRAIN_STEP"]*C, C*仕様["TERRAIN_STEP"]),
+　　　　Vec2(0,C*仕様["TERRAIN_STEP"])
+　　　]
+　　　形は座標リストのPolygon作成
+　　　PはVec2(X,Y)
+　　　物はworldに[P]でBody作成
+　　　物に形を地形OPTSで造形登録
+　　　物["色L"]は"#FFFFFF"
+　　　物["色F"]は"#959595"
+　　　地形リストに物を配列追加
+　　違えばもし、状態＝"STAIRS"&&一時ならば、
+　　　階段高は(2の乱数)*2-1
+　　　階段幅は(1の乱数)+4
+　　　階段数は(2の乱数)+3
+　　　元YはY
+　　　(階段数)回繰り返す
+　　　　Sは回数-1
+　　　　座標リストは[
+　　　　　Vec2(0,0),
+　　　　　Vec2(階段幅*仕様["TERRAIN_STEP"], 0),
+　　　　　Vec2(階段幅*仕様["TERRAIN_STEP"], 階段高*仕様["TERRAIN_STEP"]),
+　　　　　Vec2(0,階段高*仕様["TERRAIN_STEP"])
+　　　　]
+　　　　形は座標リストのPolygon作成
+　　　　PはVec2(X+S*階段幅*仕様["TERRAIN_STEP"],Y+S*階段高*仕様["TERRAIN_STEP"])
+　　　　物はworldに[P]でBody作成
+　　　　物に形を地形OPTSで造形登録
+　　　　物["色L"]は"#FFFFFF"
+　　　　物["色F"]は"#959595"
+　　　　地形リストに物を配列追加
+　　　ここまで
+　　　Cは階段数*階段幅
+　　違えばもし、状態＝"STAIRS"&&!一時ならば、
+　　　Sは階段数*階段幅-C-階段高
+　　　NはS/階段幅
+　　　Yは元Y+(N*階段高)*仕様["TERRAIN_STEP"]
+　　ここまで
+　　一時はオフ
+　　地形YリストにYを配列追加
+　　CはC-1
+　　もし、Cが0ならば、
+　　　Cは(((仕様["TERRAIN_GRASS"]-仕様["TERRAIN_GRASS"] / 2)の乱数)+仕様["TERRAIN_GRASS"] / 2)の整数部分
+　　　もし、状態＝"GRASS"&&ENV["ハードモード"]ならば、
+　　　　状態は状態リスト[(3の乱数)+1]
+　　　　一時はオン
+　　　違えば
+　　　　状態は"GRASS"
+　　　　一時はオン
+　　　ここまで
+　　ここまで
+　ここまで
+　地形OPTSは{
+　　"friction": 仕様["FRICTION"],
+　　"filterCategoryBits": 1,
+　}
+　地形形状リストとは変数
+　地形形状リストは[]
+　POLYは[]
+　(仕様["TERRAIN_LENGTH"])回繰り返す
+　　Iは回数-1
+　　PはVec2(地形Xリスト[I],地形Yリスト[I])
+　　POLYにPを配列追加
+　　地形形状リストに[地形Xリスト[I],地形Yリスト[I]]を配列追加
+　ここまで
+　形はPOLYのChain作成
+　物はworldに[]でBody作成
+　物に形を地形OPTSで造形登録
+　物["色E"]は"#7CFF7C"
+　物["色O"]は"#7C007C"
+　地形リストに物を配列追加
+　[地形リスト,地形形状リスト]で戻る
+ここまで
+
+●GYM作成とは
+　もし、GYMENV!=NULLならば、
+　　「このGym環境は１回のみ１つしか作成できません」でエラー発生
+　ここまで
+　もし、PL=NULLならば、
+　　Planckライブラリ読込
+　ここまで
+
+　ENVとは変数
+　ENVは{
+　　"ハードモード": (0=1),
+　　"FPS": 50,
+　　"INITIAL_RANDOM": 5,
+　　"H仕様": 機体構造仕様,
+　　"S仕様": 機体性能仕様,
+　　"T仕様": 地形仕様,
+　}
+　OPTSとは変数
+　OPTSは{
+　　"gravity":Vec2(0,-10)
+　}
+　ENV["World"]はOPTSでNewWorld
+　ENV["機体破損"]はオフ
+　ENV["左脚接地"]はオフ
+　ENV["右脚接地"]はオフ
+　ENV["機体"]はNULL
+　ENV["地形"]はNULL
+　ENV["地形形状"]はNULL
+　ENV["World"]の"begin-contact"にONイベント設定には(contact)
+　　形Aとは変数
+　　形Bとは変数
+　　物Aとは変数
+　　物Bとは変数
+　　形Aはcontactの構造A取得
+　　形Bはcontactの構造B取得
+　　物Aは形AのBody取得
+　　物Bは形BのBody取得
+　　もし、物AがGYMENV["機体"]["胴体"]ならば、
+　　　GYMENV["機体破損"]はオン
+　　違えばもし、物BがGYMENV["機体"]["胴体"]ならば、
+　　　GYMENV["機体破損"]はオン
+　　ここまで
+　　もし、物A＝GYMENV["機体"]["左下脚"]||物B＝GYMENV["機体"]["左下脚"]ならば、
+　　　GYMENV["左脚接地"]はオン
+　　ここまで
+　　もし、物A＝GYMENV["機体"]["右下脚"]||物B＝GYMENV["機体"]["右下脚"]ならば、
+　　　GYMENV["右脚接地"]はオン
+　　ここまで
+　ここまで
+　ENV["World"]の"end-contact"にONイベント設定には(contact)
+　　形Aとは変数
+　　形Bとは変数
+　　物Aとは変数
+　　物Bとは変数
+　　形Aはcontactの構造A取得
+　　形Bはcontactの構造B取得
+　　物Aは形AのBody取得
+　　物Bは形BのBody取得
+　もし、物A＝GYMENV["機体"]["左下脚"]||物B＝GYMENV["機体"]["左下脚"]ならば、
+　　　GYMENV["左脚接地"]はオフ
+　　ここまで
+　　もし、物A＝GYMENV["機体"]["右下脚"]||物B＝GYMENV["機体"]["右下脚"]ならば、
+　　　GYMENV["右脚接地"]はオフ
+　　ここまで
+　ここまで
+　GYMENVはENV
+　ENVで戻る
+ここまで
+
+●GYMクリアとは
+　ENVとは変数
+　worldとは変数
+　何とは変数
+　ENVはGYMENV
+　worldはENV["World"]
+　もし、ENV["地形"]≠NULLならば、
+　　worldのENV["地形"]をPLANCK一括破棄
+　　ENV["地形"]はNULL
+　ここまで
+　もし、ENV["機体"]≠NULLならば、
+　　worldのENV["機体"]をPLANCK一括破棄
+　　ENV["機体"]はNULL
+　ここまで
+ここまで
+
+●GYMリセットとは
+　ENVとは変数
+　ENVはGYMENV
+
+　GYMクリア
+
+　Xとは変数
+　Yとは変数
+　T仕様とは変数
+　H仕様とは変数
+　S仕様とは変数
+
+　T仕様はENV["T仕様"]
+　H仕様はENV["H仕様"]
+　S仕様はENV["S仕様"]
+　XはT仕様["TERRAIN_STEP"] * T仕様["TERRAIN_STARTPAD"] / 2
+　YはT仕様["TERRAIN_HEIGHT"] + 2 * H仕様["LEG_H"] + H仕様["LEG_DOWN"]
+
+　ENV["左脚接地"]はオフ
+　ENV["右脚接地"]はオフ
+　ENV["機体破損"]はオフ
+　ENV["ライダー"]はNULL
+　ENV["現ライダー"]はNULL
+　ENV["ライダー描画カウンタ"]は0
+　ENV["前回SHAPING"]はNULL
+　Pとは変数
+　Pは[X,Y]
+　ENV["機体"]はENV["World"]のPに[H仕様, S仕様]で二足歩行ロボ作成
+
+　力加減とは変数
+　力ベクトルとは変数
+　力加減は(ENV["INITIAL_RANDOM"]*2*RND)-ENV["INITIAL_RANDOM"]
+　力ベクトルはVec2(力加減,0)
+　ENV["機体"]["胴体"]を力ベクトルに重心押す
+
+　地形とは変数
+　地形はENVの地形作成
+　ENV["地形"]は地形[0]
+　ENV["地形形状"]は地形[1]
+
+　ENV["雲形状"]はENVの雲作成
+
+　結果とは変数
+　結果は[0,0,0,0]でGYMステップ
+　結果[0]で戻る
+ここまで
+
+●(ACTIONで)GYMステップとは
+　ENVとは変数
+　worldとは変数
+　機体とは変数
+　S仕様とは変数
+　T仕様とは変数
+
+　ENVはGYMENV
+　worldはENV["World"]
+　機体はENV["機体"]
+　S仕様はENV["S仕様"]
+　T仕様はENV["T仕様"]
+
+　ENV["ACTION"]はACTION
+
+　# PはVec2(0,20)
+　# 機体["胴体"]をPに重心押す
+
+　Tとは変数
+　機体["左股関節"]に(S仕様["SPEED_HIP"] * SIGN(ACTION[0]))でモーター速さ設定
+　TはS仕様["MOTORS_TORQUE"]*CLIP(ABS(ACTION[0]),0,1)
+　機体["左股関節"]にTでモーター最大トルク設定
+　機体["左膝関節"]に(S仕様["SPEED_KNEE"] * SIGN(ACTION[1]))でモーター速さ設定
+　TはS仕様["MOTORS_TORQUE"]*CLIP(ABS(ACTION[1]),0,1)
+　機体["左膝関節"]にTでモーター最大トルク設定
+　機体["右股関節"]に(S仕様["SPEED_HIP"] * SIGN(ACTION[2]))でモーター速さ設定
+　TはS仕様["MOTORS_TORQUE"]*CLIP(ABS(ACTION[2]),0,1)
+　機体["右股関節"]にTでモーター最大トルク設定
+　機体["右膝関節"]に(S仕様["SPEED_KNEE"] * SIGN(ACTION[3]))でモーター速さ設定
+　TはS仕様["MOTORS_TORQUE"]*CLIP(ABS(ACTION[3]),0,1)
+　機体["右膝関節"]にTでモーター最大トルク設定
+　worldを[1.0 / ENV["FPS"], 6 * 30, 2 * 30]でPLStep
+
+　POSとは変数
+　VELとは変数
+　POSは機体["胴体"]の位置取得
+　VELは機体["胴体"]の線速度取得
+
+　GYMENV["ライダー"]はS仕様のworldでPOSからライダー探査
+
+　STATEとは変数
+　STATEは[]
+　STATE[0]は(機体["胴体"]の回転角取得)
+　STATE[1]は(機体["胴体"]の回転速度取得) * 2.0 / ENV["FPS"]
+　STATE[2]は0.3 * VEL["x"] * ( 600 / SCALE ) / ENV["FPS"]
+　STATE[3]は0.3 * VEL["y"] * ( 400 / SCALE ) / ENV["FPS"]
+　STATE[4]は(機体["左股関節"]のJoint回転角度取得)
+　STATE[5]は(機体["左股関節"]のJoint角速度取得) / S仕様["SPEED_HIP"]
+　STATE[6]は(機体["左膝関節"]のJoint回転角度取得) + 1.0
+　STATE[7]は(機体["左膝関節"]のJoint角速度取得) / S仕様["SPEED_KNEE"]
+　STATE[8]は0
+　STATE[9]は(機体["右股関節"]のJoint回転角度取得)
+　STATE[10]は(機体["右股関節"]のJoint角速度取得) / S仕様["SPEED_HIP"]
+　STATE[11]は(機体["右膝関節"]のJoint回転角度取得) + 1.0
+　STATE[12]は(機体["右膝関節"]のJoint角速度取得) / S仕様["SPEED_KNEE"]
+　STATE[13]は0
+　もし、ENV["左脚接地"]ならば、
+　　STATE[8]は1
+　ここまで
+　もし、ENV["右脚接地"]ならば、
+　　STATE[13]は1
+　ここまで
+　10回繰り返す
+　　Iは回数-1
+　　STATE[I+14]はGYMENV["ライダー"][I]["fraction"]
+　ここまで
+
+　# 進行位置及び姿勢による評価を行う
+　# ゴール地点を300として割合で算出。
+　SHAPINGとは変数
+　SHAPINGはPOS["x"] / ((T仕様["TERRAIN_LENGTH"] - T仕様["TERRAIN_GRASS"]) * T仕様["TERRAIN_STEP"]) * 300
+　SHAPINGはSHAPING-5*ABS(STATE[0])
+
+　REWARDとは変数
+　REWARDは0
+
+　# 進行位置及び姿勢による評価の前回との差をREWARDとする
+　もし、GYMENV["前回SHAPING"]≠NULLならば、
+　　REWARDはSHAPING-GYMENV["前回SHAPING"]
+　ここまで
+　GYMENV["前回SHAPING"]はSHAPING
+
+　# ACTIONによる動きに応じてREWARDを減少させる（エネルギー消費）
+　Aとは変数
+　ACTIONをAで反復する
+　　REWARDはREWARD-0.00035*S仕様["MOTORS_TORQUE"]*CLIP(ABS(A),0,1)
+　ここまで
+
+　終了フラグとは変数
+　打切フラグとは変数
+　終了フラグはオフ
+　打切フラグはオフ
+　もし、ENV["機体破損"]||POS["x"]＜0ならば、
+　　# 左に移動しすぎるか、転んだら失敗
+　　REWARDは-100
+　　終了フラグはオン
+　ここまで
+　もし、POS["x"]＞(T仕様["TERRAIN_LENGTH"] - T仕様["TERRAIN_GRASS"]) * T仕様["TERRAIN_STEP"]ならば、
+　　# 目標距離を進んだら打切り
+　　終了フラグはオン
+　　打切フラグはオン
+　ここまで
+　[STATE, REWARD, 終了フラグ, 打切フラグ,{}]で戻る
+ここまで
+
+●GYM描画とは
+　T仕様とは変数
+　T仕様はGYMENV["T仕様"]
+
+　X表示範囲とは変数
+　X表示範囲はT仕様のGYMENV["機体"]でX表示範囲算出
+
+　キャンバス状態保存
+
+　X表示範囲で描画準備
+
+　GYMENV["雲形状"]をX表示範囲で雲描画
+
+　GYMENV["地形形状"]をX表示範囲で地面描画
+
+　GYMENVをライダー描画
+
+　GYMENV["機体"]をX表示範囲でPLANCK一括描画
+
+　GYMENV["地形"]をX表示範囲でPLANCK一括描画
+
+　T仕様のX表示範囲でスタート地点フラッグ描画
+
+　キャンバス状態復元
+ここまで
+
+### 内部関数
+
+●(S仕様のWORLDでPOSから)ライダー探査とは
+　ライダーとは変数
+　ライダーリストとは変数
+　Iとは変数
+　Pとは変数
+　ライダーリストは[]
+　GYMENV["現ライダー"]はNULL
+　10回繰り返す
+　　Iは回数-1
+　　ライダーは{}
+　　ライダー["fraction"]は1.0
+　　ライダー["p1"]はPOS
+　　PはVec2(POS["x"]+SIN(1.5*I/10)*S仕様["LIDAR_RANGE"],POS["y"]-COS(1.5*I/10)*S仕様["LIDAR_RANGE"])
+　　ライダー["p2"]はP
+　　ライダーリスト[I]はライダー
+　　GYMENV["現ライダー"]はライダー
+　　WORLDのライダー["p1"]からライダー["p2"]にWorldRayCastには(fixture, point, normal, fraction)
+　　　ライダーとは変数
+　　　ライダーはGYMENV["現ライダー"]
+　　　もし、(fixture["filterCategoryBits"] & 1)が0ならば、
+　　　　(-1)で戻る
+　　　ここまで
+　　　ライダー["p2"]はpoint
+　　　ライダー["fraction"]はfraction
+　　　fractionで戻る
+　　ここまで
+　ここまで
+　GYMENV["現ライダー"]はNULL
+　ライダーリストで戻る
+ここまで
+
+●(T仕様の機体で)X表示範囲算出とは
+　POSとは変数
+　POSは機体["胴体"]の位置取得
+　表示幅とは変数
+　表示幅は描画中キャンバス["width"] / 表示SCALE
+　XMAXとは変数
+　XMAXは(T仕様["TERRAIN_LENGTH"]-1) * T仕様["TERRAIN_STEP"] - 表示幅
+　スクロールXとは変数
+　スクロールXはCLIP(POS["x"] - 表示幅 / 5, 0, XMAX)
+　[スクロールX, スクロールX+表示幅]で戻る
+ここまで
+
+●(X表示範囲で)描画準備とは
+　全描画クリア
+　[描画中キャンバス["width"]/2,描画中キャンバス["height"]/2]に描画起点設定
+　[1,-1]に描画拡大
+　[-描画中キャンバス["width"]/2,-描画中キャンバス["height"]/2]に描画起点設定
+　空に線色設定
+　"#D8D8FF"に塗り色設定
+　[0,0,描画中キャンバス["width"],描画中キャンバス["height"]]に四角描画
+　[表示SCALE,表示SCALE]に描画拡大
+　[-X表示範囲[0], 0]に描画起点設定
+　1/表示SCALEに線太さ設定
+ここまで
+
+●(雲リストをX表示範囲で)雲描画とは
+　空に線色設定
+　"#FFFFFF"に塗り色設定
+　雲とは変数
+　雲リストを雲で反復する
+　　もし、雲[2]＜X表示範囲[0]ならば、
+　　　続ける
+　　違えばもし、雲[1]＞X表示範囲[1]ならば、
+　　　続ける
+　　ここまで
+　　雲[0]を多角形描画
+　ここまで
+ここまで
+
+●(地面リストをX表示範囲で)地面描画とは
+　空に線色設定
+　"#96985C"に塗り色設定
+　POLYとは変数
+　POSとは変数
+　PREVPOSとは変数
+　状態とは変数
+　POLYは[]
+　状態は0
+　PREVPOSはNULL
+　地面リストをPOSで反復する
+　　状態で条件分岐
+　　　0ならば、
+　　　　もし、POS[0]≧X表示範囲[0]ならば、
+　　　　　もし、PREVPOS≠NULLならば、
+　　　　　　POLYにPREVPOSを配列追加
+　　　　　ここまで
+　　　　　POLYにPOSを配列追加
+　　　　　状態は1
+　　　　ここまで
+　　　　PREVPOSはPOS
+　　　ここまで
+　　　1ならば、
+　　　　POLYにPOSを配列追加
+　　　　もし、POS[0]＞X表示範囲[1]ならば、
+　　　　　POLYに[POS[0], 0]を配列追加
+　　　　　状態は2
+　　　　　抜ける
+　　　　ここまで
+　　　ここまで
+　　　2ならば、
+　　　　# 何もしない
+　　　ここまで
+　　ここまで
+　ここまで
+　もし、状態＝１ならば、
+　　POLYに[POS[0], 0]を配列追加
+　ここまで
+　POLYに[POLY[0][0], 0]を配列追加
+　POLYを多角形描画
+ここまで
+
+●(ENVを)ライダー描画とは
+　ENV["ライダー描画カウンタ"]は(ENV["ライダー描画カウンタ"]+1)%100
+　もし、ENV["ライダー"]≠NULLならば、
+　　Iとは変数
+　　ライダー数とは変数
+　　ライダーとは変数
+　　Iは(ENV["ライダー描画カウンタ"]/2)の整数部分
+　　ライダー数はENV["ライダー"]の配列要素数
+　　もし、I<2*ライダー数ならば、
+　　　もし、I<ライダー数ならば、
+　　　　ライダーはENV["ライダー"][I]
+　　　違えば、
+　　　　ライダーはENV["ライダー"][ライダー数*2-I-1]
+　　　ここまで
+　　　"#FF0000"に線色設定
+　　　[ライダー["p1"]["x"],ライダー["p1"]["y"]]から[ライダー["p2"]["x"],ライダー["p2"]["y"]]まで線描画
+　　ここまで
+　ここまで
+ここまで
+
+●(物リストをX表示範囲で)PLANCK一括描画とは
+　物とは変数
+　位置とは変数
+　回転とは変数
+　構造とは変数
+　形とは変数
+　型とは変数
+　POSとは変数
+　PREVPOSとは変数
+　物リストを物で反復する
+　　もし、(物がIsBody)でなければ、
+　　　続ける
+　　ここまで
+　　位置は物の位置取得
+　　回転は物の回転角取得
+　　構造は物の構造リスト取得
+　　形は構造の形取得
+　　型は形の形名取得
+　　型で条件分岐
+　　　"polygon"ならば、
+　　　　POLYとは変数
+　　　　POLYは[]
+　　　　形["m_vertices"]をPOSで反復する
+　　　　　POLYに[POS["x"],POS["y"]]を配列追加
+　　　　ここまで
+　　　　キャンバス状態保存
+　　　　[位置["x"],位置["y"]]に描画起点設定
+　　　　RAD2DEG(回転)に描画回転
+　　　　物["色L"]に線色設定
+　　　　物["色F"]に塗り色設定
+　　　　POLYを多角形描画
+　　　　キャンバス状態復元
+　　　ここまで
+　　　"chain"ならば、
+　　　　Iとは変数
+　　　　状態とは変数
+　　　　状態は0
+　　　　Iは0
+　　　　PREVPOSはNULL
+　　　　形["m_vertices"]をPOSで反復する
+　　　　　もし、状態が0ならば、
+　　　　　　もし、POS["x"]＞X表示範囲[0]&&POS["x"]＜X表示範囲[1]ならば、
+　　　　　　　状態は1
+　　　　　　ここまで
+　　　　　ここまで
+　　　　　もし、状態が1ならば、
+　　　　　　もし、PREVPOS≠NULLならば、
+　　　　　　　もし、Iが0ならば、
+　　　　　　　　物["色E"]に線色設定
+　　　　　　　違えば
+　　　　　　　　物["色O"]に線色設定
+　　　　　　　ここまで
+　　　　　　　[PREVPOS["x"],PREVPOS["y"]]から[POS["x"],POS["y"]]まで線描画
+　　　　　　ここまで
+　　　　　　もし、POS["x"]＜X表示範囲[0]||POS["x"]＞X表示範囲[1]ならば、
+　　　　　　　抜ける
+　　　　　　ここまで
+　　　　　ここまで
+　　　　　Iは1-I
+　　　　　PREVPOSはPOS
+　　　　ここまで
+　　　違えば、
+　　　　「グループ描画に未対応の型({型})が含まれています」でエラー発生
+　　　ここまで
+　　ここまで
+　ここまで
+ここまで
+
+●(T仕様のX表示範囲で)スタート地点フラッグ描画とは
+　Xとは変数
+　XはT仕様["TERRAIN_STEP"] * 3
+　もし、X表示範囲[0]＞X+25/15ならば、
+　　戻る
+　ここまで
+　FLAGY1とは変数
+　FLAGY2とは変数
+　FLAGY1はT仕様["TERRAIN_HEIGHT"]
+　FLAGY2はFLAGY1 + 50 / 15
+　黒色に線色設定
+　[X, FLAGY1]から[X, FLAGY2]まで線描画
+　POLYとは変数
+　POLYは[
+　　[X, FLAGY2],
+　　[X, FLAGY2 - 10 / 15],
+　　[X + 25 / 15, FLAGY2 - 5 / 15]
+　]
+　"#D83300"に塗り色設定
+　POLYを多角形描画
+ここまで
+
+●(WORLDの物リストを)PLANCK一括破棄とは
+　何とは変数
+　何で物リストを反復する
+　　もし、(何がIsBody)ならば
+　　　WORLDから何をBody破棄
+　　ここまで
+　ここまで
+ここまで
+
+### Planckライブラリ呼び出し支援
+
+●Planckライブラリ読込とは
+　MODULEとは変数
+　URL_PLANCKを動的インポートをAWAIT
+　PLはWINDOW["planck"]
+ここまで
+
+●(X,Y)Vec2とは
+　PLの"Vec2"を[X,Y]でJSメソッド実行で戻る
+ここまで
+
+●(WORLDにARGSで)Body作成とは
+　WORLDの"createBody"をARGSでJSメソッド実行で戻る
+ここまで
+
+●(WORLDにARGSで)動的Body作成とは
+　WORLDの"createDynamicBody"をARGSでJSメソッド実行で戻る
+ここまで
+
+●(WORLDからBODYを)Body破棄とは
+　WORLDの"destroyBody"を[BODY]でJSメソッド実行
+ここまで
+
+●(Oが)IsBodyとは
+　『(function(pl,obj){return obj instanceof pl.Body;})』を[PL, O]でJS関数実行で戻る
+ここまで
+
+●(POLYの)Polygon作成とは
+　PLの"Polygon"を[POLY]でJSメソッド実行で戻る
+ここまで
+
+●(LINESの)Chain作成とは
+　PLの"Chain"を[LINES]でJSメソッド実行で戻る
+ここまで
+
+●(WHの)Box作成とは
+　PLの"Box"をWHでJSメソッド実行で戻る
+ここまで
+
+●(OPTSでBODY1からBODY2をPOSに)回転Joint作成とは
+　PLの"RevoluteJoint"を[OPTS,BODY1,BODY2,POS]でJSメソッド実行で戻る
+ここまで
+
+●(BODYにSHAPEをOPTSで)造形登録とは
+　BODYの"createFixture"を[SHAPE, OPTS]でJSメソッド実行
+ここまで
+
+●(WORLDにJOINTを)Joint登録とは
+　WORLDの"createJoint"を[JOINT]でJSメソッド実行
+ここまで
+
+●(BODYをVに)重心押とは
+　BODYの"applyForceToCenter"を[V,(1=1)]でJSメソッド実行
+ここまで
+
+●(BODYの)位置取得とは
+　BODYの"getPosition"を[]でJSメソッド実行で戻る
+ここまで
+
+●(BODYの)回転角取得とは
+　BODYの"getAngle"を[]でJSメソッド実行で戻る
+ここまで
+
+●(BODYの)線速度取得とは
+　BODYの"getLinearVelocity"を[]でJSメソッド実行で戻る
+ここまで
+
+●(BODYの)回転速度取得とは
+　BODYの"getAngularVelocity"を[]でJSメソッド実行で戻る
+ここまで
+
+●(BODYの)構造リスト取得とは
+　BODYの"getFixtureList"を[]でJSメソッド実行で戻る
+ここまで
+
+●(BODYの)構造A取得とは
+　BODYの"getFixtureA"を[]でJSメソッド実行で戻る
+ここまで
+
+●(BODYの)構造B取得とは
+　BODYの"getFixtureB"を[]でJSメソッド実行で戻る
+ここまで
+
+●(FIXTUREの)Body取得とは
+　FIXTUREの"getBody"を[]でJSメソッド実行で戻る
+ここまで
+
+●(FIXTUREの)形取得とは
+　FIXTUREの"getShape"を[]でJSメソッド実行で戻る
+ここまで
+
+●(JOINTの)Joint回転角度取得とは
+　JOINTの"getJointAngle"を[]でJSメソッド実行で戻る
+ここまで
+
+●(JOINTの)Joint角速度取得とは
+　JOINTの"getJointSpeed"を[]でJSメソッド実行で戻る
+ここまで
+
+
+●(JOINTにSPEEDで)モーター速設定とは
+　JOINTの"setMotorSpeed"を[SPEED]でJSメソッド実行
+ここまで
+
+●(JOINTにTORQUEで)モーター最大トルク設定とは
+　JOINTの"setMaxMotorTorque"を[TORQUE]でJSメソッド実行
+ここまで
+
+●(SHAPEの)形名取得とは
+　SHAPEの"getType"を[]でJSメソッド実行で戻る
+ここまで
+
+●(WORLDをOPTSで)PLStepとは
+　WORLDの"step"をOPTSでJSメソッド実行
+ここまで
+
+●(OPTSで)NewWorldとは
+　『(function(pl,o){return new pl.World(o);})』を[PL,OPTS]でJS関数実行で戻る
+ここまで
+
+●(FUNCをWORLDのP1からP2に)WorldRayCastとは
+　WORLDの"rayCast"を[P1,P2,FUNC]でJSメソッド実行
+ここまで
+
+●(FUNCをTARGETのEVTNAMEに)ONイベント設定とは
+　TARGETの"on"を[EVTNAME, FUNC]でJSメソッド実行
+ここまで
+
+### 汎用命令
+
+●(Sを)動的インポートとは
+　『(function(s) {return import(s);})』を[S]でJS関数実行で戻る
+ここまで
+
+●RNDとは
+　『(function(){return Math.random();})』を[]でJS関数実行で戻る
+ここまで
+
+●(AをIMINからIMAXまで)CLIPとは
+　もし、A<IMINならば、
+　　IMINで戻る
+　違えばもし、A>IMAXならば、
+　　IMAXで戻る
+　ここまで
+　Aで戻る
+ここまで
+
+●(A,B)MINとは
+　もし、A<Bならば、
+　　Aで戻る
+　ここまで
+　Bで戻る
+ここまで
+
+●(A,B)MAXとは
+　もし、A>Bならば、
+　　Aで戻る
+　ここまで
+　Bで戻る
+ここまで
+
+●(N,L)NumToFixedとは
+　『(function(n,l){return n.toFixed(l);})』を[N, L]でJS関数実行で戻る
+ここまで
+
+# Bipedal-Walkerは２本足の歩行ロボット。
+# 各脚には胴体の付け根と中央に関節がある（股関節と膝関節）
+# 横から見た2Dのため、
+# ・体をひねる方向に回転しない。
+# ・手前や奥の方向に倒れる事は無い。
+# 胴体が地面に接触したらゲームオーバー。
+# また、200ステップ踏破した場合もゲーム終了（打切り）
+
+# 現在の状態はGYMステップから返されるSTATEとしてあらわされる。
+# STATEは要素24の配列になる。
+#   0:胴体の角度。水平が0。
+#   1:胴体の角速度。
+#   2:胴体の+X方向(右)への速度
+#   3:胴体の+Y方向(上)への速度
+#   4:左脚付け根の角度。胴体から垂直の方向が0。
+#   5:左脚付け根の回転速度割合。
+#   6:左脚膝の角度。まっすぐが0。
+#   7:左脚膝の回転速度割合。
+#   8:左脚が地面に接していたら１。浮いていたら0。
+#   9:右脚付け根の角度。胴体から垂直の方向が0。
+#  10:右脚付け根の回転速度割合。
+#  11:右脚膝の角度。まっすぐが0。
+#  12:右脚膝の回転速度割合。
+#  13:右脚が地面に接していたら１。浮いていたら0。
+#  14-23:真右から真下まに１０個のライダーがあり地面への距離を返す。
+
+# 行動はGYMステップへ与えるACTIONとしてあらわす。
+# ACTIONは要素４の配列。
+# それぞれ関節(蝶番)への回転力(トルク)の比率で指定する。-1.0～+1.0が有効。
+#   0:左脚の付け根の関節
+#   1:左脚の膝の蝶番
+#   2:右脚の付け根の関節
+#   3:右脚の膝の蝶番
+# トルクの強弱は指定できるがそれによってどの程度早く動くかは指定できない。
+# トルク0は力を入れてない状態なので外力に従い曲がる（固定にはならない）
+
+# 以下はライダーの情報を用いずに姿勢と接地状態からのみで
+# 歩行を行うサンプルロジック（が、すぐ転ぶ）
+# 以下の３つの制御状態を左右の足で繰り返して進む
+# 「片足立ち」：保持する脚の横に踏み出す脚が並ぶまで
+# 「踏み出し」：両足が並んだ状態から踏み出す脚を前に出して接地するまで
+# 「蹴り上げ」：保持していた足を体に引き寄せる。
+# 蹴り上げて一定の位置まで引き寄せたら脚の役割を入れ替えて繰り返す。
+●歩行テストとは
+　Iとは変数
+　Jとは変数
+　Xとは変数
+　Yとは変数
+　ENVとは変数
+　SPEEDとは変数
+　制御状態とは変数
+　移動脚とは変数
+　保持脚とは変数
+　保持脚膝角度基準とは変数
+　保持脚膝角度とは変数
+　終了フラグとは変数
+　Aとは変数
+　Bとは変数
+　ステータスタイトルとは変数
+
+　SPEEDは0.29
+　ステータスタイトルは[
+　　"胴体角度",
+　　"胴体角速度",
+　　"胴体X速度",
+　　"胴体Y速度",
+　　"右腰角度",
+　　"右腰速さ",
+　　"右膝角度",
+　　"右膝速さ",
+　　"右脚接地",
+　　"左腰角度",
+　　"左腰速さ",
+　　"左膝角度",
+　　"左膝速さ",
+　　"左脚接地",
+　]
+
+　# GYM環境の作成。１回のみ必要
+　ENVはGYM作成
+　ENV["ハードモード"]は(1=0)
+
+　(1=1)の間繰り返す
+　　# 環境をリセットしてシミュレート開始する。シミュレートごとに必要。
+　　# 環境がステップの結果として終了を返して来たら要リセット。
+　　GYMリセット
+
+　　制御状態は"片足立ち"
+　　移動脚は0
+　　保持脚は1-移動脚
+　　保持脚膝角度基準は0.1
+　　保持脚膝角度は保持脚膝角度基準
+　　終了フラグはオフ
+　　Aは[0,0,0,0]
+　　(終了フラグ＝オフ)の間
+　　　結果とは変数
+　　　Sとは変数
+　　　Rとは変数
+　　　左接地とは変数
+　　　右接地とは変数
+　　　移動基準脚とは変数
+　　　保持基準脚とは変数
+　　　腰角とは変数
+　　　膝角とは変数
+　　　腰目標とは変数
+　　　膝目標とは変数
+
+　　　# 環境を１ステップ進める。
+　　　結果はAでGYMステップ
+　　　# 現在の環境の持つ状態を現在のキャンバスに描画
+　　　GYM描画
+
+　　　# 以下はGYMの機能を用いた歩行ロジック。
+　　　# 最終的に次回のステップに使用するACTIONを決定している。
+　　　Sは結果[0]
+　　　Rは結果[1]
+　　　終了フラグは結果[2]
+　　　左接地はS[8]
+　　　右接地はS[13]
+
+　　　Jは-1
+　　　もし、ENV["ライダー"]≠NULLならば、
+　　　　ライダー数とは変数
+　　　　ライダーとは変数
+　　　　Iは(ENV["ライダー描画カウンタ"]/2)の整数部分
+　　　　ライダー数はENV["ライダー"]の配列要素数
+　　　　もし、I<2*ライダー数ならば、
+　　　　　もし、I<ライダー数ならば、
+　　　　　　J=I
+　　　　　違えば、
+　　　　　　J=ライダー数*2-I-1
+　　　　　ここまで
+　　　　ここまで
+　　　ここまで
+
+　　　キャンバス状態保存
+　　　黒色に塗り色設定
+　　　「状態:{制御状態}」を[0,10]に文字描画
+　　　14回繰り返す
+　　　　Iは回数-1
+　　　　Xは((I+1)/5)の整数部分
+　　　　Yは(I+1)%5
+　　　　もし、X=0ならば、
+　　　　　YはY-1
+　　　　ここまで
+　　　　BはNumToFixed(S[I], 6)
+　　　　もし、S[I]≧0ならば、
+　　　　　Bは"+{B}"
+　　　　ここまで
+　　　　描画中コンテキスト["textAlign"]は"left"
+　　　　[X*140+130, Y*16+10]にBを文字描画
+　　　　描画中コンテキスト["textAlign"]は"right"
+　　　　[X*140+130, Y*16+10]にステータスタイトル[I]を文字描画
+　　　ここまで
+　　　描画中コンテキスト["textAlign"]は"left"
+　　　[500, 10]に「LiDAR」を文字描画
+　　　10回繰り返す
+　　　　Iは回数-1
+　　　　Xは(I/5)の整数部分
+　　　　YはI%5
+　　　　BはNumToFixed(S[I+14], 6)
+　　　　もし、I=Jならば、
+　　　　　赤色に塗り色設定
+　　　　違えば
+　　　　　黒色に塗り色設定
+　　　　ここまで
+　　　　[X*80+550, Y*16+10]にBを文字描画
+　　　ここまで
+　　　キャンバス状態復元
+
+　　　移動基準脚は4+5*移動脚
+　　　保持基準脚は4+5*保持脚
+　　　腰角は[NULL,NULL]　　# -0.8 ... +1.1
+　　　膝角は[NULL,NULL]　　# -0.6 ... +0.9
+　　　腰目標は[0,0]
+　　　膝目標は[0,0]
+　　　もし、制御状態が"片足立ち"ならば、
+　　　　# 移動する脚は腰を前に63度、膝を45度曲げるぐらいを目指す。
+　　　　腰角[移動脚]は1.1
+　　　　膝角[移動脚]は-0.6
+　　　　保持脚膝角度は保持脚膝角度+0.03
+　　　　もし、S[2]＞SPEEDならば、
+　　　　　保持脚膝角度は保持脚膝角度+0.03
+　　　　ここまで
+　　　　保持脚膝角度はMIN(保持脚膝角度, 保持脚膝角度基準)
+　　　　膝角[保持脚]は保持脚膝角度
+　　　　# 保持脚の腰が前およそ5度未満になったら踏み出しに遷移
+　　　　もし、S[2]＞SPEED*1.5ならば、
+　　　　　もし、S[保持基準脚+0]＜0.00ならば、
+　　　　　　制御状態は"踏み出し"
+　　　　　ここまで
+　　　　違えば
+　　　　　もし、S[保持基準脚+0]＜0.10ならば、
+　　　　　　制御状態は"踏み出し"
+　　　　　ここまで
+　　　　ここまで
+　　　ここまで
+　　　もし、制御状態が"踏み出し"ならば、
+　　　　# 移動する脚の腰は前方5度ぐらいを目指す
+　　　　腰角[移動脚]は0.1
+　　　　膝角[移動脚]は保持脚膝角度基準
+　　　　膝角[保持脚]は保持脚膝角度
+　　　　もし、S[移動基準脚+4]≠0ならば、
+　　　　　制御状態は"蹴り上げ"
+　　　　　保持脚膝角度はMIN(S[移動基準脚+2],保持脚膝角度基準)
+　　　　ここまで
+　　　ここまで
+　　　もし、制御状態が"蹴り上げ"ならば、
+　　　　膝角[移動脚]は保持脚膝角度
+　　　　膝角[保持脚]は1.0
+　　　　もし、(S[保持基準脚+2]＞0.88)||(S[2]＞1.2*SPEED)ならば、
+　　　　　制御状態は"片足立ち"
+　　　　　移動脚は1-移動脚
+　　　　　保持脚は1-保持脚
+　　　　ここまで
+　　　ここまで
+　　　もし、制御状態が"起立"ならば、
+　　　　腰角[移動脚]は0.1
+　　　　膝角[移動脚]は0.01
+　　　　腰角[保持脚]は0.1
+　　　　膝角[保持脚]は0.1
+　　　　もし、ABS(S[移動基準脚+0])<0.11&&ABS(S[移動基準脚+2])<0.02&&ABS(S[保持基準脚+0])<0.11&&ABS(S[保持基準脚+2])<0.11ならば、
+　　　　　制御増体は"片足立ち"
+　　　　ここまで
+　　　ここまで
+
+　　　もし、S[2]=0&&制御状態="片足立ち"&&S[8]≠0&&S[13]≠0ならば、
+　　　　制御状態は"起立"
+　　　ここまで
+
+
+　　　もし、腰角[0]≠NULLならば、
+　　　　腰目標[0]は0.9*(腰角[0]-S[4])-0.25*S[5]
+　　　ここまで
+　　　もし、腰角[1]≠NULLならば、
+　　　　腰目標[1]は0.9*(腰角[1]-S[9])-0.25*S[10]
+　　　ここまで
+　　　もし、膝角[0]≠NULLならば、
+　　　　膝目標[0]は4.0*(膝角[0]-S[6])-0.25*S[7]
+　　　ここまで
+　　　もし、膝角[1]≠NULLならば、
+　　　　膝目標[1]は4.0*(膝角[1]-S[11])-0.25*S[12]
+　　　ここまで
+
+　　　腰目標[0]は腰目標[0]-(0.9*(0-S[0])-1.5*S[1])
+　　　腰目標[1]は腰目標[1]-(0.9*(0-S[0])-1.5*S[1])
+　　　膝目標[0]は膝目標[0]-(15.0*S[3])　　# S[3]は胴体のY軸速度。
+　　　膝目標[1]は膝目標[1]-(15.0*S[3])　　# 落下しているときは膝を伸ばす
+　　　A[0]は腰目標[0]
+　　　A[1]は膝目標[0]
+　　　A[2]は腰目標[1]
+　　　A[3]は膝目標[1]
+　　　A[0]はCLIP(A[0]*0.5,-1,1)
+　　　A[1]はCLIP(A[1]*0.5,-1,1)
+　　　A[2]はCLIP(A[2]*0.5,-1,1)
+　　　A[3]はCLIP(A[3]*0.5,-1,1)
+
+　　　# FPSに従い待つ。ここでは５倍でスロー再生している。
+　　　(1.0/ENV["FPS"]*1)秒待つ
+　　ここまで
+　　ENV["ハードモード"]は!ENV["ハードモード"]
+　ここまで
+ここまで
+
+もし、プラグイン名が『メイン』ならば、
+　歩行テスト
+ここまで

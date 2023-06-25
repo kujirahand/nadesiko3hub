@@ -1,0 +1,38 @@
+### [作品情報]
+### タイトル=WebSocketエコーサーバー
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=CC0
+### 説明=cnako3で実行するWebSocketのエコーサーバのプログラムです。
+### 対象バージョン=3.2.12
+### URL=
+### 種類=cnako
+### タグ=
+### 更新日時=2022-07-01 13:41:53
+###
+
+#/usr/bin/env cnako3
+# --- WebSocket Echoサーバ ---
+# Colabにグローバルインストールした場合
+!「/tools/node/lib/node_modules/nadesiko3-websocket/nadesiko3-websocket.js」を取り込む。
+#--- 設定 ---
+PORT=5001
+#--- イベントの指定 ---
+WSサーバ起動成功した時には
+  「● WebSocketサーバ(ECHOサーバ)を起動しました」と表示。
+  自分IPアドレス取得して反復
+    「- wss://{対象}:{PORT}」を表示。
+  ここまで
+ここまで
+WSサーバ起動失敗した時には
+  「WebSocketサーバの起動に失敗しました」と表示。
+ここまで
+WSサーバ接続した時には
+  IP=対象["connection"]["remoteAddress"]
+  「クライアント{IP}が接続しました」と表示。
+ここまで
+WSサーバ受信時には
+  「受信:{対象}」と表示。
+  対象をWSサーバ全送信。
+ここまで
+#--- WebSocketを起動 ---
+PORTでWSサーバ起動。

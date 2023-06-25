@@ -1,0 +1,1630 @@
+### [作品情報]
+### タイトル=AmmoJS利用プラグイン(JSプラグイン)
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=MIT
+### 説明=Javascriptの有名な3D物理エンジンであるAmmoJSをなでしこv3から利用する為のプラグイン。必要になったつど命令を追加しているので、命令数はあまり多くない。ThreeJSと相性が良い。が、物理エンジンのなかでは多機能重量級。
+### 対象バージョン=3.2.15
+### URL=
+### 種類=js
+### タグ=
+### 更新日時=2022-03-30 21:52:58
+###
+
+/**
+ * PluginWeykAmmo
+ */
+let Ammo = null
+
+const PluginWeykAmmo = {
+  '初期化': {
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function(sys) {
+      if (sys._weykammojs) return
+      sys._weykammojs = {
+        AmmoLib: null,
+        parseVec3: function(xyz) {
+          let V
+          if (xyz instanceof this.AmmoLib.btVector3) {
+            V = xyz
+          } else {
+            const pos = this.parsePos(xyz)
+            if (pos == null) {
+              return null
+            }
+            V = new this.AmmoLib.btVector3(pos.x, pos.y, pos.z)
+          }
+          return V
+        },
+        parsePos: function(xyz) {
+          let pos = {x:0,y:0,z:0}
+          if (Array.isArray(xyz) && xyz.length === 3) {
+            pos.x = xyz[0]
+            pos.y = xyz[1]
+            pos.z = xyz[2]
+          } else
+          if (!!xyz && typeof xyz === "object" && xyz.x != null && xyz.y != null && xyz.z != null) {
+            pos.x = ( typeof xyz.x == 'function' ) ? xyz.x() : xyz.x
+            pos.y = ( typeof xyz.y == 'function' ) ? xyz.y() : xyz.y
+            pos.z = ( typeof xyz.z == 'function' ) ? xyz.z() : xyz.z
+          } else {
+            pos = null
+          }
+          return pos
+        },
+        parseRot: function(xyzw) {
+          let rot = {x:0,y:0,z:0,w:0}
+          if (Array.isArray(xyzw) && xyzw.length === 4) {
+            rot.x = xyz[0]
+            rot.y = xyz[1]
+            rot.z = xyz[2]
+            rot.w = xyz[3]
+          } else
+          if (!!xyzw && typeof xyzw === "object" && xyzw.x != null && xyzw.y != null && xyzw.z != null && xyzw.w != null) {
+            rot.x = ( typeof xyzw.x == 'function' ) ? xyzw.x() : xyzw.x
+            rot.y = ( typeof xyzw.y == 'function' ) ? xyzw.y() : xyzw.y
+            rot.z = ( typeof xyzw.z == 'function' ) ? xyzw.z() : xyzw.z
+            rot.w = ( typeof xyzw.w == 'function' ) ? xyzw.w() : xyzw.w
+          } else {
+            rot = null
+          }
+          return rot
+        },
+        ck: function() {
+          if (sys._weykammojs.AmmoLib == null) {
+            if (Ammo == null && typeof window.Ammo === 'undefined' && sys.__v0['AmmoLoader'] == null) {
+              throw new Error('ammo.wasm.jsが読み込まれていません')
+            }
+            if (Ammo == null) {
+              if (typeof window.Ammo !== 'undefined') {
+                Ammo = window.Ammo
+              } else
+              if (sys.__v0['AmmoLoader'] != null) {
+                Ammo = sys.__v0['AmmoLoader']
+              }
+            }
+            if (sys.__v0['AmmoLoader'] == null) {
+              sys.__v0['AmmoLoader'] = Ammo
+            }
+            throw new Error('ammo.wasm.jsからライブラリ本体の読み込みが行われていません')
+          }
+          return sys._weykammojs.AmmoLib
+        }
+      }
+      // オブジェクトを初期化
+      sys.__v0['AmmoLoader'] = null
+      sys.__v0['AMMO'] = null
+    }
+  },
+  // @定数・変数
+  'AmmoLoader': {type: 'const', value: ''}, // @AmmoLoader
+  'AMMO': {type: 'const', value: ''}, // @AmmoLibrary
+  'AMOベースURL': {type: 'var', value: 'https://cdn.jsdelivr.net/npm/ammojs-wasm-typed@1.1.0'}, // @AMOべーすURL
+  // https://cdn.skypack.dev/ammojs-wasm-typed
+  // https://cdn.jsdelivr.net/npm/ammojs-wasm-typed@1.1.0
+  // @Three/ライブラリ・プラグイン
+  'AMOライブラリ設定': { // @読み込み済みのAmmoJSのライブラリ本体をプラグインに設定する // @AMOらいぶらりせってい
+    type: 'func',
+    josi: [['に']],
+    pure: true,
+    fn: function (lib, sys) {
+      if (!sys._weykammojs) return null
+      sys.__v0['AMMO'] = lib
+      sys._weykammojs.AmmoLib = lib
+    },
+    return_none: true
+  },
+  'AMOライブラリ読込後': { // @AmmoJSのライブラリを動的に読み込む // @AMOらいぶらりよみこみご
+    type: 'func',
+    josi: [['に']],
+    pure: true,
+    fn: function (callback, sys) {
+      if (!sys._weykammojs) return null
+      const ammoload = function(loader) {
+        loader().then(function(lib) {
+          sys.__v0['AMMO'] = lib
+          sys._weykammojs.AmmoLib = lib
+          callback(true)
+        }, function(err) {
+          callback(false)
+        })
+      }
+      if (Ammo == null && typeof window.Ammo === 'undefined') {
+        if (true) { // for script tag
+          const script = document.createElement('script')
+          script.onload = function () {
+            script.onload = null
+            script.onerror = null
+            script.parentNode.removeChild(script)
+            Ammo = window.Ammo
+            ammoload(window.Ammo)
+          }
+          script.onerror = function () {
+            script.onload = null
+            script.onerror = null
+            script.parentNode.removeChild(script)
+            callback(false)
+          }
+          script.src = sys.__findVar('AMOベースURL','.') + '/builds/ammo.wasm.js'
+          document.querySelector('BODY').appendChild(script)
+        } else { // for es module
+          const url = sys.__findVar('AMOベースURL','.') + '/builds/ammo.wasm.js'
+          const promise = import(url)
+          .then((module) => {
+            Ammo = module
+            ammoload(Ammo)
+          })
+          promise.catch(err => {
+            callback(false)
+          })
+        }
+      } else {
+        if (Ammo == null) {
+          if (typeof window.Ammo !== 'undefined') {
+            Ammo = window.Ammo
+          } else
+          if (sys.__v0['AmmoLoader'] != null) {
+            Ammo = sys.__v0['AmmoLoader']
+          }
+        }
+        if (sys.__v0['AmmoLoader'] == null) {
+          sys.__v0['AmmoLoader'] = Ammo
+        }
+        ammoload(Ammo)
+      }
+    },
+    return_none: true
+  },
+  'AMO破棄': { // @指定のAmmoのオブジェクトを破棄する。 // @AMOはき
+    type: 'func',
+    josi: [['を']],
+    pure: true,
+    fn: function (obj,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      AmmoLib.destroy(obj)
+    },
+    return_none: true
+  },
+  // @型キャスト
+  'AMOCAST': { // @指定のAmmoの型にキャストする。 // @AMOCAST
+    type: 'func',
+    josi: [['を','から'],['に']],
+    pure: true,
+    fn: function (obj, type, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (typeof type === 'string') {
+        type = AmmoLib[type]
+      }
+      return AmmoLib.castObject(obj, type)
+    },
+    return_none: false
+  },
+  // @Vertor3
+  'AMOVec3': { // @AmmoのVector3を作成して返す // @AMOVec3
+    type: 'func',
+    josi: [['の','で','から']],
+    pure: true,
+    fn: function (opts, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      let V
+      if (opts == null) {
+        V = new AmmoLib.btVector3()
+      } else {
+        const pos = sys._weykammojs.parsePos(opts)
+        if (pos == null) {
+          throw new Error('Vector3を配列から生成する場合は要素が３つの配列([X,Y,Z])で指定してください')
+        }
+        V = new AmmoLib.btVector3(pos.x, pos.y, pos.z)
+      }
+      return V
+    },
+    return_none: false
+  },
+  'AMO正規化': { // @正規化(normalize)する // @AMOせいきか
+    type: 'func',
+    josi: [['を']],
+    pure: true,
+    fn: function (v,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      v.normalize()
+    },
+    return_none: true
+  },
+  'AMO加算': { // @加算する // @AMOかさん
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (v,a,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      v.op_add(a)
+    },
+    return_none: true
+  },
+  'AMO減算': { // @減算する // @AMOげんざん
+    type: 'func',
+    josi: [['から','に'],['を']],
+    pure: true,
+    fn: function (v,a,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      v.op_sub(a)
+    },
+    return_none: true
+  },
+  'AMO乗算': { // @乗算する // @AMOげんざん
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (v,a,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      v.op_mul(a)
+    },
+    return_none: true
+  },
+  'AMOアクセッサ設定': { // @X,Y,Zのアクセッサを設定する // @AMOあくせっさせってい
+    type: 'func',
+    josi: [['に']],
+    pure: true,
+    fn: function (v,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (typeof v.x !== 'function' || typeof v.y !== 'function' || typeof v.z !== 'function') {
+        return
+      }
+      v.getX = v.x
+      v.getY = v.y
+      v.getZ = v.z
+      delete v.x
+      delete v.y
+      delete v.z
+      Object.defineProperty(v, 'x', {
+        get() {
+          return this.getX()
+        },
+        set(value) {
+          this.setX(value)
+        }
+      })
+      Object.defineProperty(v, 'y', {
+        get() {
+          return this.getY()
+        },
+        set(value) {
+          this.setY(value)
+        }
+      })
+      Object.defineProperty(v, 'z', {
+        get() {
+          return this.getZ()
+        },
+        set(value) {
+          this.setZ(value)
+        }
+      })
+    },
+    return_none: true
+  },
+  'AMOX取得': { // @Xの値を取得して返す // @AMOXしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (v,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return v.x()
+    },
+    return_none: false
+  },
+  'AMOY取得': { // @Yの値を取得して返す // @AMOYしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (v,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return v.y()
+    },
+    return_none: false
+  },
+  'AMOZ取得': { // @Xの値を取得して返す // @AMOZしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (v,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return v.z()
+    },
+    return_none: false
+  },
+  'AMOX設定': { // @Xに値を設定する // @AMOXせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (v,x,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      v.setX(x)
+    },
+    return_none: true
+  },
+  'AMOY設定': { // @Yに値を設定する // @AMOYせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (v,y,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      v.setY(y)
+    },
+    return_none: true
+  },
+  'AMOZ設定': { // @Zに値を設定する // @AMOZせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (v,z,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      v.setZ(z)
+    },
+    return_none: true
+  },
+  // @Quotanion
+  'AMO四元数': { // @AmmoのQuotanionを作成して返す // @AMしげんすう
+    type: 'func',
+    josi: [['の','で','から']],
+    pure: true,
+    fn: function (opts, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      let Q
+      if (opts == null) {
+        Q = new AmmoLib.btQuaternion()
+      } else
+      if (opts instanceof Array && opts.length == 2) {
+        let axis
+        let isNew = false
+        if (opts[0] instanceof AmmoLib.btVector3) {
+          axis = opts[0]
+        } else {
+          const pos = sys._weykammojs.parsePos(opts[0])
+          if (pos == null) {
+            throw new Error('四元数を二次元配列から生成する場合は要素が２つの配列([X,Y,Z], angle])で指定してください')
+          }
+          axis = new AmmoLib.btVector3(pos.x, pos.y, pos.z)
+        }
+        Q = new AmmoLib.btQuaternion(axis, opts[1])
+        if (isNew) {
+          AmmoLib.destroy(axis)
+        }
+      } else {
+        const rot = sys._weykammojs.parseRot(opts)
+        if (rot == null) {
+          throw new Error('四元数を一次元配列から生成する場合は要素が４つの配列([X,Y,Z,W])で指定してください')
+        }
+        Q = new AmmoLib.btQuaternion(rot.x, rot.y, rot.z, rot.w)
+      }
+      return Q
+    },
+    return_none: false
+  },
+  'AMO回転軸取得': { // @四元数の回転軸を取得する // @AMOかいてんじくしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (quat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return quat.getAxis()
+    },
+    return_none: false
+  },
+  // @マトリクス
+  'AMO変形マトリクス作成': { // @変形用のTransformマトリクスを作成して返す // @AMOへんけいまとりくすさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btTransform()
+    },
+    return_none: false
+  },
+  'AMO単位行列設定': { // @変換マトリクスを単位行列を設定して初期化する // @AMOたんいぎょうれつせってい
+    type: 'func',
+    josi: [['を','に']],
+    pure: true,
+    fn: function (mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      mat.setIdentity()
+    },
+    return_none: true
+  },
+  'AMO原点取得': { // @変換マトリクスの原点を取得する // @AMOげんてんしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return mat.getOrigin()
+    },
+    return_none: false
+  },
+  'AMO原点設定': { // @変換マトリクスに原点を設定する // @AMOげんてんせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (mat,pos,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (pos instanceof AmmoLib.btVector3) {
+        mat.setOrigin(pos)
+      } else {
+        pos = sys._weykammojs.parsePos(pos)
+        if (pos == null) {
+          throw new Error('原点位置は要素が３つの配列([X,Y,Z])で指定してください')
+        }
+        mat.getOrigin().setValue(pos.x, pos.y, pos.z)
+      }
+    },
+    return_none: true
+  },
+  'AMO回転取得': { // @変換マトリクスの回転を取得する // @AMOかいてんしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return mat.getRotation()
+    },
+    return_none: false
+  },
+  'AMO回転設定': { // @変換マトリクスまたは四元数に回転を設定する // @AMOかいてんせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (obj,opts,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (obj instanceof AmmoLib.btTransform) {
+        const mat = obj
+        if (opts instanceof AmmoLib.btQuaternion) {
+          mat.setRotation(opts)
+        } else {
+          const rot = sys._weykammojs.parseRot(opts)
+          if (rot == null) {
+            throw new Error('変換マトリクスへの回転姿勢は要素が４つの配列([X,Y,Z,W])で指定してください')
+          }
+          const Q = new AmmoLib.btQuaternion(rot.x, rot.y, rot.z, rot.w)
+          mat.setRotation(Q)
+          AmmoLib.destroy(Q)
+        }
+      } else
+      if (obj instanceof AmmoLib.btQuaternion) {
+        let quat = obj
+        if (opts instanceof Array && opts.length == 2) {
+          let axis
+          let isNew = false
+          if (opts[0] instanceof AmmoLib.btVector3) {
+            axis = opts[0]
+          } else {
+            const pos = sys._weykammojs.parsePos(opts[0])
+            if (pos == null) {
+              throw new Error('四元数への回転姿勢は要素が２つの配列([[X,Y,Z], Angle])で指定してください')
+            }
+            axis = new AmmoLib.btVector3(pos.x, pos.y, pos.z)
+            isNew = true
+          }
+          quat.setRotation(axis ,opts[1])
+          if (isNew) {
+            AmmoLib.destroy(axis)
+          }
+        } else {
+          throw new Error('四元数への回転姿勢は要素が２つの配列([[X,Y,Z], Angle])で指定してください')
+        }
+      } else {
+        throw new Error('回転姿勢の設定は変換マトリクスまたは四元数が対象です')
+      }
+    },
+    return_none: true
+  },
+  'AMO基礎取得': { // @変換マトリクスの基礎(Mat3x3)を取得する // @AMOきそしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return mat.getBasis()
+    },
+    return_none: false
+  },
+  'AMO行取得': { // @マトリクスの指定の行を取得する // @AMOぎょうしゅとく
+    type: 'func',
+    josi: [['から'],['の']],
+    pure: true,
+    fn: function (mat, row, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return mat.getRow(row)
+    },
+    return_none: false
+  },
+  // @MotionStateの操作
+  'AMOデフォルト状態管理器作成': { // @デフォルトの状態管理器を作成して返す // @AMOでふぉるとじょうたいかんりきさくせい
+    type: 'func',
+    josi: [['で','の','から']],
+    pure: true,
+    fn: function (mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btDefaultMotionState( mat )
+    },
+    return_none: false
+  },
+  'AMOワールド変換行列取得': { // @状態管理器からワールド変換行列を指定のマトリクスに取得する // @AMOわーるどへんかんぎょうれつしゅとく
+    type: 'func',
+    josi: [['の','から'],['に','へ']],
+    pure: true,
+    fn: function (state,mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      state.getWorldTransform(mat)
+    },
+    return_none: true
+  },
+  'AMOワールド変換行列設定': { // @状態管理器または鋼体のワールド変換行列に指定のマトリクスを設定する // @AMOわーるどへんかんぎょうれつせってい
+    type: 'func',
+    josi: [['に','へ'],['を','で']],
+    pure: true,
+    fn: function (state,mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      state.setWorldTransform(mat)
+    },
+    return_none: true
+  },
+  // @形状の操作
+  'AMO箱形状作成': { // @立方体の形状を[W,H,D]で作成する // @AMOはこけいじょうさくせい
+    type: 'func',
+    josi: [['で','の']],
+    pure: true,
+    fn: function (wdh,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      let V
+      let isNew = false
+      if (wdh instanceof AmmoLib.btVector3) {
+        V = wdh
+      } else
+      if (wdh instanceof Array && wdh.length == 3) {
+        V = new AmmoLib.btVector3(wdh[0], wdh[1], wdh[2])
+        isNew = true
+      } else
+      if (wdh instanceof Number) {
+        V = new AmmoLib.btVector3(wdh, wdh, wdh)
+        isNew = true
+      } else
+      if (wdh == null) {
+        V = new AmmoLib.btVector3(1,1,1)
+        isNew = true
+      } else {
+        throw new Error('形状は要素が３つの配列([X,Y,Z])で指定してください')
+      }
+      const shape = new AmmoLib.btBoxShape(V)
+      if (isNew) {
+        AmmoLib.destroy(V)
+      }
+      return shape
+    },
+    return_none: false
+  },
+  'AMO球形状作成': { // @球の形状を半径ｒで作成する // @AMOきゅうけいじょうさくせい
+    type: 'func',
+    josi: [['で','の']],
+    pure: true,
+    fn: function (radius,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btSphereShape(radius)
+    },
+    return_none: false
+  },
+  'AMOシリンダ形状作成': { // @シリンダ(Y軸を向いた円柱)の形状を幅,高,奥行で作成する // @AMOしりんだけいじょうさくせい
+    type: 'func',
+    josi: [['で','の']],
+    pure: true,
+    fn: function (wdh,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      let V
+      let isNew = false
+      if (wdh instanceof AmmoLib.btVector3) {
+        V = wdh
+      } else
+      if (wdh instanceof Array && wdh.length == 3) {
+        V = new AmmoLib.btVector3(wdh[0], wdh[1], wdh[2])
+        isNew = true
+      } else
+      if (wdh instanceof Number) {
+        V = new AmmoLib.btVector3(wdh, wdh, wdh)
+        isNew = true
+      } else
+      if (wdh == null) {
+        V = new AmmoLib.btVector3(1,1,1)
+        isNew = true
+      } else {
+        throw new Error('重力は要素が３つの配列([X,Y,Z])で指定してください(下方向は-Yです)')
+      }
+      const shape = new AmmoLib.btCylinderShape(V)
+      if (isNew) {
+        AmmoLib.destroy(V)
+      }
+      return shape
+    },
+    return_none: false
+  },
+  'AMO高度マップ形状作成': { // @高さのデータを保持する配列を元に形状を作成する // @AMOこうどまっぷけいじょうさくせい
+    type: 'func',
+    josi: [['で','の']],
+    pure: true,
+    fn: function (opts, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      const width = opts["横分割数"] || opts["横"] || opts["幅"] || opts["W"] || opts["width"] || 1.0
+      const height = opts["縦分割数"] || opts["縦"] || opts["高さ"] || opts["奥行"] || opts["H"] || opts["height"] || opts["depth"] || 1.0
+      const maxData = opts["最高"] || opts["最小高"] || opts["最小高さ"] || 0
+      const minData = opts["最低"] || opts["最大高"] || opts["最大高さ"] || 0
+      let upAxis = opts["上方向"] || opts["upAxis"] || 1
+      const flipQuadEdges = opts["flipQuadEdges"] || false
+      const data = opts["データ"] || opts["data"] || opts["heightData"] || opts["heightMap"] || []
+      if (upAxis === "x" || upAxis === "X" || upAxis == "0") {
+        upAxis = 0
+      } else
+      if (upAxis === "y" || upAxis === "Y" || upAxis == "1") {
+        upAxis = 1
+      } else
+      if (upAxis === "z" || upAxis === "Z" || upAxis == "2") {
+        upAxis = 2
+      }
+      const heightScale = 1
+      const hdt = "PHY_FLOAT" // "PHY_FLOAT", "PHY_UCHAR", "PHY_SHORT"
+
+      const ammoHeightData = AmmoLib._malloc( 4 * width * height ) // 4 for byte of PHY_FLOAT
+
+      AmmoLib.HEAPF32.set(data, ammoHeightData >> 2)
+
+      const shape = new AmmoLib.btHeightfieldTerrainShape(
+        width, height,
+        ammoHeightData,
+        heightScale,
+        minData, maxData,
+        upAxis, hdt, flipQuadEdges)
+      return shape
+    },
+    return_none: false
+  },
+  'AMO凸形状作成': { // @凸形状を作成する // @AMOとつけいじょうさくせい
+    type: 'func',
+    josi: [['で','の']],
+    pure: true,
+    fn: function (triangles,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      const shape = new AmmoLib.btConvexHullShape()
+      const v = new AmmoLib.btVector3()
+      for (let i=0;i < triangles.length; i++) {
+        const tri=triangles[i]
+        const last=(i==triangles.length-1)
+        for (let j=0;j < 3; j++) {
+          v.setX(tri[j].x)
+          v.setY(tri[j].y)
+          v.setZ(tri[j].z)
+          shape.addPoint(v,last)
+        }
+      }
+      AmmoLib.destroy(v)
+      return shape
+    },
+    return_none: false
+  },
+  'AMO凹形状作成': { // @凹形状を作成する // @AMOおうけいじょうさくせい
+    type: 'func',
+    josi: [['で','の']],
+    pure: true,
+    fn: function (triangles,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      const triangle_mesh = new AmmoLib.btTriangleMesh()
+      const v1 = new AmmoLib.btVector3()
+      const v2 = new AmmoLib.btVector3()
+      const v3 = new AmmoLib.btVector3()
+      for (let i=0;i < triangles.length; i++) {
+        tri=triangles[i]
+        v1.setX(tri[0].x)
+        v1.setY(tri[0].y)
+        v1.setZ(tri[0].z)
+        v2.setX(tri[1].x)
+        v2.setY(tri[1].y)
+        v2.setZ(tri[1].z)
+        v3.setX(tri[2].x)
+        v3.setY(tri[2].y)
+        v3.setZ(tri[2].z)
+        triangle_mesh.addTriangle(v1,v2,v3,true)
+      }
+      AmmoLib.destroy(v1)
+      AmmoLib.destroy(v2)
+      AmmoLib.destroy(v3)
+      return new AmmoLib.btBvhTriangleMeshShape(triangle_mesh,true,true)
+    },
+    return_none: false
+  },
+  'AMO複合形状作成': { // @複数の形状を含む形状を作成する // @AMOふくごうけいじょうさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btCompoundShape(true)
+    },
+    return_none: false
+  },
+  'AMO子形状追加': { // @複合形状に子となる形状を指定のマトリクスで追加する // @AMOこけいじょうついか
+    type: 'func',
+    josi: [['に'],['で'],['を']],
+    pure: true,
+    fn: function (shape, mat, childshape, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      shape.addChildShape(mat, childshape)
+    },
+    return_none: true
+  },
+  'AMOマージン設定': { // @形状に対して他と干渉するかどうかの判定の際のマージンを設定する // @AMOまーじんせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (shape,margin,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      shape.setMargin(margin)
+    },
+    return_none: true
+  },
+  'AMO局所慣性計算': { // @形状に対して重さと慣性から局所慣性を計算して設定する // @AMOきょくしょかんせいけいさん
+    type: 'func',
+    josi: [['に'],['と'],['で']],
+    pure: true,
+    fn: function (shape,mass,itertia,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (mass instanceof AmmoLib.btVector3) {
+        let tmp = mass
+        mass = itertia
+        itertia = tmp
+      }
+      shape.calculateLocalInertia( mass, itertia )
+    },
+    return_none: true
+  },
+  'AMO局所スケール設定': { // @形状に対して局所スケーリングを設定する // @AMOきょくしょすけーるせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (shape,scales,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      shape.setLocalScaling( scales )
+    },
+    return_none: true
+  },
+  // @制約の操作
+  'AMO接合軸作成': { // @蝶番の制約のための接合軸を作成して返す // @AMOせつごうじくさくせい
+    type: 'func',
+    josi: [['の'],['に'],['で']],
+    pure: true,
+    fn: function (body, pivot, axis, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      pivot = sys._weykammojs.parseVec3(pivot)
+      if (pivot == null) {
+        throw new Error('制約で固定する位置は要素が３つの配列(x,y,z)で指定して下さい')
+      }
+      axis = sys._weykammojs.parseVec3(axis)
+      if (axis == null) {
+        throw new Error('制約で固定する軸は要素が３つの配列(x,y,z)で指定して下さい')
+      }
+      return {body: body, pivot: pivot, axis: axis}
+    },
+    return_none: false
+  },
+  'AMO蝶番制約作成': { // @蝶番の制約を作成して返す // @AMOちょうつがいせいやくさくせい
+    type: 'func',
+    josi: [['と'],['で','の']],
+    pure: true,
+    fn: function (con1, con2, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btHingeConstraint(con1.body, con2.body, con1.pivot, con2.pivot, con1.axis, con2.axis, true)
+    },
+    return_none: false
+  },
+  'AMO回転トルク力有効化': { // @制約の回転トルクを指定した速さと力で有効する // @AMOかいてんとるくゆうこうか
+    type: 'func',
+    josi: [['を'],['と'],['で']],
+    pure: true,
+    fn: function (constraint, v, f, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      constraint.enableAngularMotor(true, v, f)
+    },
+    return_none: true
+  },
+  'AMO回転専用設定': { // @制約の回転のみ有効する // @AMOかいてんせんようせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (constraint, flag, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      constraint.setAngularOnly(!!flag)
+    },
+    return_none: true
+  },
+  // @衝突オブジェクト共通の操作
+  'AMOユーザインデックス設定': { // @衝突オブジェクトにユーザインデックスを設定する // @AMOゆーざいんでっくすせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (obj, index, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      obj.setUserIndex(index)
+    },
+    return_none: true
+  },
+  'AMOユーザインデックス取得': { // @衝突オブジェクトに設定したユーザインデックスを取得して返す // @AMOゆーざいんでっくすしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (obj, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return obj.getUserIndex()
+    },
+    return_none: false
+  },
+  // @幽体の操作
+  'AMO幽体作成': { // @幽体を作成して返す // @AMOゆうたいさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      ghost = new AmmoLib.btGhostObject()
+      ghost.setCollisionFlags(ghost.getCollisionFlags() | 4)
+      return ghost
+    },
+    return_none: false
+  },
+  'AMO形状設定': { // @幽体に形状を設定する // @AMOけいじょうせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (ghost, shape, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      ghost.setCollisionShape(shape)
+    },
+    return_none: true
+  },
+  'AMOオーバーラップ数取得': { // @幽体と重なっている衝突オブジェクトの数を取得する // @AMOおーばーらっぷすうしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (ghost, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return ghost.getNumOverlappingObjects()
+    },
+    return_none: false
+  },
+  'AMOオーバーラップオブジェクト取得': { // @幽体と重なっている衝突オブジェクトを取得する // @AMOおーばーらっぷおぶじぇくとしゅとく
+    type: 'func',
+    josi: [['から'],['の']],
+    pure: true,
+    fn: function (ghost, index, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return ghost.getOverlappingObject(index)
+    },
+    return_none: false
+  },
+  'AMO幽体ペア追加削除処理作成': { // @重なっている幽体ペアのコールバックに対応して追加削除を行う処理クラスを作成して返す // @AMOゆうぺあついかさくじょしょりさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btGhostPairCallback()
+    },
+    return_none: false
+  },
+  'AMO幽体ペアコールバック設定': { // @重なっている幽体ペアの情報をコールバックで受け取る処理クラスを設定する // @AMOゆうたいぺあこーるばっくせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (obj, callback, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (obj != null && typeof obj.getBroadphase === 'function') {
+        obj = obj.getBroadphase()
+      }
+      if (obj != null && typeof obj.getOverlappingPairCache === 'function') {
+        obj = obj.getOverlappingPairCache()
+      }
+      if (!(obj != null && typeof obj.setInternalGhostPairCallback === 'function')) {
+        throw new Error('幽体ペアを受け取るコールバックの設定先が正しいオブジェクトではありません')
+      }
+      obj.setInternalGhostPairCallback(callback)
+    },
+    return_none: true
+  },
+  'AMOレイ最近接保持処理作成': { // @レイから最近接の結果を保持を行う処理クラスを作成して返す // @AMOれいさいきんせつほじしょりさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      const vMin = new AmmoLib.btVector3(0,0,0)
+      const vMax = new AmmoLib.btVector3(0,0,0)
+      const callback = new AmmoLib.ClosestRayResultCallback(vMin, vMax)
+      AmmoLib.destroy(vMin)
+      AmmoLib.destroy(vMax)
+      return callback
+    },
+    return_none: false
+  },
+  'AMOレイ全保持処理作成': { // @レイから全接点の結果を保持を行う処理クラスを作成して返す // @AMOれいぜんほじしょりさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      const vMin = new AmmoLib.btVector3(0,0,0)
+      const vMax = new AmmoLib.btVector3(0,0,0)
+      const callback = new AmmoLib.AllHitsRayResultCallback(vMin, vMax)
+      AmmoLib.destroy(vMin)
+      AmmoLib.destroy(vMax)
+      return callback
+    },
+    return_none: false
+  },
+  'AMOレイ試行': { // @鋼体構成情報に従い鋼体を作成して返す // @AMOれいしこう
+    type: 'func',
+    josi: [['を'],['から'],['に'],['で']],
+    pure: true,
+    fn: function (world, start, end, callback, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      world.rayTest(start, end, callback)
+    },
+    return_none: true
+  },
+  'AMOレイヒット': { // @鋼体構成情報に従い鋼体を作成して返す // @AMOれいしこう
+    type: 'func',
+    josi: [['の','が']],
+    pure: true,
+    fn: function (ray, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return ray.hasHit()
+    },
+    return_none: false
+  },
+  // @鋼体の操作
+  'AMO鋼体作成': { // @鋼体構成情報に従い鋼体を作成して返す // @AMOこうたいさくせい
+    type: 'func',
+    josi: [['で','の','から']],
+    pure: true,
+    fn: function (info, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btRigidBody( info )
+    },
+    return_none: false
+  },
+  'AMO状態管理器取得': { // @鋼体から状態管理器を取得する // @AMOじょうたいかんりきしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (body,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return body.getMotionState()
+    },
+    return_none: false
+  },
+  'AMO鋼体構成情報作成': { // @鋼体を作成するための構成情報を作成して返す // @AMOこうたいこうせいじょうほうさくせい
+    type: 'func',
+    josi: [['で','から','の']],
+    pure: true,
+    fn: function (opts, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (!(opts instanceof Array && opts.length == 4)) {
+        throw new Error('鋼体の構成情報の作成には要素が４つの配列(mass,motionState,shape,localInertia)で指定して下さい')
+      }
+      const mass = opts[0]
+      const motionState = opts[1]
+      const shape = opts[2]
+      const localInertia = opts[3]
+      return new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia )
+    },
+    return_none: false
+  },
+  'AMO回転速度設定': { // @鋼体に対して回転速度を直接設定する // @AMOかいてんそくどせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (body,G,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (G instanceof AmmoLib.btVector3) {
+        body.setAngularVelocity(G)
+      } else {
+        const V = sys._weykammojs.parsePos(G)
+        if (V == null) {
+          throw new Error('回転速度は要素が３つの配列([X,Y,Z])で指定してください')
+        }
+        body.getAngularVelocity().setValue(V.x, V.y, V.z)
+      }
+    },
+    return_none: true
+  },
+  'AMO回転係数設定': { // @鋼体に対して回転速度を直接設定する // @AMOかいてんそくどせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (body,G,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (G instanceof AmmoLib.btVector3) {
+        body.setAngularFactor(G)
+      } else
+      if (typeof G === 'number') {
+        body.setAngularFactor(G)
+      } else {
+        const V = sys._weykammojs.parsePos(G)
+        if (V == null) {
+          throw new Error('回転係数は要素が３つの配列([X,Y,Z])で指定してください')
+        }
+        body.getAngularFactor().setValue(V.x, V.y, V.z)
+      }
+    },
+    return_none: true
+  },
+  'AMO回転速度取得': { // @鋼体から回転速度を直接取得する // @AMOかいてんそくどしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (body, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return body.getAngularVelocity()
+    },
+    return_none: false
+  },
+  'AMO移動速度設定': { // @鋼体に対して移動速度を直接設定する // @AMOいどうそくどせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (body,G,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      let isNew = false
+      if (G instanceof AmmoLib.btVector3) {
+        body.setLinearVelocity(G)
+      } else {
+        const V = sys._weykammojs.parsePos(G)
+        if (V == null) {
+          throw new Error('移動速度は要素が３つの配列([X,Y,Z])で指定してください')
+        }
+        body.getLinearVelocity().setValue(V.x, V.y, V.z)
+      }
+    },
+    return_none: true
+  },
+  'AMO移動速度取得': { // @鋼体から移動速度を直接取得する // @AMOいどうそくどしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (body, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return body.getLinearVelocity()
+    },
+    return_none: false
+  },
+  'AMO速取得': { // @鋼体から移動速度の速さを取得する // @AMOはやさしゅとく
+    type: 'func',
+    josi: [['から','の']],
+    pure: true,
+    fn: function (body, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return body.getLinearVelocity().length()
+    },
+    return_none: false
+  },
+  'AMO減衰率設定': { // @鋼体に対して減衰率を設定する。指定に従い毎秒減速する // @AMOげんすいりつせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (body,D,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      body.setDamping(D)
+    },
+    return_none: true
+  },
+  'AMO摩擦係数設定': { // @鋼体に対して摩擦係数を設定する。２つの鋼体の間の摩擦は摩擦係数の積で決まる // @AMOまさつけいすうせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (body,F,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      body.setFriction(F)
+    },
+    return_none: true
+  },
+  'AMO回転摩擦係数設定': { // @鋼体に対して転がる際の抵抗係数を設定する。２つの鋼体の間の抵抗は係数の積で決まる // @AMOかいてんまさつけいすうせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (body,F,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      body.setRollingFriction(F)
+    },
+    return_none: true
+  },
+  'AMO反発係数設定': { // @鋼体に対して反発係数を設定する。２つの鋼体の間の反発力は反発係数の積で決まる // @AMOはんぱつけいすうせってい
+    type: 'func',
+    josi: [['に'],['を','で']],
+    pure: true,
+    fn: function (body,R,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      body.setRestitution(R)
+    },
+    return_none: true
+  },
+  'AMO活性化': { // @鋼体に物理法則が働くよう活性化する。 // @AMOかっせいか
+    type: 'func',
+    josi: [['に','を','の']],
+    pure: true,
+    fn: function (body,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      body.activate()
+    },
+    return_none: true
+  },
+  'AMO活性': { // @鋼体が活性かどうかを真偽で返す。 // @AMOかっせい
+    type: 'func',
+    josi: [['が']],
+    pure: true,
+    fn: function (body,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return body.isActive()
+    },
+    return_none: false
+  },
+  'AMO活性状態設定': { // @鋼体の活性状態を設定する。 // @AMOかっせいじょうたいせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (body,act,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (typeof act === 'string') {
+        if (act === 'ACTIVE_TAG' || act === '活性') {
+          act = 1
+        } else
+        if (act === 'ISLAND_SLEEPING' || act === '非活性') {
+          act = 2
+        } else
+        if (act === 'DISABLE_DEACTIVATION' || act === '常時活性') {
+          act = 4
+        } else
+        if (act === 'DISABLE_SIMULATION' || act === '常時非活性') {
+          act = 5
+        } else {
+        }
+      }
+      body.setActivationState(act)
+    },
+    return_none: true
+  },
+  'AMO活性状態強制設定': { // @鋼体の活性状態を強制的に設定する。 // @AMOかっせいじょうたいきょうせいせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (body,act,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (typeof act === 'string') {
+        if (act === 'ACTIVE_TAG' || act === '活性') {
+          act = 1
+        } else
+        if (act === 'ISLAND_SLEEPING' || act === '非活性') {
+          act = 2
+        } else
+        if (act === 'DISABLE_DEACTIVATION' || act === '常時活性') {
+          act = 4
+        } else
+        if (act === 'DISABLE_SIMULATION' || act === '常時非活性') {
+          act = 5
+        } else {
+        }
+      }
+      body.forceActivationState(act)
+    },
+    return_none: true
+  },
+  'AMO力静止': { // @鋼体に加わる力をクリアする。 // @AMOちからせいし
+    type: 'func',
+    josi: [['を','が','の']],
+    pure: true,
+    fn: function (body,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      body.clearForces()
+    },
+    return_none: true
+  },
+  'AMO重心押': { // @鋼体に対して外部から重心に力を加える // @AMOじゅうしんおす
+    type: 'func',
+    josi: [['を'],['で']],
+    pure: true,
+    fn: function (body,G,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      let V
+      let isNew = false
+      if (G instanceof AmmoLib.btVector3) {
+        V = G
+      } else
+      if (G instanceof Array && G.length == 3) {
+        V = new AmmoLib.btVector3(G[0], G[1], G[2])
+        isNew = true
+      } else {
+        throw new Error('押す力は要素が３つの配列([X,Y,Z])で指定してください')
+      }
+      body.applyCentralImpulse(V)
+      if (isNew) {
+        AmmoLib.destroy(V)
+      }
+    },
+    return_none: true
+  },
+  'AMO重心ワールド変換行列設定': { // @鋼体の重心に対するワールド上での変換マトリクスを設定する。 // @AMOじゅうしんわーるどへんかんぎょうれつせってい
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (body,mat,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      body.setCenterOfMassTransform(mat)
+    },
+    return_none: true
+  },
+  // @ディスパッチャ共通の操作
+  'AMO多様体数取得': { // @ディスパッチャから存在する多様体の数を取得して返す。 // @AMOたようたいすうしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (obj, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (obj != null && typeof obj.getDispatcher === 'function') {
+        obj = obj.getDispatcher()
+      }
+      return obj.getNumManifolds()
+    },
+    return_none: false
+  },
+  'AMO多様体取得': { // @ディスパッチャから指定した多様体を取得して返す。 // @AMOたようたいしゅとく
+    type: 'func',
+    josi: [['から','で'],['の']],
+    pure: true,
+    fn: function (obj, index, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (obj != null && typeof obj.getDispatcher === 'function') {
+        obj = obj.getDispatcher()
+      }
+      return obj.getManifoldByIndexInternal(index)
+    },
+    return_none: false
+  },
+  // @多様体の操作
+  'AMO衝突オブジェクトA取得': { // @多様体から衝突オブジェクトの0を取り出して返す。 // @AMOしょうとつおぶじぇくとAしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (manifold,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return manifold.getBody0()
+    },
+    return_none: false
+  },
+  'AMO衝突オブジェクトB取得': { // @多様体から衝突オブジェクトの1を取り出して返す。 // @AMOしょうとつおぶじぇくとBしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (manifold,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return manifold.getBody1()
+    },
+    return_none: false
+  },
+  'AMO近接点数取得': { // @多様体から近接点数を取得して返す。 // @AMOきんせつてんすうしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (manifold, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return manifold.getNumContacts()
+    },
+    return_none: false
+  },
+  'AMO近接点取得': { // @ディスパッチャから指定した近接点を取得して返す。 // @AMOきんせつてんしゅとく
+    type: 'func',
+    josi: [['から','で'],['の']],
+    pure: true,
+    fn: function (manifold, index, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return manifold.getContactPoint(index)
+    },
+    return_none: false
+  },
+  // @多様体近接点の操作
+  'AMO近接距離取得': { // @近接点から距離を取得して返す。 // @AMOきんせつきょりしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (contact, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return contact.getDistance()
+    },
+    return_none: false
+  },
+  'AMO衝突力取得': { // @近接点から衝突していた場合の衝撃力を返す。 // @AMOしょうとつりょくしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (contact, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return contact.getAppliedImpulse()
+    },
+    return_none: false
+  },
+  'AMOワールド座標B取得': { // @近接点からBのワールド上での位置を返す。 // @AMOわーるどざひょうBしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (contact, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return contact.get_m_positionWorldOnB()
+    },
+    return_none: false
+  },
+  'AMOワールド座標A取得': { // @近接点からAのワールド上での位置を返す。 // @AMOわーるどざひょうAしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (contact, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return contact.get_m_positionWorldOnA()
+    },
+    return_none: false
+  },
+  'AMO法線B取得': { // @近接点からBの法線を返す。 // @AMOほうせんBしゅとく
+    type: 'func',
+    josi: [['の','から']],
+    pure: true,
+    fn: function (contact, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return contact.get_m_normalWorldOnB()
+    },
+    return_none: false
+  },
+  // @ワールド
+  'AMO時間経過': { // @ワールド内の時間をT秒数進めます。ただし計算回数の上限はNまでです。 // @AMOじかんけいか
+    type: 'func',
+    josi: [['を'],['で','だけ'],['まで']],
+    pure: true,
+    fn: function (world,T,N,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (N == null) { N = 0 }
+      world.stepSimulation(T, N)
+    },
+    return_none: true
+  },
+  'AMO重力設定': { // @ワールドに重力を設定します(下方向は-Yです) // @AMOじゅうりょくせってい
+    type: 'func',
+    josi: [['に'],['の','で']],
+    pure: true,
+    fn: function (world,G,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      let V
+      let isNew = false
+      if (G instanceof AmmoLib.btVector3) {
+        V = G
+      } else
+      if (G instanceof Array && G.length == 3) {
+        V = new AmmoLib.btVector3(G[0], G[1], G[2])
+        isNew = true
+      } else
+      if (G == null) {
+        V = new AmmoLib.btVector3(0, -9.8, 0)
+        isNew = true
+      } else {
+        throw new Error('重力は要素が３つの配列([X,Y,Z])で指定してください(下方向は-Yです)')
+      }
+      world.setGravity(V)
+      if (isNew) {
+        AmmoLib.destroy(V)
+      }
+    },
+    return_none: true
+  },
+  'AMO鋼体追加': { // @ワールドに鋼体を追加する // @AMOこうたいついか
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (world,body,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      world.addRigidBody(body)
+    },
+    return_none: true
+  },
+  'AMO制約追加': { // @ワールドに制約を追加する // @AMOせいやくついか
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (world,constraint,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      world.addConstraint(constraint, false)
+    },
+    return_none: true
+  },
+  'AMO衝突オブジェクト追加': { // @ワールドに衝突オブジェクトを追加する // @AMOしょうとつおぶじぇくとついか
+    type: 'func',
+    josi: [['に'],['を']],
+    pure: true,
+    fn: function (world,obj,sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      world.addCollisionObject(obj)
+    },
+    return_none: true
+  },
+  // @各種環境
+  'AMOデフォルト衝突判定法作成': { // @デフォルトの衝突判定法を行う判定機を作成して返します // @AMOでふぉるとしょうとつはんていほうさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btDefaultCollisionConfiguration()
+    },
+    return_none: false
+  },
+  'AMO衝突判定ディスパッチャ作成': { // @指定した衝突判定器によるディスパッチャ(振り分け機)を作成して返します // @AMOしょうとつはんていでぃすぱっちゃさくせい
+    type: 'func',
+    josi: [['で','の','から']],
+    pure: true,
+    fn: function (conf, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btCollisionDispatcher( conf )
+    },
+    return_none: false
+  },
+  'AMODbvt作成': { // @衝突判定のための物体を管理するDbvt空間を作成して返します // @AMODbvtさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btDbvtBroadphase()
+    },
+    return_none: false
+  },
+  'AMO三軸スィープ作成': { // @衝突判定のための物体を管理する3軸スィープを作成して返します // @AMOさんじくすぃーぷ
+    type: 'func',
+    josi: [['から'],['の','で']],
+    pure: true,
+    fn: function (minV, maxV, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btAxisSweep3(minV, maxV)
+    },
+    return_none: false
+  },
+  'AMO物理ソルバー作成': { // @物理的な現象を適用するためのソルバーを作成して返します // @AMOぶつりそるばーさくせい
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      return new AmmoLib.btSequentialImpulseConstraintSolver()
+    },
+    return_none: false
+  },
+  'AMO離散力学ワールド作成': { // @離散した物体のみが存在する力学ワールドを作成する // @AMOりさんりきがくわーるどさくせい
+    type: 'func',
+    josi: [['で','から','の']],
+    pure: true,
+    fn: function (opts, sys) {
+      if (!sys._weykammojs) return null
+      const AmmoLib = sys._weykammojs.ck()
+      if (!(opts instanceof Array && opts.length == 4)) {
+        throw new Error('力学ワールドの作成には要素が４つの配列(dispacher,broadphase,solver,collisionConfiguration)で指定して下さい')
+      }
+      const dispatcher = opts[0]
+      const broadphase = opts[1]
+      const solver = opts[2]
+      const collisionConfiguration = opts[3]
+      return new AmmoLib.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration )
+    },
+    return_none: false
+  },
+}
+
+if (typeof global === "object" && typeof global.process === "object") {
+  module.exports = PluginWeykAmmo
+}
+
+// ブラウザからscriptタグで取り込んだ時、自動で登録する
+if (typeof navigator === 'object' && typeof navigator.nako3 === 'object') {
+  navigator.nako3.addPluginObject('PluginWeykAmmo', PluginWeykAmmo)
+}

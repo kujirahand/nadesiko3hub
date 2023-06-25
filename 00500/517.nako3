@@ -1,0 +1,54 @@
+### [作品情報]
+### タイトル=TODOリスト(マイナビ連載32回目より)
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=MIT
+### 説明=ToDOリストです。アイテムの追加削除ができます。
+### 対象バージョン=3.2.5
+### URL=https://news.mynavi.jp/article/nadeshiko-32/
+### 種類=wnako
+### タグ=
+### 更新日時=2021-04-30 21:36:31
+###
+
+# マイナビ連載32回目より
+# https://news.mynavi.jp/article/nadeshiko-32/
+
+# --- TODOリストのプログラム ---
+# 前回の保存内容を読む --- (*1)
+「TODOリスト.dat」を開いて、TODOに代入。
+もし、TODOが未定義ならば、TODO=[]
+TODO表示。
+
+●TODO表示
+  # タイトルと入力部分の指定
+  HTML=「<h1><a name="top">TODOの内容</a></h1>」
+  HTML=HTML&「<p><input id="add_txt" size=40>」
+  HTML=HTML&「<button id="add_btn">追加</button></p>」
+  # TODOの内容に基づいて繰り返しHTMLを生成する --- (*2)
+  L=0
+  TODOを反復
+    HTML＝HTML&「<li><a href="#top" data-no="{L}">{それ}</a></li>」
+    L=L+1
+  ここまで
+  DOM親要素へ「<ul>{HTML}</ul>」をHTML設定。
+  TODOイベント設定
+ここまで。
+
+●TODOイベント設定
+  ＃追加ボタンを押した時の処理を追加 --- (*3)
+  「#add_btn」をクリックした時には
+    内容＝「#add_txt」からテキスト取得。
+    TODOに内容を配列追加。
+    TODOを「TODOリスト.dat」に保存。# --- (*4)
+    TODO表示。
+  ここまで。
+  ＃TODOアイテムクリックで削除 --- (*5)
+  「a[href="#top"]」のDOM要素全取得して反復
+    それをクリックした時には
+      NO=対象["dataset"]["no"]
+      TODOのNOを配列切り取る
+      TODOを「TODOリスト.dat」に保存。
+      TODO表示。
+    ここまで。
+  ここまで。
+ここまで。

@@ -1,0 +1,972 @@
+### [作品情報]
+### タイトル=Ochikaku@三島
+### 作者=駿河(user_id=0)
+### ライセンス=BSD
+### 説明=位置情報を駆使して静岡県三島市の観光スポットを近い順に表示するプログラムです。スマートフォンで使用することができます。2021年静岡県プログラミングコンテスト中学生の部ソフト部門で1次審査を突破し、2次審査で落選しました。なでしこ3の使い方を教えてくださった皆さん、ありがとうございました。[追記]参考にしてくださった方、ありがとうございます!うれしいです!
+### 対象バージョン=3.2.25
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2021-11-11 19:22:44
+###
+
+画像=「https://docs.google.com/drawings/d/e/2PACX-1vRm5k_DSie2NpiUUCU9b3vxfAy-sIpjv9jInsO7lsTizLok9Vn1_QgPuFCxueqHBqCPrc4Po_mHSHRS/pub?w=480&h=360」
+画像の[0,0,500,500]を[0,0,200,200]に画像部分描画。
+
+空のラベル作成して、情報ラベルに代入。
+空のラベル作成して、題名に代入。
+題名に「🗻Ochikaku@三島✨」をテキスト設定。
+空のラベル作成して、情報ラベルに代入。
+情報ラベルに「　　　　　　　　　　　　　　　　　　　　　　　　　　🧭位置情報が許可されていない場合は許可してください。」をテキスト設定。
+位置情報取得した時には
+　位置は対象。
+
+
+位置で「,」が何文字目かを点に代入する。
+位置で１から　点-１　文字抜出してxに代入。
+位置の1から点だけ文字削除してyに代入。
+情報ラベルに「🗻お調べしています…」をテキスト設定。
+
+
+#楽寿園
+　場所xは「35.12334043255857」
+　場所yは「138.9139345066538」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　楽寿園は（場所x差＾2＋場所y差＾2の平方根）
+
+#山中城址
+　場所xは「35.15382827975467」
+　場所yは「138.9942842710355」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　山中城址は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#梅花藻
+　場所xは「35.115818184280535」
+　場所yは「138.91504749191085」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　梅花藻は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#佐野美術館
+　場所xは「35.11489417705852」
+　場所yは「138.91630943641763」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　佐野美術館は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#宝物館
+　場所xは「35.12145100110311」
+　場所yは「138.91944976447317」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　宝物館は（場所x差＾2＋場所y差＾2の平方根）
+
+#向山古墳
+　場所xは「35.106714937200934」
+　場所yは「138.94236555450658」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　向山古墳は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#源兵衛川
+　場所xは「35.12180737144652」
+　場所yは「138.91229692996862」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　源兵衛川は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#白滝公園
+　場所xは「35.12284349625263」
+　場所yは「138.91410088783235」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　白滝公園は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#白滝機械
+　場所xは「35.122768357422984」
+　場所yは「138.91416257864287」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　白滝機械は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#菰池公園
+　場所xは「35.12515707555226」
+　場所yは「138.91573209798233」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　菰池公園は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#市役所機械
+　場所xは「35.11936826352041」
+　場所yは「138.9194034364976」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　市役所機械は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#雷井戸
+　場所xは「35.116268171067006」
+　場所yは「138.9144772894975」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　雷井戸は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#茶臼山
+　場所xは「35.14740210375029」
+　場所yは「138.94400972453596」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　茶臼山は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#施行平
+　場所xは「35.17134594008502」
+　場所yは「139.00548505860397」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　施行平は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#温水池
+　場所xは「35.10853101120079」
+　場所yは「138.91643115824724」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　温水池は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#新城橋
+　場所xは「35.07637559252782」
+　場所yは「138.9190678222021」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　新城橋は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#末広山
+　場所xは「35.15767791239498」
+　場所yは「138.92751234780943」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　末広山は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#清住緑地
+　場所xは「35.11327974126681」
+　場所yは「138.90528249053835」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　清住緑地は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#片平山公園
+　場所xは「35.16499530589481」
+　場所yは「138.95018175196452」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　片平山公園は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#鐘
+　場所xは「35.11853276980253」
+　場所yは「138.91207520749583」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　鐘は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#石畳
+　場所xは「35.151563050856716」
+　場所yは「138.99150157340964」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　石畳は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#水
+　場所xは「35.11527378665785」
+　場所yは「138.91403750501703」
+　場所x差は「｛x-場所xの絶対値}」
+　場所y差は「｛y-場所yの絶対値}」
+　水は（場所x差＾2＋場所y差＾2の平方根）
+
+
+#配列ソート
+距離=[楽寿園,山中城址,梅花藻,佐野美術館,宝物館,向山古墳,源兵衛川,白滝公園,白滝機械,菰池公園,市役所機械,雷井戸,茶臼山,施行平,温水池,新城橋,末広山,清住緑地,片平山公園,鐘,石畳,水]
+
+距離を配列ソートして一覧表に代入。
+数字列は一覧表。
+現在初期位置は「1」。
+
+#1
+数字列で「,」が何文字目かを点に代入。
+数字列で現在初期位置から 点-1 文字抜出して順番に代入。
+数字列の現在初期位置から点だけ文字削除して数字列に代入。
+
+
+
+　もし、順番が楽寿園ならば、
+　順位は「楽寿園　　　　」。　
+　公式は「https://www.city.mishima.shizuoka.jp/rakujyu/index.html」
+　地図は「https://goo.gl/maps/SoETysSpLhr35Bt86」
+　　　　　　　　　
+違えば、もし、順番が山中城址ならば、
+　順位は「山中城址　　　」。
+　公式は「https://www.mishima-kankou.com/spot/282/」
+　地図は「https://goo.gl/maps/CapEr2gzfHvzrg9eA」
+
+
+違えば、もし、順番が梅花藻ならば、
+　順位は「三島梅花藻の里」。
+　公式は「https://www.mishima-kankou.com/spot/447/」
+　地図は「https://goo.gl/maps/Gd7DM1BQzFVnY91i7」
+
+違えば、もし、順番が佐野美術館ならば、
+　順位は「佐野美術館　　」。
+　公式は「https://www.sanobi.or.jp/」
+　地図は「https://goo.gl/maps/yr1sCqu4oKPteQCz5」
+
+
+違えば、もし、順番が宝物館ならば、
+　順位は「三嶋大社宝物館」。
+　公式は「https://www.mishima-kankou.com/spot/1605/」
+　地図は「https://goo.gl/maps/c3hdgPLkxJKijCSf7」
+
+違えば、もし、順番が向山古墳ならば、
+　順位は「向山古墳　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn032385.html」
+　地図は「https://goo.gl/maps/fuBo1kKw8S1Nc4jG8」
+
+違えば、もし、順番が源兵衛川ならば、
+　順位は「源兵衛川　　　」。
+　公式は「https://www.mishima-kankou.com/spot/287/」
+　地図は「https://goo.gl/maps/e4sTZDxSVXUpEoN5A」
+
+違えば、もし、順番が白滝公園ならば、
+　順位は「白滝公園　　　」。
+　公式は「https://www.mishima-kankou.com/spot/480/」
+　地図は「https://goo.gl/maps/d121fKXheMrT6u8b8」
+
+違えば、もし、順番が白滝機械ならば、
+　順位は「めぐみの子　　」。
+　公式は「https://www.mishima-kankou.com/spot/448/」
+　地図は「https://goo.gl/maps/HK1qi1q7ha8mZSv9A」
+
+違えば、もし、順番が菰池公園ならば、
+　順位は「菰池公園　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000003.html」。
+　地図は「https://goo.gl/maps/nQws6qUshGDhYkfa7」
+
+違えば、もし、順番が市役所機械ならば、
+　順位は「つるべっ子　　」。
+　公式は「なし」
+　地図は「https://goo.gl/maps/drtAvASsVR4naeRGA」
+
+違えば、もし、順番が雷井戸ならば、
+　順位は「雷井戸　　　　」。
+　公式は「https://www.mishima-kankou.com/spot/482/」
+　地図は「https://goo.gl/maps/CTGwTXyhJ8BfM7TC7」
+
+違えば、もし、順番が茶臼山ならば、
+　順位は「茶臼山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn018883.html」
+　地図は「https://goo.gl/maps/GzKcYFnCkgVMqKhp7」
+
+違えば、もし、順番が施行平ならば、
+　順位は「施行平　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004637.html」
+　地図は「https://goo.gl/maps/pKGsdUeXxT2mR1e58」
+
+違えば、もし、順番が温水池ならば、
+　順位は「中郷温水池　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004638.html」
+　地図は「https://goo.gl/maps/D8dK8SLJXfZiexxA8」
+
+違えば、もし、順番が新城橋ならば、
+　順位は「新城橋　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004641.html」
+　地図は「https://goo.gl/maps/zoihWFVKcjhkbmoy6」
+
+違えば、もし、順番が末広山ならば、
+　順位は「末広山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004635.html」
+　地図は「https://goo.gl/maps/C586W24tWqbzDznQ7」
+
+違えば、もし、順番が清住緑地ならば、
+　順位は「清住緑地　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn044681.html」
+　地図は「https://goo.gl/maps/PFVR59KM6bP3C6en7」
+
+違えば、もし、順番が片平山公園ならば、
+　順位は「片平山公園　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn015746.html」
+　地図は「https://goo.gl/maps/9LQYymtGU29p9v4t5」
+
+違えば、もし、順番が鐘ならば、
+　順位は「時の鐘　　　　」。
+　公式は　「https://www.city.mishima.shizuoka.jp/ipn038611.html」
+　地図は「https://goo.gl/maps/79wnEXvV4W2nnmJYA」
+
+違えば、もし、順番が石畳ならば、
+　順位は「箱根旧街道石畳」。
+　公式は「https://www.city.mishima.shizuoka.jp/kanko_content000261.html」
+　地図は「https://goo.gl/maps/HGbyxFFmxMDqw81KA」
+
+違えば、もし、順番が水ならば、
+　順位は「水の苑緑地　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000053.html」
+　地図は「https://goo.gl/maps/bkrvxTsjZsou8jWk9」
+ここまで
+
+
+
+情報ラベルに「」をテキスト設定。
+空のラベル作成して、一位に代入。
+一位に「　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+1位…｛順位｝」をテキスト設定。
+
+一位公式は公式。
+一位地図は地図。
+もし、一位公式が「なし」なら、
+　一位公式は「なし」。
+違えば、
+一位公式を「一位情報.txt」に保存。
+一位情報ボタン=「情報サイト」のボタン作成。
+一位情報ボタンをクリックした時には、
+　「一位情報.txt」を開いて一位公式に代入。
+　一位公式にブラウザ移動。
+ここまで
+
+
+
+もし、一位地図が「なし」なら、
+　一位地図は「なし」。
+違えば、
+一位地図を「一位地図.txt」に保存。
+一位地図ボタン=「地図サイト」のボタン作成。
+一位地図ボタンをクリックした時には、
+　「一位地図.txt」を開いて一位地図に代入。
+　一位地図にブラウザ移動。
+
+　　ここまで。
+ここまで。
+
+#2
+数字列で「,」が何文字目かを点に代入。
+数字列で現在初期位置から 点-1 文字抜出して順番に代入。
+数字列の現在初期位置から点だけ文字削除して数字列に代入。
+
+
+
+もし、順番が楽寿園ならば、
+　順位は「楽寿園　　　　」。　
+　公式は「https://www.city.mishima.shizuoka.jp/rakujyu/index.html」
+　地図は「https://goo.gl/maps/SoETysSpLhr35Bt86」
+　　　　　　　　　
+違えば、もし、順番が山中城址ならば、
+　順位は「山中城址　　　」。
+　公式は「https://www.mishima-kankou.com/spot/282/」
+　地図は「https://goo.gl/maps/CapEr2gzfHvzrg9eA」
+
+
+違えば、もし、順番が梅花藻ならば、
+　順位は「三島梅花藻の里」。
+　公式は「https://www.mishima-kankou.com/spot/447/」
+　地図は「https://goo.gl/maps/Gd7DM1BQzFVnY91i7」
+
+違えば、もし、順番が佐野美術館ならば、
+　順位は「佐野美術館　　」。
+　公式は「https://www.sanobi.or.jp/」
+　地図は「https://goo.gl/maps/yr1sCqu4oKPteQCz5」
+
+
+違えば、もし、順番が宝物館ならば、
+　順位は「三嶋大社宝物館」。
+　公式は「https://www.mishima-kankou.com/spot/1605/」
+　地図は「https://goo.gl/maps/c3hdgPLkxJKijCSf7」
+
+違えば、もし、順番が向山古墳ならば、
+　順位は「向山古墳　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn032385.html」
+　地図は「https://goo.gl/maps/fuBo1kKw8S1Nc4jG8」
+
+違えば、もし、順番が源兵衛川ならば、
+　順位は「源兵衛川　　　」。
+　公式は「https://www.mishima-kankou.com/spot/287/」
+　地図は「https://goo.gl/maps/e4sTZDxSVXUpEoN5A」
+
+違えば、もし、順番が白滝公園ならば、
+　順位は「白滝公園　　　」。
+　公式は「https://www.mishima-kankou.com/spot/480/」
+　地図は「https://goo.gl/maps/d121fKXheMrT6u8b8」
+
+違えば、もし、順番が白滝機械ならば、
+　順位は「めぐみの子　　」。
+　公式は「https://www.mishima-kankou.com/spot/448/」
+　地図は「https://goo.gl/maps/HK1qi1q7ha8mZSv9A」
+
+違えば、もし、順番が菰池公園ならば、
+　順位は「菰池公園　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000003.html」
+　地図は「https://goo.gl/maps/nQws6qUshGDhYkfa7」
+
+違えば、もし、順番が市役所機械ならば、
+　順位は「つるべっ子　　」。
+　公式は「なし」
+　地図は「https://goo.gl/maps/drtAvASsVR4naeRGA」
+
+違えば、もし、順番が雷井戸ならば、
+　順位は「雷井戸　　　　」。
+　公式は「https://www.mishima-kankou.com/spot/482/」
+　地図は「https://goo.gl/maps/CTGwTXyhJ8BfM7TC7」
+
+違えば、もし、順番が茶臼山ならば、
+　順位は「茶臼山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn018883.html」
+　地図は「https://goo.gl/maps/GzKcYFnCkgVMqKhp7」
+
+違えば、もし、順番が施行平ならば、
+　順位は「施行平　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004637.html」
+　地図は「https://goo.gl/maps/pKGsdUeXxT2mR1e58」
+
+違えば、もし、順番が温水池ならば、
+　順位は「中郷温水池　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004638.html」
+　地図は「https://goo.gl/maps/D8dK8SLJXfZiexxA8」
+
+違えば、もし、順番が新城橋ならば、
+　順位は「新城橋　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004641.html」
+　地図は「https://goo.gl/maps/zoihWFVKcjhkbmoy6」
+
+違えば、もし、順番が末広山ならば、
+　順位は「末広山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004635.html」
+　地図は「https://goo.gl/maps/C586W24tWqbzDznQ7」
+
+違えば、もし、順番が清住緑地ならば、
+　順位は「清住緑地　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn044681.html」
+　地図は「https://goo.gl/maps/PFVR59KM6bP3C6en7」
+
+違えば、もし、順番が片平山公園ならば、
+　順位は「片平山公園　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn015746.html」
+　地図は「https://goo.gl/maps/9LQYymtGU29p9v4t5」
+
+違えば、もし、順番が鐘ならば、
+　順位は「時の鐘　　　　」。
+　公式は　「https://www.city.mishima.shizuoka.jp/ipn038611.html」
+　地図は「https://goo.gl/maps/79wnEXvV4W2nnmJYA」
+
+違えば、もし、順番が石畳ならば、
+　順位は「箱根旧街道石畳」。
+　公式は「https://www.city.mishima.shizuoka.jp/kanko_content000261.html」
+　地図は「https://goo.gl/maps/HGbyxFFmxMDqw81KA」
+
+違えば、もし、順番が水ならば、
+　順位は「水の苑緑地　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000053.html」
+　地図は「https://goo.gl/maps/bkrvxTsjZsou8jWk9」
+ここまで
+
+
+空のラベル作成して、二位に代入。
+二位に「　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+2位…｛順位｝」をテキスト設定。
+公式を二位公式に代入。
+地図を二位地図に代入。
+
+
+もし、二位公式が「なし」なら、
+　ニ位公式は「なし」。
+違えば、
+二位公式を「二位情報.txt」に保存。
+ニ位情報ボタン=「情報サイト」のボタン作成。
+ニ位情報ボタンをクリックした時には、
+　「二位情報.txt」を開いて二位公式に代入。
+　二位公式にブラウザ移動。
+ここまで
+
+
+
+もし、二位地図が「なし」なら、
+　ニ位地図は「なし」。
+違えば、
+二位地図を「二位地図.txt」に保存。
+ニ位地図ボタン=「地図サイト」のボタン作成。
+ニ位地図ボタンをクリックした時には、
+　「二位地図.txt」を開いて二位地図に代入。
+　二位地図にブラウザ移動。
+ここまで
+
+#3
+数字列で「,」が何文字目かを点に代入。
+数字列で現在初期位置から 点-1 文字抜出して順番に代入。
+数字列の現在初期位置から点だけ文字削除して数字列に代入。
+
+
+
+もし、順番が楽寿園ならば、
+　順位は「楽寿園　　　　」。　
+　公式は「https://www.city.mishima.shizuoka.jp/rakujyu/index.html」
+　地図は「https://goo.gl/maps/SoETysSpLhr35Bt86」
+　　　　　　　　　
+違えば、もし、順番が山中城址ならば、
+　順位は「山中城址　　　」。
+　公式は「https://www.mishima-kankou.com/spot/282/」
+　地図は「https://goo.gl/maps/CapEr2gzfHvzrg9eA」
+
+
+違えば、もし、順番が梅花藻ならば、
+　順位は「三島梅花藻の里」。
+　公式は「https://www.mishima-kankou.com/spot/447/」
+　地図は「https://goo.gl/maps/Gd7DM1BQzFVnY91i7」
+
+違えば、もし、順番が佐野美術館ならば、
+　順位は「佐野美術館　　」。
+　公式は「https://www.sanobi.or.jp/」
+　地図は「https://goo.gl/maps/yr1sCqu4oKPteQCz5」
+
+
+違えば、もし、順番が宝物館ならば、
+　順位は「三嶋大社宝物館」。
+　公式は「https://www.mishima-kankou.com/spot/1605/」
+　地図は「https://goo.gl/maps/c3hdgPLkxJKijCSf7」
+
+違えば、もし、順番が向山古墳ならば、
+　順位は「向山古墳　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn032385.html」
+　地図は「https://goo.gl/maps/fuBo1kKw8S1Nc4jG8」
+
+違えば、もし、順番が源兵衛川ならば、
+　順位は「源兵衛川　　　」。
+　公式は「https://www.mishima-kankou.com/spot/287/」
+　地図は「https://goo.gl/maps/e4sTZDxSVXUpEoN5A」
+
+違えば、もし、順番が白滝公園ならば、
+　順位は「白滝公園　　　」。
+　公式は「https://www.mishima-kankou.com/spot/480/」
+　地図は「https://goo.gl/maps/d121fKXheMrT6u8b8」
+
+違えば、もし、順番が白滝機械ならば、
+　順位は「めぐみの子　　」。
+　公式は「https://www.mishima-kankou.com/spot/448/」
+　地図は「https://goo.gl/maps/HK1qi1q7ha8mZSv9A」
+
+違えば、もし、順番が菰池公園ならば、
+　順位は「菰池公園　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000003.html」
+　地図は「https://goo.gl/maps/nQws6qUshGDhYkfa7」
+
+違えば、もし、順番が市役所機械ならば、
+　順位は「つるべっ子　　」。
+　公式は「なし」
+　地図は「https://goo.gl/maps/drtAvASsVR4naeRGA」
+
+違えば、もし、順番が雷井戸ならば、
+　順位は「雷井戸　　　　」。
+　公式は「https://www.mishima-kankou.com/spot/482/」
+　地図は「https://goo.gl/maps/CTGwTXyhJ8BfM7TC7」
+
+違えば、もし、順番が茶臼山ならば、
+　順位は「茶臼山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn018883.html」
+　地図は「https://goo.gl/maps/GzKcYFnCkgVMqKhp7」
+
+違えば、もし、順番が施行平ならば、
+　順位は「施行平　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004637.html」
+　地図は「https://goo.gl/maps/pKGsdUeXxT2mR1e58」
+
+違えば、もし、順番が温水池ならば、
+　順位は「中郷温水池　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004638.html」
+　地図は「https://goo.gl/maps/D8dK8SLJXfZiexxA8」
+
+違えば、もし、順番が新城橋ならば、
+　順位は「新城橋　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004641.html」
+　地図は「https://goo.gl/maps/zoihWFVKcjhkbmoy6」
+
+違えば、もし、順番が末広山ならば、
+　順位は「末広山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004635.html」
+　地図は「https://goo.gl/maps/C586W24tWqbzDznQ7」
+
+違えば、もし、順番が清住緑地ならば、
+　順位は「清住緑地　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn044681.html」
+　地図は「https://goo.gl/maps/PFVR59KM6bP3C6en7」
+
+違えば、もし、順番が片平山公園ならば、
+　順位は「片平山公園　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn015746.html」
+　地図は「https://goo.gl/maps/9LQYymtGU29p9v4t5」
+
+違えば、もし、順番が鐘ならば、
+　順位は「時の鐘　　　　」。
+　公式は　「https://www.city.mishima.shizuoka.jp/ipn038611.html」
+　地図は「https://goo.gl/maps/79wnEXvV4W2nnmJYA」
+
+違えば、もし、順番が石畳ならば、
+　順位は「箱根旧街道石畳」。
+　公式は「https://www.city.mishima.shizuoka.jp/kanko_content000261.html」
+　地図は「https://goo.gl/maps/HGbyxFFmxMDqw81KA」
+
+違えば、もし、順番が水ならば、
+　順位は「水の苑緑地　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000053.html」
+　地図は「https://goo.gl/maps/bkrvxTsjZsou8jWk9」
+ここまで
+
+
+空のラベル作成して、三位に代入。
+三位に「　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+3位…｛順位｝」をテキスト設定。
+公式を三位公式に代入。
+地図を三位地図に代入。
+
+
+もし、三位公式が「なし」なら、
+　三位公式は「なし」。
+違えば、
+三位公式を「三位情報.txt」に保存。
+三位情報ボタン=「情報サイト」のボタン作成。
+三位情報ボタンをクリックした時には、
+　「三位情報.txt」を開いて三位公式に代入。
+　三位公式にブラウザ移動。
+ここまで
+
+
+
+もし、三位地図が「なし」なら、
+　三位地図は「なし」。
+違えば、
+三位地図を「三位地図.txt」に保存。
+三位地図ボタン=「地図サイト」のボタン作成。
+三位地図ボタンをクリックした時には、
+　「三位地図.txt」を開いて三位地図に代入。
+　三位地図にブラウザ移動。
+ここまで
+
+#4
+数字列で「,」が何文字目かを点に代入。
+数字列で現在初期位置から 点-1 文字抜出して順番に代入。
+数字列の現在初期位置から点だけ文字削除して数字列に代入。
+
+
+
+もし、順番が楽寿園ならば、
+　順位は「楽寿園　　　　」。　
+　公式は「https://www.city.mishima.shizuoka.jp/rakujyu/index.html」
+　地図は「https://goo.gl/maps/SoETysSpLhr35Bt86」
+　　　　　　　　　
+違えば、もし、順番が山中城址ならば、
+　順位は「山中城址　　　」。
+　公式は「https://www.mishima-kankou.com/spot/282/」
+　地図は「https://goo.gl/maps/CapEr2gzfHvzrg9eA」
+
+
+違えば、もし、順番が梅花藻ならば、
+　順位は「三島梅花藻の里」。
+　公式は「https://www.mishima-kankou.com/spot/447/」
+　地図は「https://goo.gl/maps/Gd7DM1BQzFVnY91i7」
+
+違えば、もし、順番が佐野美術館ならば、
+　順位は「佐野美術館　　」。
+　公式は「https://www.sanobi.or.jp/」
+　地図は「https://goo.gl/maps/yr1sCqu4oKPteQCz5」
+
+
+違えば、もし、順番が宝物館ならば、
+　順位は「三嶋大社宝物館」。
+　公式は「https://www.mishima-kankou.com/spot/1605/」
+　地図は「https://goo.gl/maps/c3hdgPLkxJKijCSf7」
+
+違えば、もし、順番が向山古墳ならば、
+　順位は「向山古墳　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn032385.html」
+　地図は「https://goo.gl/maps/fuBo1kKw8S1Nc4jG8」
+
+違えば、もし、順番が源兵衛川ならば、
+　順位は「源兵衛川　　　」。
+　公式は「https://www.mishima-kankou.com/spot/287/」
+　地図は「https://goo.gl/maps/e4sTZDxSVXUpEoN5A」
+
+違えば、もし、順番が白滝公園ならば、
+　順位は「白滝公園　　　」。
+　公式は「https://www.mishima-kankou.com/spot/480/」
+　地図は「https://goo.gl/maps/d121fKXheMrT6u8b8」
+
+違えば、もし、順番が白滝機械ならば、
+　順位は「めぐみの子　　」。
+　公式は「https://www.mishima-kankou.com/spot/448/」
+　地図は「https://goo.gl/maps/HK1qi1q7ha8mZSv9A」
+
+違えば、もし、順番が菰池公園ならば、
+　順位は「菰池公園　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000003.html」
+　地図は「https://goo.gl/maps/nQws6qUshGDhYkfa7」
+
+違えば、もし、順番が市役所機械ならば、
+　順位は「つるべっ子　　」。
+　公式は「なし」
+　地図は「https://goo.gl/maps/drtAvASsVR4naeRGA」
+
+違えば、もし、順番が雷井戸ならば、
+　順位は「雷井戸　　　　」。
+　公式は「https://www.mishima-kankou.com/spot/482/」
+　地図は「https://goo.gl/maps/CTGwTXyhJ8BfM7TC7」
+
+違えば、もし、順番が茶臼山ならば、
+　順位は「茶臼山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn018883.html」
+　地図は「https://goo.gl/maps/GzKcYFnCkgVMqKhp7」
+
+違えば、もし、順番が施行平ならば、
+　順位は「施行平　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004637.html」
+　地図は「https://goo.gl/maps/pKGsdUeXxT2mR1e58」
+
+違えば、もし、順番が温水池ならば、
+　順位は「中郷温水池　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004638.html」
+　地図は「https://goo.gl/maps/D8dK8SLJXfZiexxA8」
+
+違えば、もし、順番が新城橋ならば、
+　順位は「新城橋　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004641.html」
+　地図は「https://goo.gl/maps/zoihWFVKcjhkbmoy6」
+
+違えば、もし、順番が末広山ならば、
+　順位は「末広山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004635.html」
+　地図は「https://goo.gl/maps/C586W24tWqbzDznQ7」
+
+違えば、もし、順番が清住緑地ならば、
+　順位は「清住緑地　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn044681.html」
+　地図は「https://goo.gl/maps/PFVR59KM6bP3C6en7」
+
+違えば、もし、順番が片平山公園ならば、
+　順位は「片平山公園　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn015746.html」
+　地図は「https://goo.gl/maps/9LQYymtGU29p9v4t5」
+
+違えば、もし、順番が鐘ならば、
+　順位は「時の鐘　　　　」。
+　公式は　「https://www.city.mishima.shizuoka.jp/ipn038611.html」
+　地図は「https://goo.gl/maps/79wnEXvV4W2nnmJYA」
+
+違えば、もし、順番が石畳ならば、
+　順位は「箱根旧街道石畳」。
+　公式は「https://www.city.mishima.shizuoka.jp/kanko_content000261.html」
+　地図は「https://goo.gl/maps/HGbyxFFmxMDqw81KA」
+
+違えば、もし、順番が水ならば、
+　順位は「水の苑緑地　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000053.html」
+　地図は「https://goo.gl/maps/bkrvxTsjZsou8jWk9」
+ここまで
+
+
+空のラベル作成して、四位に代入。
+四位に「　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+4位…｛順位｝」をテキスト設定。
+公式を四位公式に代入。
+地図を四位地図に代入。
+
+
+もし、四位公式が「なし」なら、
+　四位公式は「なし」。
+違えば、
+四位公式を「四位情報.txt」に保存。
+四位情報ボタン=「情報サイト」のボタン作成。
+四位情報ボタンをクリックした時には、
+　「四位情報.txt」を開いて四位公式に代入。
+　四位公式にブラウザ移動。
+ここまで
+
+もし、四位地図が「なし」なら、
+　四位地図は「なし」。
+違えば、
+四位地図を「四位地図.txt」に保存。
+四位地図ボタン=「地図サイト」のボタン作成。
+四位地図ボタンをクリックした時には、
+　「四位地図.txt」を開いて四位地図に代入。
+　四位地図にブラウザ移動。
+ここまで
+
+#5
+数字列で「,」が何文字目かを点に代入。
+数字列で現在初期位置から 点-1 文字抜出して順番に代入。
+数字列の現在初期位置から点だけ文字削除して数字列に代入。
+
+
+
+もし、順番が楽寿園ならば、
+　順位は「楽寿園　　　　」。　
+　公式は「https://www.city.mishima.shizuoka.jp/rakujyu/index.html」
+　地図は「https://goo.gl/maps/SoETysSpLhr35Bt86」
+　　　　　　　　　
+違えば、もし、順番が山中城址ならば、
+　順位は「山中城址　　　」。
+　公式は「https://www.mishima-kankou.com/spot/282/」
+　地図は「https://goo.gl/maps/CapEr2gzfHvzrg9eA」
+
+
+違えば、もし、順番が梅花藻ならば、
+　順位は「三島梅花藻の里」。
+　公式は「https://www.mishima-kankou.com/spot/447/」
+　地図は「https://goo.gl/maps/Gd7DM1BQzFVnY91i7」
+
+違えば、もし、順番が佐野美術館ならば、
+　順位は「佐野美術館　　」。
+　公式は「https://www.sanobi.or.jp/」
+　地図は「https://goo.gl/maps/yr1sCqu4oKPteQCz5」
+
+
+違えば、もし、順番が宝物館ならば、
+　順位は「三嶋大社宝物館」。
+　公式は「https://www.mishima-kankou.com/spot/1605/」
+　地図は「https://goo.gl/maps/c3hdgPLkxJKijCSf7」
+
+違えば、もし、順番が向山古墳ならば、
+　順位は「向山古墳　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn032385.html」
+　地図は「https://goo.gl/maps/fuBo1kKw8S1Nc4jG8」
+
+違えば、もし、順番が源兵衛川ならば、
+　順位は「源兵衛川　　　」。
+　公式は「https://www.mishima-kankou.com/spot/287/」
+　地図は「https://goo.gl/maps/e4sTZDxSVXUpEoN5A」
+
+違えば、もし、順番が白滝公園ならば、
+　順位は「白滝公園　　　」。
+　公式は「https://www.mishima-kankou.com/spot/480/」
+　地図は「https://goo.gl/maps/d121fKXheMrT6u8b8」
+
+違えば、もし、順番が白滝機械ならば、
+　順位は「めぐみの子　　」。
+　公式は「https://www.mishima-kankou.com/spot/448/」
+　地図は「https://goo.gl/maps/HK1qi1q7ha8mZSv9A」
+
+違えば、もし、順番が菰池公園ならば、
+　順位は「菰池公園　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000003.html」
+　地図は「https://goo.gl/maps/nQws6qUshGDhYkfa7」
+
+違えば、もし、順番が市役所機械ならば、
+　順位は「つるべっ子　　」。
+　公式は「なし」
+　地図は「https://goo.gl/maps/drtAvASsVR4naeRGA」
+
+違えば、もし、順番が雷井戸ならば、
+　順位は「雷井戸　　　　」。
+　公式は「https://www.mishima-kankou.com/spot/482/」
+　地図は「https://goo.gl/maps/CTGwTXyhJ8BfM7TC7」
+
+違えば、もし、順番が茶臼山ならば、
+　順位は「茶臼山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn018883.html」
+　地図は「https://goo.gl/maps/GzKcYFnCkgVMqKhp7」
+
+違えば、もし、順番が施行平ならば、
+　順位は「施行平　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004637.html」
+　地図は「https://goo.gl/maps/pKGsdUeXxT2mR1e58」
+
+違えば、もし、順番が温水池ならば、
+　順位は「中郷温水池　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004638.html」
+　地図は「https://goo.gl/maps/D8dK8SLJXfZiexxA8」
+
+違えば、もし、順番が新城橋ならば、
+　順位は「新城橋　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004641.html」
+　地図は「https://goo.gl/maps/zoihWFVKcjhkbmoy6」
+
+違えば、もし、順番が末広山ならば、
+　順位は「末広山　　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn004635.html」
+　地図は「https://goo.gl/maps/C586W24tWqbzDznQ7」
+
+違えば、もし、順番が清住緑地ならば、
+　順位は「清住緑地　　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn044681.html」
+　地図は「https://goo.gl/maps/PFVR59KM6bP3C6en7」
+
+違えば、もし、順番が片平山公園ならば、
+　順位は「片平山公園　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/ipn015746.html」
+　地図は「https://goo.gl/maps/9LQYymtGU29p9v4t5」
+
+違えば、もし、順番が鐘ならば、
+　順位は「時の鐘　　　　」。
+　公式は　「https://www.city.mishima.shizuoka.jp/ipn038611.html」
+　地図は「https://goo.gl/maps/79wnEXvV4W2nnmJYA」
+
+違えば、もし、順番が石畳ならば、
+　順位は「箱根旧街道石畳」。
+　公式は「https://www.city.mishima.shizuoka.jp/kanko_content000261.html」
+　地図は「https://goo.gl/maps/HGbyxFFmxMDqw81KA」
+
+違えば、もし、順番が水ならば、
+　順位は「水の苑緑地　　」。
+　公式は「https://www.city.mishima.shizuoka.jp/websystem/kouen/kouen_syousai000053.html」
+　地図は「https://goo.gl/maps/bkrvxTsjZsou8jWk9」
+ここまで
+
+
+空のラベル作成して、五位に代入。
+五位に「　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+5位…｛順位｝」をテキスト設定。
+公式を五位公式に代入。
+地図を五位地図に代入。
+
+
+もし、五位公式が「なし」なら、
+　五位公式は「なし」。
+違えば、
+五位公式を「五位情報.txt」に保存。
+五位情報ボタン=「情報サイト」のボタン作成。
+五位情報ボタンをクリックした時には、
+　「五位情報.txt」を開いて五位公式に代入。
+　五位公式にブラウザ移動。
+ここまで
+
+
+
+もし、五位地図が「なし」なら、
+　五位地図は「なし」。
+違えば、
+五位地図を「五位地図.txt」に保存。
+五位地図ボタン=「地図サイト」のボタン作成。
+五位地図ボタンをクリックした時には、
+　「五位地図.txt」を開いて五位地図に代入。
+　五位地図にブラウザ移動。
+ここまで
+
+ここまで
+ここまで
+ここまで
+ここまで
+ここまで
+ここまで
+ここまで
+ここまで
+ここまで
+ここまで

@@ -1,0 +1,47 @@
+### [作品情報]
+### タイトル=PluginActiveCheck - JSプラグインの「初期化」「!クリア」を使ったアクティブ状態の確認
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=CC0
+### 説明=プラグインの「初期化」と「!クリア」の利用例
+### 対象バージョン=3.3.61
+### URL=
+### 種類=js
+### タグ=プラグイン
+### 更新日時=2022-09-01 01:00:03
+###
+
+//
+// なでしこJSプラグインの作り方の例です。
+// [URL] https://nadesi.com/v3/doc/go.php?1161
+// 初期化と!クリアを使って、なでしこのプログラムがアクティブ状態かどうかを確認できます。
+//
+const PluginActiveCheck = {
+  '初期化': {
+    type: 'func',
+    josi: [],
+    fn: function (sys) {
+      sys.__active = true
+      if (sys.__tid !== undefined) {
+        clearInterval(sys.__tid)
+      }
+      sys.__tid = setInterval(()=>{
+        console.log('__active=', sys.__active)
+      },1000)
+    }
+  },
+  '!クリア': {
+    type: 'func',
+    josi: [],
+    fn: function (sys) {
+      sys.__active = false
+      clearInterval(sys.__tid)
+    }
+  }
+}
+
+// CommonJS方式で自動登録を実装
+if (typeof (navigator) === 'object') {
+  navigator.nako3.addPluginObject("PluginActiveCheck", PluginActiveCheck)
+} else {
+  module.exports = pluginObj
+}

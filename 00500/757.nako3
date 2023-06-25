@@ -1,0 +1,406 @@
+### [作品情報]
+### タイトル=PNGファイルの内容(メタデータ)表示
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=PNGファイルを選択するかドロップすると、PNGファイル内にある各チャンクの情報を表示します。みたいチャンクが「内容未対応」と表示されたけどやっぱり内容知りたいという場合、連絡貰えれば対応します。
+### 対象バージョン=3.2.27
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2021-10-15 21:19:38
+###
+
+!「https://n3s.nadesi.com/plain/752.js」を取り込む
+
+ファイル枠＝ファイル枠作成には(対象ファイル)
+　対象ファイルを"ArrayBuffer"でファイル読込完了時には(ar)
+　　P＝arをPNG読み込み
+　　＃　Pを表示
+　　PのPNG内容表示
+　ここまで
+ここまで
+
+●(PNGの)PNG内容表示
+　アニメーション含はオフ
+　カラータイプは0
+　(PNGからPNGチャンク配列取得)を反復
+　　チャンク＝それ
+　　チャンク["chunkType"]で条件分岐
+　　　「IHDR」ならば、
+　　　　カラータイプはチャンク["colorType"]
+　　　ここまで
+　　　「acTL」ならば、
+　　　　アニメーション含はオン
+　　　ここまで
+　　ここまで
+　ここまで
+
+　TBL＝「TABLE」のDOM要素作成
+　TBLに{"border-collapse":"collapse"}をDOMスタイル一括設定
+　THEAD＝「THEAD」のDOM要素作成
+　TBODY＝「TBODY」のDOM要素作成
+　TBLにTHEADをDOM子要素追加
+　TBLにTBODYをDOM子要素追加
+　TR＝「TR」のDOM要素作成
+　ヘッダ部＝「<th colspan="3">基本情報</th>」
+　もし、アニメーション含ならば、
+　　ヘッダ部＝「{ヘッダ部}<th colspan="7">アニメーション情報</th>」
+　ここまで
+　ヘッダ部＝「{ヘッダ部}<th>補足情報</th>」
+　TRにヘッダ部をDOM_HTML設定
+　THEADにTRをDOM子要素追加
+　TR＝「TR」のDOM要素作成
+　ヘッダ部＝「<th>No</th><th>種類</th><th>長さ</th>」
+　もし、アニメーション含ならば、
+　　ヘッダ部＝「{ヘッダ部}<th>連番</th><th>フレーム番号</th>」
+　　ヘッダ部＝「{ヘッダ部}<th>位置</th><th>サイズ</th><th>表示時間</th><th>描き方</th><th>消え方</th>」
+　ここまで
+　ヘッダ部＝「{ヘッダ部}<th>内容</th>」
+　TRにヘッダ部をDOM_HTML設定
+　THEADにTRをDOM子要素追加
+
+　チャンク番号＝１
+　フレーム番号＝０
+　(PNGからPNGチャンク配列取得)を反復
+　　チャンク＝それ
+　　TR＝「TR」のDOM要素作成
+　　// 全チャンク共通の基本的な情報について表示を行う
+　　TD＝「TD」のDOM要素作成
+　　TDにチャンク番号をDOMテキスト設定
+　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　TRにTDをDOM子要素追加
+　　TD＝「TD」のDOM要素作成
+　　TDにチャンク["chunkType"]をDOMテキスト設定
+　　TDに{"text-align":"left"}をDOMスタイル一括設定
+　　TRにTDをDOM子要素追加
+　　TD＝「TD」のDOM要素作成
+　　TDにチャンク["chunkLength"]をDOMテキスト設定
+　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　TRにTDをDOM子要素追加
+　　// アニメーションに関する情報について表示を行う
+　　もし、アニメーション含ならば、
+　　　チャンク["chunkType"]で条件分岐
+　　　　「IDAT」ならば、
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　もし、フレーム番号＞０ならば、
+　　　　　　TDにフレーム番号をDOMテキスト設定
+　　　　　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　　　　ここまで
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　ここまで
+　　　　「fcTL」ならば、
+　　　　　フレーム番号＝フレーム番号＋１
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDにチャンク["sequence_number"]をDOMテキスト設定
+　　　　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDにフレーム番号をDOMテキスト設定
+　　　　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDに{"text-align":"left"}をDOMスタイル一括設定
+　　　　　TDに「{チャンク["x_offset"]},{チャンク["y_offset"]}」をDOMテキスト設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDに{"text-align":"left"}をDOMスタイル一括設定
+　　　　　TDに「{チャンク["width"]},{チャンク["height"]}」をDOMテキスト設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　　　　ワーク＝チャンク["delay_den"]
+　　　　　もし、ワーク＝0ならば、ワーク＝100
+　　　　　TDに「{チャンク["delay_num"]}/{ワーク}秒」をDOMテキスト設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDに{"text-align":"left"}をDOMスタイル一括設定
+　　　　　チャンク["blend_op"]で条件分岐
+　　　　　　0ならば、
+　　　　　　　ワーク＝「置き換え」
+　　　　　　ここまで
+　　　　　　1ならば、
+　　　　　　　ワーク＝「透過合成」
+　　　　　　ここまで
+　　　　　　違えば、
+　　　　　　　ワーク＝「不明({チャンク["blend_op"]})」
+　　　　　　ここまで
+　　　　　ここまで
+　　　　　TDにワークをDOMテキスト設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDに{"text-align":"left"}をDOMスタイル一括設定
+　　　　　チャンク["dispose_op"]で条件分岐
+　　　　　　0ならば、
+　　　　　　　ワーク＝「消さない」
+　　　　　　ここまで
+　　　　　　1ならば、
+　　　　　　　ワーク＝「透明黒で塗る」
+　　　　　　ここまで
+　　　　　　2ならば、
+　　　　　　　ワーク＝「元に戻す」
+　　　　　　ここまで
+　　　　　　違えば、
+　　　　　　　ワーク＝「不明({チャンク["dispose_op"]})」
+　　　　　　ここまで
+　　　　　ここまで
+　　　　　TDにワークをDOMテキスト設定
+　　　　　TRにTDをDOM子要素追加
+　　　　ここまで
+　　　　「fdAT」ならば、
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDにチャンク["sequence_number"]をDOMテキスト設定
+　　　　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TDにフレーム番号をDOMテキスト設定
+　　　　　TDに{"text-align":"right"}をDOMスタイル一括設定
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　ここまで
+　　　　違えば、
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　　TD＝「TD」のDOM要素作成
+　　　　　TRにTDをDOM子要素追加
+　　　　ここまで
+　　　ここまで
+　　ここまで
+　　// 内容について表示を行う
+　　TD＝「TD」のDOM要素作成
+　　チャンク["chunkType"]で条件分岐
+　　　「IHDR」ならば、
+　　　　ワーク＝「サイズ:{チャンク["width"]}x{チャンク["height"]}<br>画像形式:{チャンク["bitDepth"]}bit 」
+　　　　チャンク["colorType"]で条件分岐
+　　　　　0ならば、
+　　　　　　ワーク＝「{ワーク}グレイスケール<br>」
+　　　　　ここまで
+　　　　　2ならば、
+　　　　　　ワーク＝「{ワーク}フルカラー<br>」
+　　　　　ここまで
+　　　　　3ならば、
+　　　　　　ワーク＝「{ワーク}パレット(8bitフルカラー)<br>」
+　　　　　ここまで
+　　　　　4ならば、
+　　　　　　ワーク＝「{ワーク}グレイスケール＋透過情報<br>」
+　　　　　ここまで
+　　　　　6ならば、
+　　　　　　ワーク＝「{ワーク}フルカラー＋透過情報<br>」
+　　　　　ここまで
+　　　　　違えば、
+　　　　　　ワーク＝「{ワーク}？？？({チャンク["colorType"]})<br>」
+　　　　　ここまで
+　　　　ここまで
+　　　　もし、チャンク["compression"]≠0ならば、
+　　　　　ワーク＝「{ワーク}圧縮方法:不明({チャンク["compression"]})<br>」
+　　　　ここまで
+　　　　もし、チャンク["filter"]≠0ならば、
+　　　　　ワーク＝「{ワーク}フィルタ:不明({チャンク["filter"]})<br>」
+　　　　ここまで
+　　　　チャンク["interlace"]で条件分岐
+　　　　　0ならば、
+　　　　　　ワーク＝「{ワーク}インタレース:なし」
+　　　　　ここまで
+　　　　　1ならば、
+　　　　　　ワーク＝「{ワーク}インタレース:Adam7」
+　　　　　ここまで
+　　　　　違えば、
+　　　　　　ワーク＝「{ワーク}インタレース:不明({チャンク["interlace"]})」
+　　　　　ここまで
+　　　　ここまで
+　　　　TDにワークをDOM_HTML設定
+　　　ここまで
+　　　「IDAT」ならば、
+　　　　もし、アニメーション含ならば、
+　　　　　もし、フレーム番号＞０ならば、
+　　　　　　TDに「フレーム画像」をDOMテキスト設定
+　　　　　違えば、
+　　　　　　TDに「代替画像」をDOMテキスト設定
+　　　　　ここまで
+　　　　違えば、
+　　　　　TDに「画像データ」をDOMテキスト設定
+　　　　ここまで
+　　　　// チャンク["chunkRaw"]のPNGInflate
+　　　ここまで
+　　　「PLTE」ならば、
+　　　　TDに「パラーパレット:{チャンク["palette"]["length"]}色」をDOMテキスト設定
+　　　ここまで
+　　　「IEND」ならば、
+　　　　TDに「終端」をDOMテキスト設定
+　　　ここまで
+　　　「tRNS」ならば、
+　　　　カラータイプで条件分岐
+　　　　　0ならば、
+　　　　　　TDに「透過色:{チャンク["alphas"]}」をDOMテキスト設定
+　　　　　ここまで
+　　　　　2ならば、
+　　　　　　TDに「透過色:{チャンク["alphas"][0]},{チャンク["alphas"][1]},{チャンク["alphas"][2]}」をDOMテキスト設定
+　　　　　ここまで
+　　　　　3ならば、
+　　　　　　TDに「透過情報付パレット:{チャンク["alphas"]["length"]}色」をDOMテキスト設定
+　　　　　ここまで
+　　　　ここまで
+　　　ここまで
+　　　「tEXt」ならば、
+　　　　TDに「{チャンク["key"]}:{チャンク["text"]}」をDOMテキスト設定
+　　　ここまで
+　　　「pHYs」ならば、
+　　　　もし、チャンク["unit"]＝0ならば、
+　　　　　TDに「アスペクト比:X:Y=({チャンク["pixelDimensionsX"]}:{チャンク["pixelDimensionsY"]})」をDOMテキスト設定
+　　　　違えば、
+　　　　　ワーク＝「単位不明」
+　　　　　もし、チャンク["unit"]＝1ならば、ワーク＝「メートル」
+　　　　　TDに「物理サイズ:({チャンク["pixelDimensionsX"]}x{チャンク["pixelDimensionsY"]})Pixel/{ワーク}」をDOMテキスト設定
+　　　　ここまで
+　　　ここまで
+　　　「gAMA」ならば、
+　　　　TDに「ガンマ比:{チャンク["gamma"]}」をDOMテキスト設定
+　　　ここまで
+　　　「sRGB」ならば、
+　　　　ワーク＝「不明」
+　　　　チャンク["renderingIntent"]で条件分岐
+　　　　　0ならば、
+　　　　　　ワーク＝「Perceptual」
+　　　　　ここまで
+　　　　　1ならば、
+　　　　　　ワーク＝「相対colorimetric」
+　　　　　ここまで
+　　　　　2ならば、
+　　　　　　ワーク＝「Saturation」
+　　　　　ここまで
+　　　　　3ならば、
+　　　　　　ワーク＝「絶対colorimetric」
+　　　　　ここまで
+　　　　ここまで
+　　　　TDに「色空間:standard RGB<br>プロファイル:{ワーク}」をDOMテキスト設定
+　　　ここまで
+　　　「acTL」ならば、
+　　　　ワーク＝チャンク["num_plays"]
+　　　　もし、ワーク＝０ならば、ワーク＝「無限」
+　　　　TDに「総フレーム数:{チャンク["num_frames"]}<br>再生回数:{ワーク}」をDOM_HTML設定
+　　　ここまで
+　　　「fcTL」ならば、
+　　　　TDに「フレーム情報」をDOMテキスト設定
+　　　ここまで
+　　　「fdAT」ならば、
+　　　　TDに「フレーム画像」をDOMテキスト設定
+　　　ここまで
+　　　違えば、
+　　　　TDに「内容未対応」をDOMテキスト設定
+　　　ここまで
+　　ここまで
+　　TDに{"text-align":"left","vertical-align":"top"}をDOMスタイル一括設定
+　　TRにTDをDOM子要素追加
+
+　　TBODYにTRをDOM子要素追加
+　　チャンク番号＝チャンク番号＋１
+　ここまで
+　TBLにTBODYをDOM子要素追加
+
+　(TBLの「TD,TH」をDOM子要素全取得)を反復する
+　　それに{ボーダー:"1px #000000 solid"}をDOMスタイル一括設定
+　ここまで
+
+　TBLをDOM親要素にDOM子要素追加
+ここまで
+
+ファイル枠をDOM親要素にDOM子要素追加
+
+●(CALLBACKを)ファイル枠作成
+　ファイル選択時＝CALLBACK
+　枠＝"DIV"をDOM要素作成
+　ファイル選択＝"INPUT"をDOM要素作成
+　枠にファイル選択をDOM子要素追加
+　ファイル選択["type"]＝"file"
+　ドラッグ中処理＝枠で引数付ソレには(枠)
+　　EVT＝WINDOW["event"]
+　　EVTの"stopPropagation"を[]でJSメソッド実行
+　　EVTの"preventDefault"を[]でJSメソッド実行
+　　枠の「背景色」へ「#e1e7f0」をDOMスタイル設定
+　ここまで
+　ドラッグ離処理＝枠で引数付ソレには(枠)
+　　EVT＝WINDOW["event"]
+　　EVTの"stopPropagation"を[]でJSメソッド実行
+　　EVTの"preventDefault"を[]でJSメソッド実行
+　　枠の「背景色」へ「#ffffff」をDOMスタイル設定
+　ここまで
+　ファイル選択処理＝[ファイル選択,CALLBACK]で引数付ソレには(OBJ)
+　　ファイル選択＝OBJ[0]
+　　ファイル選択時＝OBJ[1]
+　　対象ファイル＝ファイル選択["files"][0]
+　　ファイル選択時(対象ファイル)
+　ここまで
+　ドロップ処理＝[枠,ファイル選択,ファイル選択処理]で引数付ソレには(OBJ)
+　　枠＝OBJ[0]
+　　ファイル選択＝OBJ[1]
+　　ファイル選択処理＝OBJ[2]
+　　EVT＝WINDOW["event"]
+　　EVTの"stopPropagation"を[]でJSメソッド実行
+　　EVTの"preventDefault"を[]でJSメソッド実行
+　　ファイル選択["files"]＝EVT["dataTransfer"]["files"]
+　　対象ファイル＝ファイル選択["files"][0]
+　　ファイル選択処理()
+　　枠の「背景色」へ「#ffffff」をDOMスタイル設定
+　ここまで
+　枠の"dragover"にドラッグ中処理をDOMイベント追加
+　枠の"dragleave"にドラッグ離処理をDOMイベント追加
+　枠の"drop"にドロップ処理をDOMイベント追加
+　ファイル選択の"change"にファイル選択処理をDOMイベント追加
+　枠で戻る
+ここまで
+
+●(FUNCを)ソレ
+　FUNCで戻る
+ここまで
+
+●(FUNCをARGSで)引数付ソレ
+　『(function(func,preargs){return function(...args){return func(preargs,args)}})』を[FUNC,ARGS]でJS関数実行で戻る
+ここまで
+
+●(callbackにfileをtypeで)ファイル読込完了時
+『(function(file,type,callback){
+const fr=new FileReader();
+fr.onload=()=>{
+callback(fr.result);
+fr.onload=null;
+}
+if (type==='DataURL'){
+fr.readAsDataURL(file);
+}else
+if (type==='ArrayBuffer'){
+fr.readAsArrayBuffer(file);
+}else{
+throw new Error('invalid type');
+}
+})』を[file,type,callback]でJS関数実行
+ここまで

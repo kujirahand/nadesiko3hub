@@ -1,0 +1,60 @@
+### [作品情報]
+### タイトル=HTMLタグの実体参照変換
+### 作者=雪乃☆雫(user_id=3)
+### ライセンス=CC0
+### 説明=掲示板で表示が乱れてしまうHTMLタグやタブ、勝手に全角に変換されてしまう半角スペースとかを正しく表示出来るように変換するやつ。※変換後のテキストをクリップボードにコピーするボタンを付けたよ☆
+### 対象バージョン=3.3.74
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2022-10-08 11:18:41
+###
+
+DOM親要素の「行揃え」に「左」をDOMスタイル設定。
+＃---設定----------
+データ＝空。
+元文字＝[「&」,「<」,「>」,「"」,「 」,タブ]
+実体参照文字＝["&amp;","&lt;","&gt;","&quot;","&nbsp;","&nbsp;&nbsp;&nbsp;&nbsp;"]
+
+＃---HTML設置----------
+HTML=「<fieldset>
+<legend><B>変換する項目</B></legend>
+  <label><input type="checkbox" id="check1" checked="checked"> &lt; <span class="s">(小なり)</span></label>　
+  <label><input type="checkbox" id="check2" checked="checked"> &gt; <span class="s">(大なり)</span></label>　
+  <label><input type="checkbox" id="check4" checked="checked"> <span class="s">(半角スペース)</span></label>　
+  <label><input type="checkbox" id="check5" checked="checked"> <span class="s">(タブ)</span></label><BR>
+  <label><input type="checkbox" id="check0"> &amp; <span class="s">(アンパサンド)</span></label>　
+  <label><input type="checkbox" id="check3"> &quot; <span class="s">(二重引用符)</span></label>
+</fieldset>
+<div>
+  <h3>変換元</h3>
+  <textarea id="code" rows="10"></textarea><BR>
+  <button id="henkan">変換</button>
+  <button id="reset">クリア</button>
+</div>
+<div>
+  <h3>変換後</h3>
+  <textarea id="result" rows="10"></textarea>
+  <button id="copy">コピー</button>
+</div>」
+DOM親要素にHTMLをHTML設定。
+「#code」の「幅」に「99%」をDOMスタイル設定。
+「#result」の「幅」に「99%」をDOMスタイル設定。
+
+＃---イベント設定----------
+「#henkan」をクリックした時には
+　　データ＝「#code」のDOMテキスト取得。
+　　(元文字の要素数)回
+　　　　C＝回数-1。
+　　　　チェック＝「#check{C}」の「checked」をDOM属性取得。
+　　　　もし、チェック＝オンならば、データ＝データの元文字[C]を実体参照文字[C]に置換。
+　　ここまで。
+　　「#result」にデータをDOMテキスト設定。
+ここまで。
+「#reset」をクリックした時には
+　　「#code」に空をDOMテキスト設定。
+　　「#result」に空をDOMテキスト設定。
+ここまで。
+「#copy」をクリックした時には
+    「#result」のテキスト取得をクリップボード設定。
+ここまで。

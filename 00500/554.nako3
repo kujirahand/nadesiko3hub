@@ -1,0 +1,41 @@
+### [作品情報]
+### タイトル=nadesiko3-hello - 挨拶するだけのJSプラグイン
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=CC0
+### 説明=なでしこでJSプラグインを定義するサンプルです。詳しくはマニュアルの「文法/JSプラグイン作り方」をご覧ください。
+### 対象バージョン=3.2.13
+### URL=
+### 種類=js
+### タグ=
+### 更新日時=2022-05-10 16:56:36
+###
+
+//--------------------------------------------------------
+// 挨拶するだけのテストプラグイン
+// [URL] https://n3s.nadesi.com/plain/nadesiko3-hello.js
+//--------------------------------------------------------
+// JSプラグインの作り方
+// [URL] https://nadesi.com/v3/doc/go.php?1161
+//--------------------------------------------------------
+const pluginHello = {
+  '挨拶テスト': { // @テスト関数 // @あいさつてすと
+    type: 'func', // 関数であれば func にする
+    josi: [], // 助詞を配列で宣言する
+    fn: function (sys) {
+        alert('こんにちは!')
+    }, // 関数の実態
+    return_none: true
+  },
+  '掛算テスト': { // @掛け算をするだけのテスト関数 // @かけざんてすと
+    type: 'func', // 関数であれば func にする
+    josi: [['と'],['を']], // 助詞を配列で宣言する
+    fn: function (a, b) {
+        return a * b
+    }
+  }
+}
+if (typeof (navigator) === 'object') {
+  navigator.nako3.addPluginObject("pluginHello", pluginHello)
+} else {
+  module.exports = pluginHello
+}

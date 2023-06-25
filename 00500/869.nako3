@@ -1,0 +1,61 @@
+### [作品情報]
+### タイトル=クリスマスな時計
+### 作者=くれあ(user_id=10)
+### ライセンス=MIT
+### 説明=なでしこ Advent Calendar 2021「クリスマスな時計を作る！」のふろくです！
+### 対象バージョン=3.2.30
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2021-12-23 01:13:08
+###
+
+#クリスマスな時計
+#2021/12/22
+
+#日数を設定する
+日数に今日の/*9文字目*/9から2文字抜き出して代入
+/*05日を5日にするために*/日数に「{日数×1}」を代入
+
+#フォントを設定する
+DOM親要素に『
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap" rel="stylesheet">
+    』をHTML設定
+
+#時間、今日の日付、飾りつけを表示する
+時間ラベル＝今のラベル作成して改行作成
+日付ラベル＝「~ {今年}.{今月}.{日数} ~🎄」のラベル作成
+飾りつけラベル＝「❄ Merry Christmas !! > 🦌🎅」のラベル作成
+
+時間ラベルに｛
+    文字サイズ：「{1.3×80}px」、
+    色："crimson"、
+    /*上の余白*/ 「padding-top」：「{1×80}px」、
+    「font-family」：「'Leckerli One', cursive」、
+    「display」:「block」、
+    「text-align」:「中央」
+    ｝をDOMスタイル一括設定
+
+日付ラベルに｛
+    文字サイズ：  「{0.4×80}px」、
+    色："darkcyan"、
+    /*上の余白*/ 「padding-top」：「{0.5×80}px」、
+    /*下の余白*/ 「padding-bottom」：「{0.5×80}px」、
+    「font-family」：「'Leckerli One', cursive」、
+    「display」:「block」、
+    「text-align」:「中央」
+    ｝をDOMスタイル一括設定
+
+飾りつけラベルに｛
+    文字サイズ：  「{0.4×80}px」、
+    色："silver"、
+    「font-family」：「'Leckerli One', cursive」、
+    「display」:「block」、
+    「text-align」:「中央」
+    ｝をDOMスタイル一括設定
+
+1/60秒毎には
+    時間ラベルに今をテキスト設定
+    ここまで

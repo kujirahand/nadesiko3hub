@@ -1,0 +1,35 @@
+### [作品情報]
+### タイトル=html組み込み実行時の標準出力表示用JSファイル
+### 作者=てぃふと@うぇいく(user_id=2)
+### ライセンス=CC0
+### 説明=簡易エディタ等やなでしこ３貯蔵庫ではなくhtmlにscriptタグを書いてwnakoを読み込み実行している場合に、なでしこで表示した内容について、このプログラムを読み込むscriptタグの位置に簡易的に表示する。ただし、このプログラムのscriptタグの位置がwnakoを取り込むscriptタグよりも前にある場合はwnako取り込みのsciprtタグより後の位置に「html組み込み実行時の補助処理用JS」をscriptタグで読み込む必要がある。読み込んだ位置には表示されたdivタグが置かれて、そこに表示された内容を追記する。開発中での表示内容の確認にどうぞ。埋め込むタグは『<script src="https://n3s.nadesi.com/plain/750.js"></script>』のような感じに。
+### 対象バージョン=3.2.27
+### URL=
+### 種類=js
+### タグ=
+### 更新日時=2021-10-04 23:44:06
+###
+
+(function(){
+  if (typeof navigator === 'object') {
+    const listeningType='stdout'
+    const includeUpperLevel=false
+    const targetId='nako3target_'+listeningType+'_'+Date.now()
+    const callback=function (obj) {
+      document.getElementById(targetId).innerHTML += obj.html
+    }
+    document.write('<div id="'+targetId+'"></div>')
+    if (typeof navigator.nako3 === 'object') {
+      navigator.nako3.logger.addListener(listeningType,callback,includeUpperLevel)
+    } else {
+      if (typeof navigator.nako3loglistener === 'undefined') {
+        navigator.nako3loglistener=[]
+      }
+      navigator.nako3loglistener.push({
+        type:listeningType,
+        upperlevel:includeUpperLevel,
+        callback:callback
+      })
+    }
+  }
+})();

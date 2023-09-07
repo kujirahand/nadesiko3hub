@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=w_noname
-### 更新日時=2023-09-01 09:51:27
+### 更新日時=2023-09-07 11:10:30
 ###
 
 !「https://snowdrops89.github.io/nako3_plugin/Plugin_UserInfo.js」を取り込む
@@ -23,7 +23,7 @@
 改行作成
 「漢字ぺディア(漢字)」のボタン作成して漢字ペディアに代入
 「漢字ぺディア(言葉)」のボタン作成して漢字ペディア言葉に代入
-incognito = ["https://qudfcj.csb.app","https://rdk00n.csb.app","https://6nv6br.csb.app","https://h7cw51.csb.app","https://0jzey0.csb.app","https://87wg0z.csb.app","https://2cjjjb.csb.app","https://o5qnw2.csb.app","https://ftxvmk.csb.app","https://incog.dev"]
+incognito = ["https://qudfcj.csb.app","https://rdk00n.csb.app","https://6nv6br.csb.app","https://h7cw51.csb.app","https://0jzey0.csb.app","https://87wg0z.csb.app","https://2cjjjb.csb.app","https://o5qnw2.csb.app","https://ftxvmk.csb.app"]
 B＝「」
 漢字ペディアをクリックした時には
     表示ログクリア
@@ -83,7 +83,7 @@ ango15=「4436,4427,4379,4380,4438,」
     もしそれ=trueならば
         「解除してください」と表示
     違えば　もしango=ango10ならば
-        incognito@(9の乱数)を開
+        incognito@(8の乱数)を開
         B＝それ
     違えば　もしango=ango5ならば
         「https://google.com」にブラウザ移動
@@ -141,7 +141,7 @@ ango15=「4436,4427,4379,4380,4438,」
             ここまで
             もし時間<=システム時間ならば
                 もし更新=trueならば
-                    「window.location.reload();」をJS実行
+                    「window.__cpLocation.reload();」をJS実行
                     抜ける
                 違えば
                     「#inline」に{

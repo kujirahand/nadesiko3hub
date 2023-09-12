@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=w_noname
-### 更新日時=2023-09-11 08:51:50
+### 更新日時=2023-09-12 10:53:19
 ###
 
 !「https://snowdrops89.github.io/nako3_plugin/Plugin_UserInfo.js」を取り込む
@@ -113,7 +113,7 @@ ango7= 「4436,4427,4379,4380,4445,」
         「https://usemetallic.com」を開
         B＝それ
     違えば　もしango=ango7ならば
-        「https://tweb.web.app」を開
+        「https://tweb.web.app/feature/Oweb/」を開
         B＝それ
     違えば
         「ミス」にtrueをローカルストレージ保存

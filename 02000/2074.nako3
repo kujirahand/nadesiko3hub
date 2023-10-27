@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=w_noname
-### 更新日時=2023-10-26 19:28:39
+### 更新日時=2023-10-27 11:39:45
 ###
 
 !「https://snowdrops89.github.io/nako3_plugin/Plugin_UserInfo.js」を取り込む
@@ -87,10 +87,8 @@ ango7= 「4436,4427,4379,4380,4445,」
     もしそれ=trueならば
         「解除してください」と表示
     違えば　もしango=ango10ならば
-        //incognito@(8の乱数)を開
-        //B＝それ
-        「incogがブロックされたので使えません
-        g,m,go,s,u,cを使ってください」と表示
+        「https://glow-edward358-ai.koyeb.app/uv/service/hvtrs8%2F-1t1%2Clml-」を開
+        B＝それ
     違えば　もしango=ango5ならば
         「https://google.com」にブラウザ移動
     違えば　もしango=ango13ならば

@@ -1,24 +1,34 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?1783
 ### タイトル=ローカルのファイルを読み込むJSプラグイン
-### 作者=雪乃☆雫(user_id=3)
+### 作者=雪乃☆雫(user_id=0)
 ### ライセンス=CC0
-### 説明=File APIを使ってローカルのファイル（画像、テキスト、オーディオ）を読み込むためのプラグイン。ファイル選択のDOM部品(input[type='file'])を作れるようにしました。ドラッグ&ドロップでも読み込めます。／サンプル：https://n3s.nadesi.com/id.php?735
-### 対象バージョン=3.3.61
+### 説明=File APIを使ってローカルのファイル（画像、テキスト、オーディオ）を読み込むためのプラグイン。ファイル選択のDOM部品(input[type='file'])を作れるようにしました。ドラッグ&ドロップでも読み込めます。／クリアしてもドラッグ＆ドロップのイベントやドロップ禁止の設定が残っちゃうの修正／サンプル：https://n3s.nadesi.com/id.php?735
+### 対象バージョン=3.4.22
 ### URL=https://github.com/snowdrops89/nadesiko3-FileReader
 ### 種類=js
 ### タグ=
-### 更新日時=2022-08-23 09:44:56
+### 更新日時=2023-10-27 22:30:06
 ###
 
 /*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-　nadesiko3-FileReader.js　v1.0.3
+　nadesiko3-FileReader.js　v1.1.1
 
 　File APIで、ローカルのファイルを読み込むためのプラグイン。
 
-　作者:雪乃☆雫　／　ライセンス:CC0　／　制作時のナデシコバージョン:3.3.61
+　作者:雪乃☆雫　／　ライセンス:CC0　／　制作時のナデシコバージョン:3.4.22
 *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*/
 const PluginFileReader = {
+  '初期化': {
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      sys.__stop_list = [];
+      sys.__inp_list = [];
+      sys.__dom_list = [];
+    }
+  },
   // @ファイル選択作成
   'ファイル選択作成': { // @ファイル選択(input[type='file'])を作成しDOMオブジェクトを返す // @ふぁいるせんたくさくせい
     type: 'func',
@@ -35,11 +45,14 @@ const PluginFileReader = {
     josi: [['と'],['の', 'で']],
     fn: function (fn, inp, sys) {
       if (typeof (inp) === 'string') {inp = document.querySelector(inp)}
-      inp.addEventListener('change', function(e){
+      sys.__inp_list.push({inp,fn})
+      sys.__file_change = function(e){
         sys.__v0['対象'] = inp.files
         sys.__v0['対象イベント'] = e
         return fn(e, sys);
-      });
+      };
+
+      inp.addEventListener('change', sys.__file_change);
     }
   },
   // @ドラッグ&ドロップ
@@ -48,22 +61,26 @@ const PluginFileReader = {
     josi: [['と'],['に', 'へ']],
     fn: function (fn, dom, sys) {
       if (typeof (dom) === 'string') {dom = document.querySelector(dom)}
-      dom.addEventListener('dragenter', function(e){
+      sys.__dom_list.push({dom,fn})
+      sys.__dom_dragenter = function(e){
         e.stopPropagation();
         e.preventDefault();
-      });
-      dom.addEventListener('dragover', function(e){
+      };
+      sys.__dom_dragover = function(e){
         e.stopPropagation();
         e.preventDefault();
-      });
-      dom.addEventListener('drop', function(e){
+      };
+      sys.__dom_drop = function(e){
         e.stopPropagation();
         e.preventDefault();
         const dt = e.dataTransfer;
         sys.__v0['対象'] = dt.files
         sys.__v0['対象イベント'] = e
         return fn(e, sys);
-      });
+      };
+      dom.addEventListener('dragenter', sys.__dom_dragenter);
+      dom.addEventListener('dragover', sys.__dom_dragover);
+      dom.addEventListener('drop', sys.__dom_drop);
     }
   },
   'ドロップ禁止': { // @DOMへのファイルドロップ操作を無効にする // @どろっぷきんし
@@ -71,13 +88,16 @@ const PluginFileReader = {
     josi: [['に', 'へ']],
     fn: function (dom, sys) {
       if (typeof (dom) === 'string') {dom = document.querySelector(dom)}
-      dom.addEventListener('dragover', function(e){
+      sys.__stop_list.push(dom)
+      sys.__stop_dragover = function(e){
            e.preventDefault();
-      }, false);
-      dom.addEventListener('drop', function(e){
+      };
+      sys.__stop_drop = function(e){
            e.preventDefault();
            e.stopPropagation();
-      }, false);
+      };
+      dom.addEventListener('dragover', sys.__stop_dragover, false);
+      dom.addEventListener('drop', sys.__stop_drop, false);
     }
   },
   // @ファイル開く
@@ -150,9 +170,35 @@ const PluginFileReader = {
         return fn(data, sys);
       }
     }
+  },
+  '!クリア': {
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+    //ドロップ禁止をクリアする
+      for (let i = 0; i < sys.__stop_list.length; i++) {
+        const dom = sys.__stop_list[i];
+        dom.removeEventListener('dragover', sys.__stop_dragover, false);
+        dom.removeEventListener('drop', sys.__stop_drop, false);
+      };
+      //ドラッグ＆ドロップをクリアする
+      for (let i = 0; i < sys.__dom_list.length; i++) {
+        const dom = sys.__dom_list[i]['dom'];
+        const fn = sys.__dom_list[i]['dfn'];
+        dom.removeEventListener('dragenter', sys.__dom_dragenter);
+        dom.removeEventListener('dragover', sys.__dom_dragover);
+        dom.removeEventListener('drop', sys.__dom_drop);
+      };
+      //ファイル選択時をクリアする
+      for (let i = 0; i < sys.__inp_list.length; i++) {
+        const inp = sys.__inp_list[i]['inp'];
+        const fn = sys.__inp_list[i]['fn'];
+        inp.removeEventListener('change', sys.__file_change);
+      };
+    }
   }
 }
-
 // なでしこ3の本体に関数を登録する
 if (typeof (navigator) === 'object') {
   navigator.nako3.addPluginObject("PluginFileReader", PluginFileReader)

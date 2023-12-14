@@ -1,0 +1,205 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2710
+### タイトル=N目並べ(二人対戦用)
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=2人以上対象の四目並べ。四目並べを作っていたら、五目並べを作りたくなり色々した
+### 対象バージョン=3.4.24
+### URL=
+### 種類=wnako
+### タグ=ゲーム,四目並べ,五目並べ,対戦ゲーム,暇つぶし,初心者
+### 更新日時=2023-12-14 20:00:41
+###
+
+# N目並べ
+X=0
+Y=0
+#グローバル変数として定義
+Observer=0
+#0がプレイ中、1がゲーム終了を示す
+Winer=0
+#勝者の番号
+Horizontal_row=7
+Vertical_row=6
+#それぞれ縦のマス目の数と横のマス目の数。
+Width=50
+#Widthはキャンバス上のマスをどれだけ離すか。
+Stage=盤面初期化
+#Stageは集合。Stageは左から順に縦列を設定している。
+Who=1
+#whoは手番の人。1で赤。2で青。
+Limit=4
+#Limitは揃える目の長さ
+Type=2
+#Typeは想定している人数
+Colors={
+"1":"#FF0000",
+"2":"#0000FF",
+"3":"#FFFF00",
+"4":"#00FF00",
+"5":"#00FFFF"
+}
+#辞書型変数で色を対応させる
+Type_Limit=Colorsの要素数
+#Type_Limitは実装しているColorのパターン数
+Direction=[[0,1,0,-1],[1,1,-1,-1],[1,0,-1,0],[1,-1,-1,1]]
+#確認する方向を(x,y,x,y)の形で反対方向と同時に接続
+Gravity=1
+#落下するかどうか。1ならあり。0ならなし
+
+Resetボタン=「Reset」のボタン作成
+Resetボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
+Resetボタンをクリックした時には
+　初期化
+ここまで
+
+Gravityボタン=「Gravity」のボタン作成
+Gravityボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
+Gravityボタンをクリックした時には
+  もしGravity=1ならば
+　　Gravity=0
+　違えば
+　　Gravity=Gravity+1
+　ここまで
+　初期化
+ここまで
+
+Typeボタン="Type"のボタン作成
+Typeボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
+Typeボタンをクリックした時には
+　もしType=Type_Limitならば
+　　Type=2
+　違えば
+　　Type=Type+1
+　ここまで
+　初期化
+ここまで
+
+盤面描画
+
+
+描画中キャンバスをマウス押した時には
+　もしObserver=0ならば
+　　X＝FLOOR(マウスX/Width)-1
+　　Y＝FLOOR(マウスY/Width)-1
+　　　もし(盤面範囲(X,Y))ならば
+　　　　Y=石落下場所(X)
+　　　　　　Stage[X,Y]=Who
+　　　　チェック
+　　　　手番交代
+　　　ここまで
+　違えば
+　"{Limit}個揃ってるよ！"と言う
+　ここまで
+　盤面描画
+ここまで
+
+●初期化
+　Stage=盤面初期化
+　Who=1
+　Observer=0
+　盤面描画
+ここまで
+
+●チェック
+　Directionを反復
+　　　定数[ax,ay,bx,by]=対象
+　　　counter=一方(一方(Limit-1,ax,ay),bx,by)
+　　　もしcounter<1ならば
+　　　　　Observer=1
+　　　　　Winer=Who
+　　　　　抜ける
+　　　ここまで
+　ここまで
+ここまで
+
+●一方(i,x,y)
+　もしi>0ならば
+　　jを1からLimit-1まで繰り返す
+　　　もし盤面範囲(X+x*j,Y+y*j)ならば
+　　　　もしStage[X+x*j,Y+y*j]=Whoならば
+　　　　　i=i-1
+　　　　違えば
+　　　　　iを戻す
+　　　　ここまで
+　　　ここまで
+　　ここまで
+　iを戻す
+　ここまで
+ここまで
+
+●手番交代
+　もしWho=Typeならば
+　　Who=1
+　　違えば
+　　Who=Who+1
+　ここまで
+ここまで
+
+●(x)石落下場所
+　もしGravity=0なら
+　　　もしStage[x,Y]=0なら
+　　　　Yを戻す
+　　　ここまで
+　違えば
+　　　iをVertical_row-1から0まで繰り返す
+　　　　もしStage[x,i]=0なら
+　　　　　iを戻す
+　　　　ここまで
+　　　ここまで
+　ここまで
+　終わる
+ここまで
+
+●縦列作成
+　縦列=[]を「,」で区切る
+　　Vertical_row回
+　　　縦列に0を配列追加
+　　ここまで
+　縦列を戻す
+ここまで
+
+●(x,y)盤面範囲
+　もし(x>=0 && x<Horizontal_row && y>=0 && y<Vertical_row)なら
+　　　はいを戻す
+　　ここまで
+いいえを戻す
+ここまで
+
+●盤面初期化とは
+　盤面=[]
+　縦列=縦列作成
+　　iを0から(Horizontal_row-1)まで繰り返す
+　　　盤面[i] = 縦列を配列複製
+　　ここまで。
+　盤面を戻す。
+ここまで。
+
+
+●盤面描画
+　全描画クリア
+　　vを1からVertical_rowまで繰り返す
+　　hを1からHorizontal_rowまで繰り返す
+　　　2に線太設定
+　　　"#FFFFFF"に塗色設定
+　　　[h*Width,v*Width+1,Width,Width]に四角描画
+　　　　もしStage[h-1,v-1]>0なら
+　　　　　0.1に線太設定。
+　　　　　(Colors["{Stage[(h-1),(v-1)]}"])に塗色設定
+　　　　　［h*Width+Width/2,v*Width+Width/2］へWidth/4の円描画
+　　　　ここまで
+　　ここまで
+　　ここまで
+　2に線太設定
+　"#E0E0E0"に塗色設定
+　[Width,1,220,Width]に四角描画。
+　　もしObserver=0なら
+　　　Colors[Who]に塗色設定。
+　　　"bold 36px serif"に描画フォント設定。
+　　　[Width,Width-10]へ" 今は{Who}番です"を文字描画
+　　違えば
+　　  "{Colors[Winer]}"に塗色設定。
+　　　"bold 36px serif"に描画フォント設定。
+　　　[Width,Width-10]へ" {Winer} の勝ちです"を文字描画
+　　ここまで
+ここまで

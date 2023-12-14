@@ -1,0 +1,29 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2711
+### タイトル=グラデーション(直線)
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=両端の色を平均して行ってグラデーションを作成
+### 対象バージョン=3.4.24
+### URL=
+### 種類=wnako
+### タグ=グラデーション,デモ
+### 更新日時=2023-12-14 20:06:57
+###
+
+#グラデーション
+width=描画中キャンバスの"width"をDOM属性取得-50
+height=描画中キャンバスの"height"をDOM属性取得-50
+全描画クリア
+1に線太設定
+
+main__gradient(乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255))
+
+●gradient(a,b,c,d,e,f):
+    #(a,b,c)=(R1,G1,B1),(d,e,f)=(R2,G2,B2)
+    red=(d-a)/width
+    green=(e-b)/width
+    blue=(f-c)/width
+　　iを0からwidthまで繰り返す:
+　　　　RGB(FLOOR(a+red*i),FLOOR(b+green*i),FLOOR(c+blue*i))に線色設定
+　　　　[25+i,25]から[25+i,25+height]まで線描画

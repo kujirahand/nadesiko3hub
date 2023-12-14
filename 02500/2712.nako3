@@ -1,0 +1,43 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2712
+### タイトル=グラデーション2(平面)
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=グラデーションを二次元で作成。x軸と並行で、平行な二つの頂点で平均を取り、同じy座標上の点をまた同じ様に出す割り出す
+### 対象バージョン=3.4.24
+### URL=
+### 種類=wnako
+### タグ=グラデーション,デモ
+### 更新日時=2023-12-14 20:13:01
+###
+
+#グラデーション2(読みやすさ重視)
+width=描画中キャンバスの"width"をDOM属性取得-50
+height=描画中キャンバスの"height"をDOM属性取得-50
+全描画クリア
+"#000000"に線色設定
+1に線太設定
+
+main__gradient3(255,0,0,0,255,0,0,0,255,0,0,0)
+#main__gradient3(乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255),乱数(255))
+
+●gradient3(r1,g1,b1,r2,g2,b2,r3,g3,b3,r4,g4,b4):
+    red1=(r2-r1)/width
+    red2=(r4-r3)/width
+    green1=(g2-g1)/width
+    green2=(g4-g3)/width
+    blue1=(b2-b1)/width
+    blue2=(b4-b3)/width
+    hを0からwidthまで繰り返す:
+    　　red3=r1+red1*h
+    　　red4=r3+red2*h
+    　　red5=(red4-red3)/height
+    　　green3=g1+green1*h
+    　　green4=g4+green2*h
+    　　green5=(green4-green3)/height
+    　　blue3=b1+blue1*h
+    　　blue4=b3+blue2*h
+    　　blue5=(blue4-blue3)/height
+    　　vを0からheightまで繰り返す:
+    　　　　RGB(CEIL(red3+red5*v),CEIL(green3+green5*v),CEIL(blue3+blue5*v))に線色設定
+    　　　　線描画([25+h,25+v],[26+h,26+v])

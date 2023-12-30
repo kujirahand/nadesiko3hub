@@ -1,14 +1,14 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?539
 ### タイトル=画像処理をするプラグイン
-### 作者=雪乃☆雫(user_id=3)
+### 作者=雪乃☆雫(user_id=0)
 ### ライセンス=CC0
 ### 説明=画像処理をするNAKO3プラグイン。あるいは描画ダウンロードのテスト。／v3.3.31以降？ sys__ctxがJS関数実行の中で直接参照出来なくなっていたのでお直し
-### 対象バージョン=3.3.74
+### 対象バージョン=3.4.24
 ### URL=
 ### 種類=wnako
 ### タグ=画像処理
-### 更新日時=2022-09-15 08:17:39
+### 更新日時=2023-12-31 02:39:33
 ###
 
 #-----------------------------------------------
@@ -335,14 +335,14 @@
 　描画中コンテキストの「getImageData」をxywhでJSメソッド実行して、それ["data"]で戻る。
 ここまで。
 ●(xywhを色データで|xywhに)画像処理反映
-「(function (color,ctx){波カッコ}
-const img = ctx.getImageData({xywh});
+『(function (xywh,color,ctx){
+const [x,y,w,h]=xywh;
+const img = ctx.getImageData(x,y,w,h);
 let data = img.data;
-for (let i=0; i<data.length;i++){波カッコ}data[i]=color[i]{波カッコ閉じ}
-ctx.putImageData(img,{xywh[0]}, {xywh[1]});
-{波カッコ閉じ})」を[色データ,描画中コンテキスト]でJS関数実行。
+for (let i=0; i<data.length;i++){data[i]=color[i]}
+ctx.putImageData(img,x,y);
+})』を[xywh,色データ,描画中コンテキスト]でJS関数実行。
 ここまで。
-//sys__ctxが直接参照出来なくなっていたのでちょっとお直し
 #-----------------------------------------------
 
 ＃以下はテスト

@@ -1,0 +1,123 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2724
+### タイトル=Perlin noise
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=パーリンノイズを自動生成して描画するシステム。パーリンノイズは、コンピュータグラフィックスのリアリティを増すために使われるテクスチャ作成技法。擬似乱数的な見た目であるが、同時に細部のスケール感が一定である。このため制御が容易であり、各種スケールのパーリンノイズを数式に入力することで多彩なテクスチャを表現できる。パーリンノイズによるテクスチャは、CGIで自然な外観を物に与えるためによく使われる。
+### 対象バージョン=3.4.26
+### URL=
+### 種類=wnako
+### タグ=PerlinNoise
+### 更新日時=2024-01-10 13:23:49
+###
+
+#Noise
+Noise = [] //2D用
+Waves = [] //生成したnoiseを全てここに格納する
+
+定数 NumberLines = 3 //生成する線の数
+定数 HorizontalLines = 1
+定数 VerticalLines = 1
+定数 Rate = 100 //FLOOR(300/NumberLines) //一本の線を分割する数
+定数 Degree = 2 //生成する乱数の振れ幅(原点0を中心に正負へ等距離にある点同士の距離)
+定数 Scale = 1 //wavelet関数の平面上で原点(0,0)からどれだけ離れているか
+定数 CanvasWidth = 描画中キャンバス["width"] //Canvasの左上から右上までの距離
+定数 CanvasHeight = 描画中キャンバス["height"] //Canvasの左上から左下までの距離
+
+/*
+Waves = main__CreateWaves(NumberLines,Degree,Rate,Scale)
+main__DrawWaves(Waves)
+#*/
+
+
+main__CreatePlane(HorizontalLines,VerticalLines,Degree,Rate)
+main__DrawPlane(HorizontalLines,VerticalLines,Rate,Noise)
+#*/
+
+●線形補完(A,B,C):
+    A+C*(B-A)を戻す
+
+●CreatePlane(horizontal,vertical,degree,rate):
+    slopes = []
+    2*((horizontal+1)*(vertical+1))回:
+        slopesに((乱数(degree*10)-degree*5)/10)を配列追加
+    jを0から(vertical-1)まで繰り返す:
+        iを0から(horizontal-1)まで繰り返す:
+            slopeX00 = slopes[((i*2)+j*(2*(horizontal+1)))] //x:(x,y)=(0,0)
+            slopeY00 = slopes[((i*2+1)+j*(2*(horizontal+1)))] //y:(x,y)=(0,0)
+            slopeX10 = slopes[(((i+1)*2)+j*(2*(horizontal+1)))] //x:(x,y)=(1,0)
+            slopeY10 = slopes[(((i+1)*2+1)+j*(2*(horizontal+1)))] //y:(x,y)=(1,0)
+            slopeX01 = slopes[((i*2)+(j+1)*(2*(horizontal+1)))] //x:(x,y)=(0,1)
+            slopeY01 = slopes[((i*2+1)+(j+1)*(2*(horizontal+1)))] //y:(x,y)=(0,1)
+            slopeX11 = slopes[(((i+1)*2)+(j+1)*(2*(horizontal+1)))] //x:(x,y)=(1,1)
+            slopeY11 = slopes[(((i+1)*2+1)+(j+1)*(2*(horizontal+1)))] //y:(x,y)=(1,1)
+            nyを0からrate-1まで繰り返す:
+                nxを0からrate-1まで繰り返す:
+                    u = nx / (rate-1)
+                    v = ny / (rate-1)
+                    //マジでここの理解に7時間かかった。アドバイスありがとうd('v')
+                    pointu0 = 線形補完(CreateWavelet2(u,v,slopeX00,slopeY00,1),CreateWavelet2(u-1,v,slopeX10,slopeY10,1),u)
+                    pointu1 = 線形補完(CreateWavelet2(u,v-1,slopeX01,slopeY01,1),CreateWavelet2(u-1,v-1,slopeX11,slopeY11,1),u)
+                    pointuv = 線形補完(pointu0,pointu1,v)
+                    Noiseにpointuvを配列追加
+
+
+●CreateWaves(numberLines,degree,rate,scale):
+    array = []
+    slopes = [] //wavelet一本に必要な角度を二個ずつ格納する
+    //与えられたdegree(角度の範囲)に合わせてSlopeにランダムな角度を生成
+    iを0からnumberLinesまで繰り返す:
+        slopesに((乱数(degree*10)-degree*5)/10)を配列追加
+    //与えられたnumberLines(線の本数)とrate(線を分割する数)に応じて点をarrayに生成
+    iを0から(numberLines-1)まで繰り返す:
+        jを0から(rate-1)まで繰り返す:
+            X = j/rate
+            //二つのslope(傾き)の違う曲線の同じXを計算
+            pointA = main__CreateWavelet(X,slopes[i],scale)
+            pointB = main__CreateWavelet(X-1,slopes[i+1],scale)
+            //補完してWavesに格納
+            arrayに(pointA + X * (pointB - pointA))を配列追加
+    arrayを戻す
+
+●CreateWavelet(wx,slope,scale):
+    //与えられたslope(角度),scale(規模)のwaveletの上のwx(x座標)に対応するy座標を返す関数
+    ((slope * wx)*((ABS(wx)^3)/scale^2 - (2 * (wx^2))/scale + scale))を戻す
+
+●CreateWavelet2(wx,wy,slopeA,slopeB,scale):
+    //与えられたslope(角度),scale(規模)のwaveletの上のwx(x座標),wy(y座標)に対応するz座標を返す関数
+    ((2*(ABS(wx)^3)/scale^2 - 3*(wx^2)/scale + scale))*((2*(ABS(wy)^3)/scale^2 - 3*(wy^2)/scale + scale))*(slopeA*wx+slopeB*wy)を戻す
+
+●比較(A,B):
+    もしA<Bなら:
+        Bを戻す
+    Aを戻す
+
+●DrawWaves(array):
+    定数 Maxpoint = main__比較((arrayの配列最大値),ABS((arrayの配列最小値)))
+    定数 linesWidth = CanvasWidth/(要素数(array)+1) //隣り合う点同士の距離
+    定数 linesHeight = CanvasHeight/Maxpoint//隣りの点との距離
+    定数 halfHeight = CanvasHeight/2 // 高さの中央
+    
+    全描画クリア
+    線太設定(1)
+    
+    iを0から(要素数(array)-1)まで繰り返す:
+        線描画([(i+1)*linesWidth+300,halfHeight+array[i]*linesHeight],[(i+2)*linesWidth+300,halfHeight+array[i+1]*linesHeight])
+
+●DrawPlane(horizontal,vertical,rate,array):
+    定数 Maxpoint = main__比較((arrayの配列最大値),ABS((arrayの配列最小値)))
+    定数 Maxlength = main__比較(horizontal,vertical)
+    定数 planeWidth = CanvasWidth/(Maxlength*rate)
+    定数 mini = 121/Maxpoint
+    
+    全描画クリア
+    線太設定(0.01)
+    線色設定（"#00000000")
+    
+    jを0からvertical-1まで繰り返す:
+        iを0からhorizontal-1まで繰り返す:
+            yを0からrate-1まで繰り返す:
+                xを0からrate-1まで繰り返す:
+                    color = FLOOR(mini*array[(i+j*horizontal)*(rate^2)+x+y*rate])+122
+                    RGB(color,color,color)に塗色設定
+                    四角描画([(j*rate+y)*planeWidth,(i*rate+x)*planeWidth,planeWidth,planeWidth])

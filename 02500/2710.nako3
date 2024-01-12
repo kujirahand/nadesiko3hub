@@ -8,198 +8,194 @@
 ### URL=
 ### 種類=wnako
 ### タグ=ゲーム,四目並べ,五目並べ,対戦ゲーム,暇つぶし,初心者
-### 更新日時=2023-12-14 20:00:41
+### 更新日時=2024-01-12 17:03:02
 ###
 
 # N目並べ
 X=0
 Y=0
-#グローバル変数として定義
-Observer=0
-#0がプレイ中、1がゲーム終了を示す
-Winer=0
-#勝者の番号
-Horizontal_row=7
-Vertical_row=6
-#それぞれ縦のマス目の数と横のマス目の数。
-Width=50
-#Widthはキャンバス上のマスをどれだけ離すか。
-Stage=盤面初期化
-#Stageは集合。Stageは左から順に縦列を設定している。
-Who=1
-#whoは手番の人。1で赤。2で青。
-Limit=4
-#Limitは揃える目の長さ
-Type=2
-#Typeは想定している人数
-Colors={
+countlimit = 15
+count = countlimit
+NumberTimes = []
+Observer = 0 #0がプレイ中、1がゲーム終了を示す
+Winer = 0 #勝者の番号
+#それぞれ縦のマス目の数と横のマス目の数
+Horizontal_row = 10
+Vertical_row = 10
+Width = (描画中キャンバスの"height"をDOM属性取得)/(Vertical_row+2)#Widthはキャンバス上のマスをどれだけ離すか。
+Stage = 盤面初期化 #Stageは集合。Stageは左から順に縦列を設定している。
+Who = 1 #whoは手番の人。1で赤。2で青。
+Limit = 4 #Limitは揃える目の長さ
+Type = 2 #Typeは想定している人数
+Colors = {
 "1":"#FF0000",
 "2":"#0000FF",
-"3":"#FFFF00",
+"3":"#FFA500",
 "4":"#00FF00",
-"5":"#00FFFF"
-}
-#辞書型変数で色を対応させる
-Type_Limit=Colorsの要素数
-#Type_Limitは実装しているColorのパターン数
-Direction=[[0,1,0,-1],[1,1,-1,-1],[1,0,-1,0],[1,-1,-1,1]]
-#確認する方向を(x,y,x,y)の形で反対方向と同時に接続
-Gravity=1
-#落下するかどうか。1ならあり。0ならなし
+"5":"#DA70D6",
+"6":"#808080",
+"7":"#000000",
+} #辞書型変数で色を対応させる
+Type_Limit = Colorsの要素数 #Type_Limitは実装しているColorのパターン数
+Direction = [[0,1,0,-1],[1,1,-1,-1],[1,0,-1,0],[1,-1,-1,1]] #確認する方向を(x,y,x,y)の形で反対方向と同時に接続
+Gravity = 1 #落下するかどうか。1ならあり。0ならなし
+
+main__盤面描画
+
+
+1秒毎には:
+    count = count - 1
+    もしcount == 0なら:
+        もしObserver == 0ならば:
+                X＝乱数(Horizontal_row)
+                Y＝乱数(Vertical_row)
+                もし(盤面範囲(X,Y))ならば:
+                    Y=石落下場所(X)
+                    Stage[X,Y]=Who
+                    チェック
+                    手番交代
+        違えば:
+            "{Limit}個揃ってるよ！"と言う
+            全タイマー停止
+        count = countlimit
+    盤面描画
+    [Width*6,Width-5]へ" 残り{count}秒です"を文字描画
+
+
 
 Resetボタン=「Reset」のボタン作成
 Resetボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
-Resetボタンをクリックした時には
-　初期化
-ここまで
+Resetボタンをクリックした時には:
+    初期化
 
 Gravityボタン=「Gravity」のボタン作成
 Gravityボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
-Gravityボタンをクリックした時には
-  もしGravity=1ならば
-　　Gravity=0
-　違えば
-　　Gravity=Gravity+1
-　ここまで
-　初期化
-ここまで
+Gravityボタンをクリックした時には:
+    もしGravity=1ならば:
+        Gravity=0
+    違えば:
+        Gravity=Gravity+1
+    初期化
 
 Typeボタン="Type"のボタン作成
 Typeボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
-Typeボタンをクリックした時には
-　もしType=Type_Limitならば
-　　Type=2
-　違えば
-　　Type=Type+1
-　ここまで
-　初期化
-ここまで
+Typeボタンをクリックした時には:
+    もしType=Type_Limitならば:
+        Type=2
+    違えば:
+        Type=Type+1
+    初期化
 
-盤面描画
+Reroll = "Reroll"のボタン作成
+Rerollに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
+Rerollをクリックした時には:
+    もし0 < 要素数(NumberTimes)なら:
+        X = 配列ポップ(NumberTimes)
+        Y = 配列ポップ(NumberTimes)
+        Stage[X,Y] = 0
+        Who = ((要素数(NumberTimes))/2%Type) + 1
+        count = countlimit
+        Observer = 0
+        main__盤面描画
 
+描画中キャンバスをマウス押した時には:
+    もしObserver=0なら:
+        X＝FLOOR(マウスX/Width)-1
+        Y＝FLOOR(マウスY/Width)-1
+        もし盤面範囲(X,Y)&&Stage[X,Y] == 0なら:
+            Y=石落下場所(X)
+            Stage[X,Y] = Who
+            チェック
+            手番交代
+    違えば:
+        "{Limit}個揃ってるよ！"と言う
+    盤面描画
+    
+    [Width*6,Width-5]へ" 残り{count}秒です"を文字描画
+    count = countlimit
+    #*/
 
-描画中キャンバスをマウス押した時には
-　もしObserver=0ならば
-　　X＝FLOOR(マウスX/Width)-1
-　　Y＝FLOOR(マウスY/Width)-1
-　　　もし(盤面範囲(X,Y))ならば
-　　　　Y=石落下場所(X)
-　　　　　　Stage[X,Y]=Who
-　　　　チェック
-　　　　手番交代
-　　　ここまで
-　違えば
-　"{Limit}個揃ってるよ！"と言う
-　ここまで
-　盤面描画
-ここまで
+●初期化:
+    Stage = 盤面初期化
+    NumberTimes = []
+    Who = 1
+    count = countlimit
+    Observer = 0
+    盤面描画
 
-●初期化
-　Stage=盤面初期化
-　Who=1
-　Observer=0
-　盤面描画
-ここまで
+●チェック:
+    Directionを反復:
+        定数[ax,ay,bx,by]=対象
+        counter = 一方(一方(Limit-1,ax,ay),bx,by)
+        もしcounter < 1なら:
+            Observer = 1
+            Winer = Who
+            抜ける
 
-●チェック
-　Directionを反復
-　　　定数[ax,ay,bx,by]=対象
-　　　counter=一方(一方(Limit-1,ax,ay),bx,by)
-　　　もしcounter<1ならば
-　　　　　Observer=1
-　　　　　Winer=Who
-　　　　　抜ける
-　　　ここまで
-　ここまで
-ここまで
+●一方(i,x,y):
+    もしi>0ならば:
+        jを1からLimit-1まで繰り返す:
+            もし盤面範囲(X+x*j,Y+y*j)なら:
+                もしStage[X+x*j,Y+y*j] == Whoなら:
+                    i=i-1
+                違えば:
+                    iを戻す
+    iを戻す
 
-●一方(i,x,y)
-　もしi>0ならば
-　　jを1からLimit-1まで繰り返す
-　　　もし盤面範囲(X+x*j,Y+y*j)ならば
-　　　　もしStage[X+x*j,Y+y*j]=Whoならば
-　　　　　i=i-1
-　　　　違えば
-　　　　　iを戻す
-　　　　ここまで
-　　　ここまで
-　　ここまで
-　iを戻す
-　ここまで
-ここまで
-
-●手番交代
-　もしWho=Typeならば
-　　Who=1
-　　違えば
-　　Who=Who+1
-　ここまで
-ここまで
-
-●(x)石落下場所
-　もしGravity=0なら
-　　　もしStage[x,Y]=0なら
-　　　　Yを戻す
-　　　ここまで
-　違えば
-　　　iをVertical_row-1から0まで繰り返す
-　　　　もしStage[x,i]=0なら
-　　　　　iを戻す
-　　　　ここまで
-　　　ここまで
-　ここまで
-　終わる
-ここまで
-
-●縦列作成
-　縦列=[]を「,」で区切る
-　　Vertical_row回
-　　　縦列に0を配列追加
-　　ここまで
-　縦列を戻す
-ここまで
-
-●(x,y)盤面範囲
-　もし(x>=0 && x<Horizontal_row && y>=0 && y<Vertical_row)なら
-　　　はいを戻す
-　　ここまで
-いいえを戻す
-ここまで
-
-●盤面初期化とは
-　盤面=[]
-　縦列=縦列作成
-　　iを0から(Horizontal_row-1)まで繰り返す
-　　　盤面[i] = 縦列を配列複製
-　　ここまで。
-　盤面を戻す。
-ここまで。
+●手番交代:
+    NumberTimesにYを配列追加
+    NumberTimesにXを配列追加
+    Who = ((要素数(NumberTimes)/2)%Type) + 1
 
 
-●盤面描画
-　全描画クリア
-　　vを1からVertical_rowまで繰り返す
-　　hを1からHorizontal_rowまで繰り返す
-　　　2に線太設定
-　　　"#FFFFFF"に塗色設定
-　　　[h*Width,v*Width+1,Width,Width]に四角描画
-　　　　もしStage[h-1,v-1]>0なら
-　　　　　0.1に線太設定。
-　　　　　(Colors["{Stage[(h-1),(v-1)]}"])に塗色設定
-　　　　　［h*Width+Width/2,v*Width+Width/2］へWidth/4の円描画
-　　　　ここまで
-　　ここまで
-　　ここまで
-　2に線太設定
-　"#E0E0E0"に塗色設定
-　[Width,1,220,Width]に四角描画。
-　　もしObserver=0なら
-　　　Colors[Who]に塗色設定。
-　　　"bold 36px serif"に描画フォント設定。
-　　　[Width,Width-10]へ" 今は{Who}番です"を文字描画
-　　違えば
-　　  "{Colors[Winer]}"に塗色設定。
-　　　"bold 36px serif"に描画フォント設定。
-　　　[Width,Width-10]へ" {Winer} の勝ちです"を文字描画
-　　ここまで
-ここまで
+●(x)石落下場所:
+    もしGravity == 0なら:
+        もしStage[x,Y] = 0なら:
+            Yを戻す
+    違えば:
+         iをVertical_row-1から0まで繰り返す:
+            もしStage[x,i]=0なら:
+                iを戻す
+
+●縦列作成:
+    縦列 = []
+    Vertical_row回:
+        縦列に0を配列追加
+    縦列を戻す
+
+●(x,y)盤面範囲:
+    もし(x>=0 && x<Horizontal_row && y>=0 && y<Vertical_row)なら:
+        trueを戻す
+    falseを戻す
+
+●盤面初期化:
+    盤面 = []
+    縦列 = 縦列作成
+    iを0から(Horizontal_row-1)まで繰り返す:
+        盤面[i] = 縦列を配列複製
+    盤面を戻す
+
+
+●盤面描画:
+    全描画クリア
+    vを1からVertical_rowまで繰り返す:
+        hを1からHorizontal_rowまで繰り返す:
+            線太設定(2)
+            "#FFFFFF"に塗色設定
+            [h*Width,v*Width+1,Width,Width]に四角描画
+            もしStage[h-1,v-1]>0なら:
+                線太設定(0.1)
+                (Colors["{Stage[(h-1),(v-1)]}"])に塗色設定
+                [h*Width+Width/2,v*Width+Width/2]へWidth/4の円描画
+    線太設定(2)
+    "bold {Width}px serif"に描画フォント設定
+    もしObserver=0なら:
+        Colors[Who]に塗色設定
+        [0,Width-5]へ" 今は{Who}番です"を文字描画
+    違えば:
+        Colors[Winer]に塗色設定
+        [0,Width-5]へ" {Winer} の勝ちです"を文字描画
+
+/*
+https://memo.onl.jp/?DPqAC4bHBF
+*/

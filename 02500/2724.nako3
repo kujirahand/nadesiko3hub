@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=PerlinNoise
-### 更新日時=2024-01-10 13:23:49
+### 更新日時=2024-01-16 17:04:13
 ###
 
 #Noise
@@ -16,51 +16,124 @@ Noise = [] //2D用
 Waves = [] //生成したnoiseを全てここに格納する
 
 定数 NumberLines = 3 //生成する線の数
-定数 HorizontalLines = 1
-定数 VerticalLines = 1
-定数 Rate = 100 //FLOOR(300/NumberLines) //一本の線を分割する数
+定数 HorizontalLines = 2
+定数 VerticalLines = 2
+定数 Rate = 100/HorizontalLines //一本の線を分割する数
 定数 Degree = 2 //生成する乱数の振れ幅(原点0を中心に正負へ等距離にある点同士の距離)
 定数 Scale = 1 //wavelet関数の平面上で原点(0,0)からどれだけ離れているか
+
 定数 CanvasWidth = 描画中キャンバス["width"] //Canvasの左上から右上までの距離
 定数 CanvasHeight = 描画中キャンバス["height"] //Canvasの左上から左下までの距離
+定数 XORSHIFT_SEED = 2463534242 //Xorshift乱数生成のシード値(適当)
 
 /*
 Waves = main__CreateWaves(NumberLines,Degree,Rate,Scale)
 main__DrawWaves(Waves)
 #*/
 
+octave = 1
 
-main__CreatePlane(HorizontalLines,VerticalLines,Degree,Rate)
-main__DrawPlane(HorizontalLines,VerticalLines,Rate,Noise)
+main__CreatePlane(Noise,HorizontalLines,VerticalLines,Degree,Rate)
+main__DrawPlane(Noise,HorizontalLines,VerticalLines,Rate)
+1秒待
+
+main__fractalPerlin(Noise,HorizontalLines,VerticalLines,Rate,Degree,octave,5)
+
+main__DrawPlane(Noise,HorizontalLines,VerticalLines,Rate)
+
+
 #*/
+
+●fractalPerlin(array,horizontal,vertical,rate,degree,octave,times):
+    iを0からtimes-1まで繰り返す:
+        smallArray = []
+        main__CreatePlane(smallArray,horizontal*2^octave,vertical*2^octave,degree/octave,rate/2^octave)
+        main__AddArray2D(array,smallArray,horizontal*rate,vertical*rate)
+        octave = octave+1
+
+●AddArray2D(arrayA,arrayB,width,height):
+    xを0からwidth-1まで繰り返す:
+        yを0からheight-1まで繰り返す:
+            arrayA[x][y] = arrayA[x][y] + arrayB[x][y]
+
+●CreatePlane(array,horizontal,vertical,degree,rate):
+    //arrayに横幅(horizontal*rate)*縦幅(vertical*rate)のパーリンノイズを二次元配列[x][y]を返す関数
+    slopes = []
+    xを0から(horizontal+1)-1まで繰り返す:
+        yを0から(vertical+1)-1まで繰り返す:
+            slopesにmain__GetSlope(x,y)を配列追加
+    iを0から(horizontal*rate)-1まで繰り返す:
+        row = []
+        jを0から(vertical*rate)-1まで繰り返す:
+            X = FLOOR(i/rate) //タイルのindex
+            Y = FLOOR(j/rate)
+            u = (i%rate) / (rate) //タイルより細かいマスのindex
+            v = (j%rate) / (rate)
+            //マジでここの理解に7時間かかった。アドバイスありがとうd('v')
+            
+            pointu0 = 線形補完(main__CreateWavelet2D(u,v,                                                              slopes[(X*vertical+Y)][0]/* x:(x,y)=(0,0) */,                                                       slopes[(X*vertical+Y)][1]/* y:(x,y)=(0,0) */,1),main__CreateWavelet2D(u-1,v,                               slopes[((X+1)*vertical+Y)][0]/* x:(x,y)=(1,0) */,                                                   slopes[((X+1)*vertical+Y)][1]/* y:(x,y)=(1,0) */,1),u)
+            
+            pointu1 = 線形補完(CreateWavelet2D(u,v-1,                                                            slopes[(X*vertical+(Y+1))][0] /* x:(x,y)=(0,1) */ ,                                                 slopes[(X*vertical+(Y+1))][1]/* y:(x,y)=(0,1) */,1),main__CreateWavelet2D(u-1,v-1,                         slopes[((X+1)*vertical+(Y+1))][0]/* x:(x,y)=(1,1) */,                                               slopes[((X+1)*vertical+(Y+1))][1]/* y:(x,y)=(1,1) */,1),u)
+            
+            pointuv = 線形補完(pointu0,pointu1,v)
+            rowにpointuvを配列追加
+        arrayのiにrowを配列挿入
+
+//(x, y)での傾きを、(ax, ay)の形式で戻す
+//引数は整数である必要がある
+●GetSlope(x, y):
+    定数 X = 0
+    定数 Y = 1
+    定数 noiseSeed = システム時間ミリ秒 //ノイズのシード値
+    s = Xorshift(noiseSeed + x)
+    s = Xorshift(s + y)
+    sx = Xorshift(s + X) % 20000 - 10000
+    sy = Xorshift(sx + Y) % 20000 - 10000
+    [sx / 10000, sy / 10000]を戻す
+
+//一つの値をXorshiftして戻す
+●Xorshift(seed):
+    n = XORSHIFT_SEED + seed
+    n = XOR(n, n << 13)
+    n = XOR(n, n >>> 17)
+    n = XOR(n, n << 5)
+    n = n >>> 0
+    nを戻す
+
+●CreateWavelet2D(wx,wy,slopeA,slopeB,scale):
+    //与えられたslope(角度),scale(規模)のwaveletの上のwx(x座標),wy(y座標)に対応するz座標を返す関数
+    ((2*(ABS(wx)^3)/scale^2 - 3*(wx^2)/scale + scale))*((2*(ABS(wy)^3)/scale^2 - 3*(wy^2)/scale + scale))*(slopeA*wx+slopeB*wy)を戻す
+
+●比較(A,B):
+    もしA<Bなら:
+        Bを戻す
+    Aを戻す
 
 ●線形補完(A,B,C):
     A+C*(B-A)を戻す
 
-●CreatePlane(horizontal,vertical,degree,rate):
-    slopes = []
-    2*((horizontal+1)*(vertical+1))回:
-        slopesに((乱数(degree*10)-degree*5)/10)を配列追加
-    jを0から(vertical-1)まで繰り返す:
-        iを0から(horizontal-1)まで繰り返す:
-            slopeX00 = slopes[((i*2)+j*(2*(horizontal+1)))] //x:(x,y)=(0,0)
-            slopeY00 = slopes[((i*2+1)+j*(2*(horizontal+1)))] //y:(x,y)=(0,0)
-            slopeX10 = slopes[(((i+1)*2)+j*(2*(horizontal+1)))] //x:(x,y)=(1,0)
-            slopeY10 = slopes[(((i+1)*2+1)+j*(2*(horizontal+1)))] //y:(x,y)=(1,0)
-            slopeX01 = slopes[((i*2)+(j+1)*(2*(horizontal+1)))] //x:(x,y)=(0,1)
-            slopeY01 = slopes[((i*2+1)+(j+1)*(2*(horizontal+1)))] //y:(x,y)=(0,1)
-            slopeX11 = slopes[(((i+1)*2)+(j+1)*(2*(horizontal+1)))] //x:(x,y)=(1,1)
-            slopeY11 = slopes[(((i+1)*2+1)+(j+1)*(2*(horizontal+1)))] //y:(x,y)=(1,1)
-            nyを0からrate-1まで繰り返す:
-                nxを0からrate-1まで繰り返す:
-                    u = nx / (rate-1)
-                    v = ny / (rate-1)
-                    //マジでここの理解に7時間かかった。アドバイスありがとうd('v')
-                    pointu0 = 線形補完(CreateWavelet2(u,v,slopeX00,slopeY00,1),CreateWavelet2(u-1,v,slopeX10,slopeY10,1),u)
-                    pointu1 = 線形補完(CreateWavelet2(u,v-1,slopeX01,slopeY01,1),CreateWavelet2(u-1,v-1,slopeX11,slopeY11,1),u)
-                    pointuv = 線形補完(pointu0,pointu1,v)
-                    Noiseにpointuvを配列追加
+●DrawPlane(array,horizontal,vertical,rate):
+    定数 Maxpoint = main__HighestPoint(array)
+    定数 Maxlength = main__比較(horizontal,vertical)
+    定数 planeWidth = CanvasWidth/(Maxlength*rate)
+    定数 mini = 121/Maxpoint
+    
+    全描画クリア
+    線太設定(0.01)
+    線色設定（"#00000000")
+    
+    Xを0からhorizontal*rate-1まで繰り返す:
+        Yを0からvertical*rate-1まで繰り返す:
+            color = FLOOR(mini*array[X,Y])+123
+            RGB(color,color,color)に塗色設定
+            四角描画([(X)*planeWidth,(Y)*planeWidth,planeWidth,planeWidth])
 
+●HighestPoint(array):
+    Max = 0
+    xを0から(要素数(array)-1)まで繰り返す:
+        yを0から(要素数(array)-1)まで繰り返す:
+            Max = 比較(Max,ABS(array[x][y]))
+    Maxを戻す
 
 ●CreateWaves(numberLines,degree,rate,scale):
     array = []
@@ -83,15 +156,6 @@ main__DrawPlane(HorizontalLines,VerticalLines,Rate,Noise)
     //与えられたslope(角度),scale(規模)のwaveletの上のwx(x座標)に対応するy座標を返す関数
     ((slope * wx)*((ABS(wx)^3)/scale^2 - (2 * (wx^2))/scale + scale))を戻す
 
-●CreateWavelet2(wx,wy,slopeA,slopeB,scale):
-    //与えられたslope(角度),scale(規模)のwaveletの上のwx(x座標),wy(y座標)に対応するz座標を返す関数
-    ((2*(ABS(wx)^3)/scale^2 - 3*(wx^2)/scale + scale))*((2*(ABS(wy)^3)/scale^2 - 3*(wy^2)/scale + scale))*(slopeA*wx+slopeB*wy)を戻す
-
-●比較(A,B):
-    もしA<Bなら:
-        Bを戻す
-    Aを戻す
-
 ●DrawWaves(array):
     定数 Maxpoint = main__比較((arrayの配列最大値),ABS((arrayの配列最小値)))
     定数 linesWidth = CanvasWidth/(要素数(array)+1) //隣り合う点同士の距離
@@ -103,21 +167,3 @@ main__DrawPlane(HorizontalLines,VerticalLines,Rate,Noise)
     
     iを0から(要素数(array)-1)まで繰り返す:
         線描画([(i+1)*linesWidth+300,halfHeight+array[i]*linesHeight],[(i+2)*linesWidth+300,halfHeight+array[i+1]*linesHeight])
-
-●DrawPlane(horizontal,vertical,rate,array):
-    定数 Maxpoint = main__比較((arrayの配列最大値),ABS((arrayの配列最小値)))
-    定数 Maxlength = main__比較(horizontal,vertical)
-    定数 planeWidth = CanvasWidth/(Maxlength*rate)
-    定数 mini = 121/Maxpoint
-    
-    全描画クリア
-    線太設定(0.01)
-    線色設定（"#00000000")
-    
-    jを0からvertical-1まで繰り返す:
-        iを0からhorizontal-1まで繰り返す:
-            yを0からrate-1まで繰り返す:
-                xを0からrate-1まで繰り返す:
-                    color = FLOOR(mini*array[(i+j*horizontal)*(rate^2)+x+y*rate])+122
-                    RGB(color,color,color)に塗色設定
-                    四角描画([(j*rate+y)*planeWidth,(i*rate+x)*planeWidth,planeWidth,planeWidth])

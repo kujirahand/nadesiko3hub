@@ -1,0 +1,61 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2756
+### タイトル=CombSort
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=コムソートは、原始的なバブルソートの亜種のような物。(本来比較すべきはもっと大きな配列なので異常にコムソートのみ速く実行しているように見える。そのためこの結果はコードを参考にする程度にどどめてもらえるとありがたい)observer=0に変える事でで実行中を描画するか変えられる。ソートは、データの集合を一定の規則に従って並べること。日本語では整列、並べ替え、分類などと訳される。
+### 対象バージョン=3.5.1
+### URL=
+### 種類=wnako
+### タグ=Sort,Algorithm
+### 更新日時=2024-03-06 20:35:11
+###
+
+#なでしこ #CombSort #timer
+Arraylengh=1800
+
+maxheight=描画中キャンバスの"height"をDOM属性取得
+width=(描画中キャンバスの"width"をDOM属性取得)/Arraylengh
+height=(maxheight)/Arraylengh
+
+Array=[]
+iを1からArraylenghまで繰り返す:
+    Arrayの乱数((Arrayの要素数))にiを配列挿入
+
+    
+observer=1
+表示(実行時間計測("Combsort"))
+
+
+●Combsort:
+    array = Array
+    sortlengh=arrayの要素数
+    h=FLOOR(sortlengh/1.3)
+    trueの間:
+        flag=true
+        jを0から(sortlengh-h-1)まで繰り返す:
+            もしArray[j]>Array[j+h]なら:
+                item=array[j]
+                array[j]=array[j+h]
+                array[j+h]=item
+                flag=false
+        もし1<hなら:
+            h=FLOOR(h/1.3)
+        違えば:
+            もしflagなら:
+                抜ける
+        もしobserver == 1なら:
+            0秒待
+            main__draw(array)
+    main__draw(array)
+    arrayを戻す
+
+
+
+●draw(array):
+    全描画クリア
+    i=0
+    arrayを反復:
+        y=対象
+        [i*width,maxheight-y*height,width,y*height]に四角描画
+        i=i+1

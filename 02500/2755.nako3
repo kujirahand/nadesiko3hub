@@ -1,0 +1,82 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2755
+### タイトル=HeapSort
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=ヒープーソートは、二分木の性質を利用して高速で最長を見つけている。observer=0に変える事でで実行中を描画するか変えられる。ソートは、データの集合を一定の規則に従って並べること。日本語では整列、並べ替え、分類などと訳される。
+### 対象バージョン=3.5.1
+### URL=
+### 種類=wnako
+### タグ=Sort,Algorithm
+### 更新日時=2024-03-06 20:37:03
+###
+
+#なでしこ #HeapSort #時間計測
+#Arraylenghは配列の長さ
+Arraylengh=300
+
+#描画用の変数
+maxheight=描画中キャンバスの"height"をDOM属性取得
+width=(描画中キャンバスの"width"をDOM属性取得)/Arraylengh
+height=(maxheight)/Arraylengh
+
+#配列を生成
+Array=[]
+iを0からArraylengh-1まで繰り返す:
+    Arrayの乱数((Arrayの要素数))にiを配列挿入
+
+#ソートする関数
+observer = 1
+表示(実行時間計測("heapsort"))
+
+
+●heapsort:
+    array = Array
+    start = 0
+    end = Arraylengh
+    #limitはヒープする配列の最大を表す
+    #start,endもヒープする
+    limitをendからstartまで繰り返す:
+        #iをヒープ済みになるまで繰り返す
+        #iはヒープ部分のインデックス
+        iを0から(limit-start)まで繰り返す:
+            #ヒープ上でのインデックスを表す変数
+            child=i
+            parent=FLOOR((child)/2)
+            #array上でのインデックスを表す変数
+            array_child=start+child
+            array_parent=start+parent
+            #ヒープ構造を作成
+            #高さを計算しているので、ifでparent=0つまり根かどうかを調べる必要はない
+            (CEIL(LOGN(2,child))+1)回:
+                もしarray[array_parent]<array[array_child]なら:
+                    main__swap(array,array_child,array_parent)
+                    child=parent
+                    parent=FLOOR((child)/2)
+                    array_child=start+child
+                    array_parent=start+parent
+                違えば:
+                    抜ける
+            main__swap(array,start,limit)
+        もしobserver == 1なら:
+            0秒待
+            main__draw(array)
+    main__draw(array)
+    arrayを戻す
+
+
+#Arrayの二要素を入れ替える関数
+●swap(array,a,b):
+    item=array[a]
+    array[a]=array[b]
+    array[b]=item
+    arrayを戻す
+
+#Arrayを描画
+●draw(array):
+    全描画クリア
+    i=0
+    arrayを反復:
+        y=対象
+        [i*width,maxheight-y*height,width,y*height]に四角描画
+        i=i+1

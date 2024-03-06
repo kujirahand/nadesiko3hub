@@ -1,0 +1,103 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2760
+### タイトル=fractal(駄文注意)
+### 作者=クレスト(user_id=0)
+### ライセンス=CC0
+### 説明=メモの底にあった過去の作品。更新は再生成ボタンを押さないといけないので注意。フラクタルの美しさに触れる機会になればなあと。クジラ飛行機机様のhttps://n3s.nadesi.com/index.php?action=show&page=2521に着想を得ました。素晴らしい作品の数々を公開して頂きありがとうございます。
+### 対象バージョン=3.5.1
+### URL=
+### 種類=wnako
+### タグ=fractal,シダ,シダ？,駄文,駄コード,黒歴史
+### 更新日時=2024-03-06 22:11:04
+###
+
+x=250
+y=375
+AngleLimit=15
+RepeatCount=9
+StartLine=60
+LineLimit=20
+Scale=0.8
+階層=0
+Thickness=7
+
+全描画クリア
+Thicknessに線太設定
+［x,y］から［x,y-100］まで線描画。
+分岐(x,y-100,0,StartLine)
+
+再生成ボタン=「再生成」のボタン作成。
+再生成ボタンをクリックした時には
+全描画クリア
+Thickness=7
+Thicknessに線太設定
+［x,y］から［x,y-100］まで線描画。
+分岐(x,y-100,0,StartLine)
+ここまで
+
+正角度ボタン=「正角度」のボタン作成。
+正角度ボタンをクリックした時には
+AngleLimitを5増やす
+ここまで
+
+負角度ボタン=「負角度」のボタン作成。
+負角度ボタンをクリックした時には
+AngleLimitを5減らす
+ここまで
+
+階層増加ボタン=「階層増加」のボタン作成。
+階層増加ボタンをクリックした時には
+RepeatCountを1増やす
+ここまで
+
+階層減少ボタン=「階層減少」のボタン作成。
+階層減少ボタンをクリックした時には
+RepeatCountを1減らす
+ここまで
+
+表示ボタン=「表示」のボタン作成。
+表示ボタンをクリックした時には
+AngleLimitを表示
+RepeatCountを表示
+ここまで
+
+●sin(A)とは
+SIN(A*PI/180)
+ここまで
+
+●cos(A)とは
+COS(A*PI/180)
+ここまで
+
+●行列x(X,Y,A)
+X*cos(A)-Y*sin(A)を戻す
+ここまで
+
+●行列y(X,Y,A)
+X*sin(A)+Y*cos(A)を戻す
+ここまで
+
+●(X,Y,A,LineLong)分岐とは
+分岐角度=AngleLimit
+Thickness=LineLong/10
+Thicknessに線太設定
+
+回転前x=LineLong*cos(90-分岐角度)
+回転前y=LineLong*sin(90-分岐角度)
+回転後x1=行列x(回転前x,回転前y,A)
+回転後y1=-行列y(回転前x,回転前y,A)
+［X,Y］から［X+回転後x1,Y+回転後y1］まで線描画。
+
+回転前x=-LineLong*cos(90-分岐角度)
+回転前y=LineLong*sin(90-分岐角度)
+回転後x2=行列x(回転前x,回転前y,A)
+回転後y2=-行列y(回転前x,回転前y,A)
+［X,Y］から［X+回転後x2,Y+回転後y2］まで線描画。
+
+もし階層+1<=RepeatCountなら
+階層を1増やす
+分岐(X+回転後x1,Y+回転後y1,A-分岐角度,LineLong*Scale)
+分岐(X+回転後x2,Y+回転後y2,A+分岐角度,LineLong*Scale)
+階層を1減らす
+ここまで
+ここまで

@@ -1,0 +1,75 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2754
+### タイトル=ShakerSort
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=シェイカーソートは、原始的なバブルソートの亜種のような物。observer=0に変える事でで実行中を描画するか変えられる。ソートは、データの集合を一定の規則に従って並べること。日本語では整列、並べ替え、分類などと訳される。
+### 対象バージョン=3.5.1
+### URL=
+### 種類=wnako
+### タグ=Sort,Algorithm
+### 更新日時=2024-03-06 20:36:30
+###
+
+#なでしこ #ShakerSort #時間計測
+Arraylengh=900
+
+maxheight=描画中キャンバスの"height"をDOM属性取得
+width=(描画中キャンバスの"width"をDOM属性取得)/Arraylengh
+height=(maxheight)/Arraylengh
+
+Array=[]
+iを1からArraylenghまで繰り返す:
+    Arrayの乱数((Arrayの要素数))にiを配列挿入
+
+    
+#timer
+observer = 1
+"shakersort"の実行時間計測して表示
+
+
+●shakersort:
+    array = Array
+    sortlengh=Arraylengh+1
+    rightlengh=0
+    leftlengh=0
+    FLOOR(Arraylengh/2)回:
+        j=leftlengh
+        sortlengh回:
+            もしArray[j]>Array[j+1]なら:
+                item=Array[j]
+                array[j]=array[j+1]
+                array[j+1]=item
+            j=j+1
+        rightlengh=rightlengh+1
+        sortlengh=sortlengh-1
+        
+        もしobserver == 1なら:
+            0秒待
+            main__draw(array)
+        
+        j=Arraylengh-rightlengh
+        sortlengh回:
+            もしArray[j-1]>Array[j]なら:
+                item=Array[j-1]
+                array[j-1]=array[j]
+                array[j]=item
+            j=j-1
+        leftlengh=leftlengh+1
+        sortlengh=sortlengh-1
+        もしobserver == 1なら:
+            0秒待
+            main__draw(array)
+    main__draw(array)
+    arrayを戻す
+
+
+
+
+●draw(array):
+    全描画クリア
+    i=0
+    arrayを反復:
+        y=対象
+        [i*width,maxheight-y*height,width,y*height]に四角描画
+        i=i+1

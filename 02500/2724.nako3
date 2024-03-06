@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=PerlinNoise
-### 更新日時=2024-01-16 17:04:13
+### 更新日時=2024-03-06 20:38:14
 ###
 
 #Noise
@@ -35,10 +35,10 @@ octave = 1
 
 main__CreatePlane(Noise,HorizontalLines,VerticalLines,Degree,Rate)
 main__DrawPlane(Noise,HorizontalLines,VerticalLines,Rate)
+/*
 1秒待
 
 main__fractalPerlin(Noise,HorizontalLines,VerticalLines,Rate,Degree,octave,5)
-
 main__DrawPlane(Noise,HorizontalLines,VerticalLines,Rate)
 
 

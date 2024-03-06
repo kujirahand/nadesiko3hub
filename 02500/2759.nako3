@@ -1,0 +1,104 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2759
+### タイトル=穴掘り法迷路(ループ処理)
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=ループ処理穴掘り法迷路。再起処理は簡潔にコードを書けるが、スタックを消費するため物理的にな限界が存在する。(＊クレスト調べで100×100がギリギリで200×200は無理だった)しかし、ループ処理にするとスタックではなく、繰り返し可能限界まで繰り返せるため、実際に大きい迷路を作れる(こちらもクレスト調べで、200×200は余裕で1500×1500までなら多少時間が掛かるが生成する事が出来た)
+### 対象バージョン=3.5.1
+### URL=
+### 種類=wnako
+### タグ=Maze,Algorithm
+### 更新日時=2024-03-06 21:56:18
+###
+
+#なでしこ #迷路 #ループ処理
+Wall = []
+Vertical_row = 149
+Horizontal_row = 149
+smaller = Horizontal_row
+もしVertical_row < Horizontal_rowなら:
+    smaller = Vertical_row
+Width=(描画中キャンバス["width"])/smaller
+Direction=[[0,1],[1,0],[0,-1],[-1,0]]
+
+
+main__壁初期化
+main__迷路作成(1,1)
+main__壁描画
+
+●壁初期化とは:
+    もしVertical_row%2=0ならば:
+    　　Vertical_row=Vertical_row+1
+    もしHorizontal_row%2=0ならば:
+    　　Horizontal_row=Horizontal_row+1
+    Wall=[]
+    row=[]
+    Vertical_row回:
+    　　rowに1を配列追加
+    iを0からHorizontal_row-1まで繰り返す:
+    　　Wall[i]=rowを配列複製
+
+
+●壁描画とは:
+    全描画クリア
+    iを0からHorizontal_row-1まで繰り返す:
+        jを0からVertical_row-1まで繰り返す:
+            もしWall[i][j]=1なら:
+            　　[i*Width,j*Width,Width,Width]に四角描画
+
+
+●(px,py)迷路範囲内とは:
+    もしpx<0||px>=Horizontal_row||py<0||py>=Vertical_rowならば:
+    　　falseを戻す
+    trueを戻す
+
+●(x,y)迷路作成とは:
+    px = x
+    py = y
+    digList = [[px,py]]
+    flag = 1
+    (flag < 2)間:
+        
+        (flag == 1)間:
+            Wall[px][py] = 0
+            way = 配列複製(Direction)
+            配列シャッフル(way)
+            
+            iを0から(要素数(way)-1)まで繰り返す:
+                定数 dx = way[i][0]
+                定数 dy = way[i][1]
+                wx = px+dx+dx
+                wy = py+dy+dy
+                
+                もし迷路範囲内(wx,wy) && Wall[wx][wy] == 1なら:
+                    Wall[wx-dx][wy-dy]=0
+                    px = wx
+                    py = wy
+                    配列追加(digList,[wx,wy])
+                    抜ける
+                
+                もしi == (要素数(way)-1)なら:
+                    flag = 0
+        
+        (flag == 0)間:
+            
+            もし要素数(digList) > 0なら:
+                count = 0
+                index = 乱数((要素数(digList))-1)
+                
+                iを0から(要素数(Direction)-1)まで繰り返す:
+                    
+                    定数 sx = 2 * Direction[i][0] + digList[index][0]
+                    定数 sy = 2 * Direction[i][1] + digList[index][1]
+                    
+                    もし迷路範囲内(sx,sy) && Wall[sx][sy] == 1なら:
+                        count = count + 1
+                    
+                もしcount == 0なら:
+                    配列削除(digList,index)
+                違えば:
+                    px = digList[index][0]
+                    py = digList[index][1]
+                    flag = 1
+            違えば:
+                flag = 2

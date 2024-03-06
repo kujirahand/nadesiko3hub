@@ -1,0 +1,203 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2763
+### タイトル=Astar探索
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=Aster探索。first routeを押すと綺麗に描画されます。表示される数字は100が最短距離に対してどれだけ探索したか。ヒューリスティック関数を用いて、仮想距離をコストに入れて探索。原始的な割になかなか悪くない探索。
+### 対象バージョン=3.5.1
+### URL=
+### 種類=wnako
+### タグ=Maze,Algorithm
+### 更新日時=2024-03-06 22:26:09
+###
+
+#なでしこ #迷路 #Astar探索 ver.6.5
+#迷路作成用の変数設定
+Wall=[]
+Vertical_row=75
+Horizontal_row=75
+Width=4
+Direction=[[0,-1],[1,0],[-1,0],[0,1]]
+0に線太設定
+
+"Wallをコピーしているなら[OK]
+そうで無いなら[キャンセル]で答えてね"と二択。
+
+もしそれ==0なら:
+    main__壁作成
+    main__迷路作成(1,1)
+    main__壁描画(Wall,0)
+違えば:
+    クリップボード取得
+    temp=それを","で区切る
+    もし(tempの要素数)==(Horizontal_row*Vertical_row)なら:
+        iを0からHorizontal_row-1まで繰り返す:
+            Wallのiに(tempの0からVertical_rowを配列取出)を配列挿入
+
+
+#探索用のグローバル変数設定
+list=Wallを配列複製
+stack=[]
+stack2=[]
+goalRoute=[]
+distance=2
+h_weight=2
+
+#探索する関数を作動
+main__search(1,1,Vertical_row-2,Horizontal_row-2)
+
+#最短経路との誤差を計算
+FLOOR(distance/(goalRouteの要素数)*100)を表示
+
+#UIを作成
+firstRoute="firstRoute"のボタン作成。
+firstRouteをクリックした時には:
+    main__壁描画(Wall,0)
+    main__探索路描画(goalRoute)
+
+allRoute="allRoute"のボタン作成。
+allRouteをクリックした時には:
+    main__壁描画(list,distance)
+
+OutPut="OutPut"のボタン作成
+OutPutをクリックした時には:
+    Wallをクリップボード設定
+    "クリップボードにコピーしました"と言う
+
+research="research"のボタン作成。
+researchをクリックした時には:
+    list=Wallを配列複製
+    stack=[]
+    stack2=[]
+    goalRoute=[]
+    distance=2
+    main__search(1,1,Vertical_row-2,Horizontal_row-2)
+
+描画中キャンバスをタッチ終了時には:
+    X=FLOOR(タッチX/Width)
+    Y=FLOOR(タッチY/Width)
+    もしmain__迷路範囲内(X,Y)なら:
+        もしWall[X][Y]=0なら:
+            Wall[X][Y]=1
+        違えば:
+            Wall[X,Y]=0
+        main__壁描画(Wall,0)
+
+
+●壁作成とは:
+    もしVertical_row%2==0ならば:
+    　　Vertical_row=Vertical_row+1
+    もしHorizontal_row%2=0ならば:
+    　　Horizontal_row==Horizontal_row+1
+    Wall=[]
+    row=[]
+    Vertical_row回:
+    　　rowに1を配列追加
+    iを0からHorizontal_row-1まで繰り返す:
+    　　Wall[i]=rowを配列複製
+
+
+●壁描画(wall,max)とは:
+    全描画クリア
+    iを0からHorizontal_row-1まで繰り返す:
+        jを0からVertical_row-1まで繰り返す:
+            もしwall[i][j]=1なら:
+            　　黒色に塗色設定
+            　　[i*Width,j*Width,Width,Width]に四角描画
+            もしwall[i][j]>1なら:
+                hue=CEIL(255/max*wall[i][j])
+                RGB(hue,0,255-hue)に塗色設定
+            　　[i*Width,j*Width,Width,Width]に四角描画
+
+
+●探索路描画(route)とは:
+    0.01に線太設定
+    all=routeの要素数
+    i=0
+　　routeを反復:
+　　　　定数[x,y]=対象
+　　　　hue=CEIL(255/all*i)
+　　　　RGB(hue,ABS(255-ABS(255-2*hue)),255-hue)に塗色設定
+　　　　i=i+1
+　　　　[x*Width,y*Width,Width,Width]に四角描画
+
+
+●(x,y)迷路作成とは:
+    Wall[x][y]=0
+    way=Directionを配列複製
+    wayを配列シャッフル
+    wayを反復:
+        定数[dx,dy]=対象
+        wx=x+dx+dx
+        wy=y+dy+dy
+        もし迷路範囲内(wx,wy)&&Wall[wx][wy]==1ならば:
+            Wall[wx-dx][wy-dy]=0
+            迷路作成(wx,wy)
+
+
+●(px,py)迷路範囲内とは:
+    もしpx<0||px>=Horizontal_row||py<0||py>=Vertical_rowならば:
+    　　falseを戻す
+    trueを戻す
+
+●四方探索(x,y,gx,gy):
+    もしlist[x][y]==0なら:
+        list[x][y]=distance
+    Directionを反復:
+        定数[dx,dy]=対象
+        mx=x+dx
+        my=y+dy
+        もし迷路範囲内(mx,my)なら:
+            もしlist[mx][my]==0なら:
+                stackに[mx,my]を配列追加
+                定数[farx,fary]=[ABS(gx-x),ABS(gy-y)]
+                stack2に(distance+h_weight*(farx+fary))を配列追加
+                /*
+                stack2はstackのインデックス代わりに使用
+                far^2+fary^2はユークリッド距離、farx+faryはマンハッタン距離
+                今回は上下左右のみなので、マンハッタン距離を採用
+                */
+            違えば:
+                もしdistance<list[mx][my]なら:
+                    stackに[mx,my]を配列追加
+                    定数[farx,fary]=[ABS(gx-x),ABS(gy-y)]
+                    stack2に(distance+h_weight*(farx+fary))を配列追加
+
+
+
+
+●search(x,y,gx,gy):
+    px=x
+    py=y
+    main__四方探索(px,py,gx,gy)
+    flag=true
+    px<>gx||py<>gyの間繰り返す:
+        もし(stackの要素数)==0なら:
+            flag=false
+            抜ける
+        #stack2から最小のコストを選択
+    　　p=stack2の(stack2の配列最小値)を配列検索
+    　　px=stack[p][0]
+    　　py=stack[p][1]
+    　　stackのpを配列削除
+    　　stack2のpを配列削除
+    　　distance=distance+1
+    　　main__四方探索(px,py,gx,gy)
+    　　0秒待
+    　　main__壁描画(list,distance)
+    /*
+    ここで探索は終了
+    ここから最短経路を作成
+    */
+    もしflagなら:
+        mx=gx
+        my=gy
+        goalRoute=[[mx,my]]
+        iをdistanceから2まで繰り返す:
+            Directionを反復:
+                定数[dx,dy]=対象
+                もしlist[mx+dx][my+dy]==iなら:
+                    mx=mx+dx
+                    my=my+dy
+                    goalRouteの0に[mx,my]を配列挿入
+                    抜ける

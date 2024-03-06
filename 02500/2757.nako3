@@ -1,0 +1,129 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2757
+### タイトル=MargeSort
+### 作者=クレスト(user_id=0)
+### ライセンス=MIT
+### 説明=マージソートは分割と結合(マージ)をする事でソートしている。observer=0に変える事でで実行中を描画するか変えられる。ソートは、データの集合を一定の規則に従って並べること。日本語では整列、並べ替え、分類などと訳される。
+### 対象バージョン=3.5.1
+### URL=
+### 種類=wnako
+### タグ=Sort,Algorithm
+### 更新日時=2024-03-06 20:47:36
+###
+
+#なでしこ #MargeSort #時間計測
+#Arraylenghは配列の長さ
+Arraylengh=600
+
+#描画用の変数
+maxheight=描画中キャンバスの"height"をDOM属性取得
+width=(描画中キャンバスの"width"をDOM属性取得)/Arraylengh
+height=(maxheight)/Arraylengh
+
+#配列を生成
+Array=[]
+iを0からArraylengh-1まで繰り返す:
+    Arrayの乱数((Arrayの要素数))にiを配列挿入
+
+#ソートする関数
+observer=1
+表示(実行時間計測("Margesort"))
+
+●Margesort:
+    array = Array
+    limit = 5
+    first = 0
+    last = Arraylengh-1
+    #arrayのインデックスを保管
+    borders=[first,last]
+    #gapをflag代わりにしつつ、挿入のずれを補間
+    gap=1
+    #一度でもbordersに追加されていれば再走
+    gap!=0の間:
+        gap=0
+        iを0から(bordersの要素数)まで繰り返す:
+            #limitは小さいデータの高速ソートの間隔
+            もしlimit<borders[i+gap+1]-borders[i+gap]なら:
+                average=FLOOR((borders[i+gap+1]+borders[i+gap])/2)
+                bordersの(i+gap+1)にaverageを配列挿入
+                bordersの(i+gap+2)にaverage+1を配列挿入
+                #2個入れたから2個分ずらそう
+                gap=gap+2
+            もしlast<borders[i+gap+1]なら:
+                抜ける
+    #ここで分割は終了
+    #ここから各区間でのソート(もっと高速なソートがあればそちらの方がいい。
+    #ヒープソートは安定した実行速度を保っているので採用した)
+    iを0から(bordersの要素数)/2-1まで繰り返す:
+        main__heapsort(array,borders[i*2],borders[i*2+1])
+    #borders=[first,last]になるまで繰り返す
+    2<(bordersの要素数)の間:
+        #今回はgapはflagとして使用しない
+        gap=0
+        #二区間毎に演算
+        iを0からFLOOR((bordersの要素数)/4)まで繰り返す:
+            point=i*4
+            left=borders[point+gap]
+            right=borders[point+2+gap]
+            #二区間の長さ分繰り返す
+            borders[point+3+gap]-borders[point+gap]回:
+                #左のデータと右のデータの最初を比較。
+                もしarray[right]<array[left]なら:
+                    arrayのleftにarray[right]を配列挿入
+                    arrayのright+1を配列削除
+                    right=right+1
+                left=left+1
+                もしright==borders[point+4+gap]||left==borders[point+4+gap]なら:
+                    抜ける
+            もし(bordersの要素数-1)!=point+1+gapなら:
+                bordersの(point+1+gap)を配列削除
+                bordersの(point+1+gap)を配列削除
+            gap=gap-2
+            main__draw(array）
+            0秒待
+
+
+    
+    
+●heapsort(array,start,end):
+    #limitはヒープする配列の最大を表す
+    #start,endもヒープする
+    limitをendからstartまで繰り返す:
+        #iをヒープ済みになるまで繰り返す
+        #iはヒープ部分のインデックス
+        iを0から(limit-start)まで繰り返す:
+            #ヒープ上でのインデックスを表す変数
+            child=i
+            parent=FLOOR((child)/2)
+            #array上でのインデックスを表す変数
+            array_child=start+child
+            array_parent=start+parent
+            #ヒープ構造を作成
+            #高さを計算しているので、ifでparent=0つまり根かどうかを調べる必要はない
+            (CEIL(LOGN(2,child))+1)回:
+                もしarray[array_parent]<array[array_child]なら:
+                    main__swap(array,array_child,array_parent)
+                    child=parent
+                    parent=FLOOR((child)/2)
+                    array_child=start+child
+                    array_parent=start+parent
+                違えば:
+                    抜ける
+            main__swap(array,start,limit)
+    arrayを戻す
+
+#Arrayの二要素を入れ替える関数
+●swap(array,a,b):
+    item=array[a]
+    array[a]=Array[b]
+    array[b]=item
+    arrayを戻す
+
+#Arrayを描画
+●draw(array):
+    全描画クリア
+    i=0
+    arrayを反復:
+        y=対象
+        [i*width,maxheight-y*height,width,y*height]に四角描画
+        i=i+1

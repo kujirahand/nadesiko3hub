@@ -1,15 +1,17 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?2769
-### タイトル=フィボナッチ数列-名画(富嶽三十六景)に重ねる
+### タイトル=フィボナッチ数列-名画(富嶽三十六景)に重ねる(連載より)
 ### 作者=クジラ飛行机(user_id=0)
 ### ライセンス=CC0
 ### 説明=フィボナッチ数列を名画(富嶽三十六景)に重ねてみました。
 ### 対象バージョン=3.5.3
-### URL=
+### URL=https://news.mynavi.jp/techplus/article/nadeshiko-83/
 ### 種類=wnako
 ### タグ=フィボナッチ
-### 更新日時=2024-04-10 11:25:30
+### 更新日時=2024-05-11 21:21:51
 ###
+
+# [連載URL] https://news.mynavi.jp/techplus/article/nadeshiko-83/
 
 F数列=6のフィボナッチ数列作成。
 URL=「https://n3s.nadesi.com/image.php?f=468.jpg」

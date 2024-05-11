@@ -1,0 +1,37 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2782
+### タイトル=貯蔵庫APIテスト(ベータ版)
+### 作者=クジラ飛行机(user_id=0)
+### ライセンス=CC0
+### 説明=貯蔵庫APIテストです。ベータ版なので今後変更される可能性があります。
+### 対象バージョン=3.6.2
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2024-05-12 00:39:30
+###
+
+# 貯蔵庫APIテスト(ベータ版)
+TOKEN=「#api_token」のテキスト取得。
+
+
+# ログインしているか調べる
+「api.php?action=api&page=is_logined&token={TOKEN}」からAJAX_JSON取得してLに代入。
+もし、L["result"]がいいえならば
+    「ログインが必要です」と表示。
+    B=「ログイン」のボタン作成
+    Bをクリックした時には
+        BACK=「index.php?action=widget&page=2782&run=1」をURLエンコード。
+        「https://n3s-sandbox.nadesi.com/index.php?action=login&back={BACK}」にブラウザ移動。
+    ここまで。
+違えば
+　　# 貯蔵庫にデータを保存する
+　　「api.php?action=api&page=astorage_put&key=test&value=abcdefg&token={TOKEN}」からHTTP取得して表示。
+　　# 貯蔵庫からデータを取得する
+　　「api.php?action=api&page=astorage_get&key=test&token={TOKEN}」からHTTP取得して表示。
+    B=「ログアウト」のボタン作成
+    Bをクリックした時には
+        BACK=「index.php?action=widget&page=2782」をURLエンコード。
+        「https://n3s-sandbox.nadesi.com/index.php?action=logout&back={BACK}」にブラウザ移動。
+    ここまで。
+ここまで

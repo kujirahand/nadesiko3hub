@@ -1,0 +1,200 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2814
+### タイトル=貯蔵庫API
+### 作者=クジラ飛行机(user_id=0)
+### ライセンス=CC0
+### 説明=貯蔵庫APIを使うためのライブラリ。使い方は、参照URLをご覧ください。
+### 対象バージョン=3.6.7
+### URL=https://n3s.nadesi.com/id.php?2782
+### 種類=wnako
+### タグ=ライブラリ
+### 更新日時=2024-06-02 00:39:16
+###
+
+# ----------------------------------------------------------------
+# 貯蔵庫API for なでしこ3
+# ----------------------------------------------------------------
+# 貯蔵庫APIを使うためのライブラリです。
+# 詳しい使い方は、以下を参照してください。
+# [URL] https://n3s.nadesi.com/id.php?2782
+# ----------------------------------------------------------------
+APIデバッグ＝オフ
+# 基本情報の取得
+TOKEN=「#api_token」のテキスト取得。
+APP_ID=「#app_id」のテキスト取得。
+
+●ログイン確認とは
+　　「api.php?action=api&page=is_logined&token={TOKEN}」からAJAX_JSON取得してLに代入。
+　　もし、L["result"]がいいえならば
+　　　　「<h3>アプリ(app_id={APP_ID})にログインが必要です</h3>」のラベル作成。
+    　　B=「ログイン」のボタン作成
+    　　Bをクリックした時には
+        　　BACK=「index.php?action=widget&page={APP_ID}&run=1」をURLエンコード。
+        　　「https://n3s-sandbox.nadesi.com/index.php?action=login&back={BACK}」にブラウザ移動。
+        ここまで。
+        それはいいえ。
+    違えば
+        それははい。
+    ここまで。
+ここまで。
+
+# --- 基本 ----
+●(METHODにDICTを)貯蔵庫API呼ぶとは
+    もし、METHOD===undefinedならば
+        {"result": FALSE, "message": "メソッドが空"}で戻る。
+    ここまで。
+    DICT["token"] = TOKEN
+　　S=「api.php?action=api&page={METHOD}」へDICTをPOSTフォーム送信。
+　　もし、APIデバッグならば
+　　　　「[DEBUG] {METHOD} => {S}」を表示
+　　ここまで。
+　　もし、S===undefinedならば
+        {"result": FALSE, "message": "戻り値が空"}で戻る。
+    ここまで。
+　　SをJSONデコード。
+ここまで
+# --- APPキー ---
+●APPキー一覧取得とは
+    Rとは変数=「list_key_as_app」に{}を貯蔵庫API呼ぶ
+    もし、R["result"]ならば
+        それは、R["keys"]
+    違えば
+        それは、[]
+    ここまで。
+ここまで。
+●(KEYの)APPキー取得とは
+    R=「get_key_as_app」に{"key": KEY}を貯蔵庫API呼ぶ
+    もし、R["result"]ならば
+        それは、R["value"]
+    違えば
+        それは、空
+    ここまで
+ここまで。
+●(KEYにVALUEを)APPキー設定とは
+    「set_key_as_app」に{"key":KEY, "value":VALUE}を貯蔵庫API呼ぶ
+ここまで。
+●(KEYを|KEYの)APPキー削除とは
+    「delete_key_as_app」に{"key":KEY}を貯蔵庫API呼ぶ
+ここまで。
+# ---APPアイテム ---
+●(KEYにVALUEを)APPアイテム追加とは
+    R=「insert_item_as_app」に{"key": KEY, "value": VALUE}を貯蔵庫API呼ぶ
+    もし、R["result"]ならば
+        それは、R["item_id"]
+    違えば
+        それは、0
+    ここまで。
+ここまで。
+●(KEYのOFFSETからLIMITだけ)APPアイテム取得とは
+    R=「select_items_as_app」に{"key": KEY, "offset": OFFSET, "limit": LIMIT, "sort": "ASC"}を貯蔵庫API呼ぶ
+    もしR["result"]ならば
+        それは、R["values"]
+    違えば
+        それは[]
+    ここまで。
+ここまで。
+●(KEYのOFFSETからLIMITだけ)APPアイテム末尾取得とは
+    R=「select_items_as_app」に{"key": KEY, "limit": LIMIT, "sort": "DESC"}を貯蔵庫API呼ぶ
+    もしR["result"]ならば
+        それは、R["values"]
+    違えば
+        それは[]
+    ここまで。
+ここまで。
+●(KEYのIDを)APPアイテム削除とは
+    「delete_item_as_app」に{"key": KEY, "item_id": ID}を貯蔵庫API呼ぶ
+ここまで。
+●(KEYのIDをVALUEに|VALUEへ)APPアイテム更新とは
+    「update_item_as_app」に{"key": KEY, "item_id": ID, "value": VALUE}を貯蔵庫API呼ぶ
+ここまで。
+
+# --- USERキー ---
+●USERキー一覧取得とは
+    R=「list_key_as_user」に{}を貯蔵庫API呼ぶ
+    もし、R["result"]ならば
+        それは、R["keys"]
+    違えば
+        それは、[]
+    ここまで。
+ここまで。
+●(KEYの)USERキー取得とは
+    R=「get_key_as_user」に{"key": KEY}を貯蔵庫API呼ぶ
+    もし、R["result"]ならば
+        それは、R["value"]
+    違えば
+        それは、空
+    ここまで
+ここまで。
+●(KEYにVALUEを)USERキー設定とは
+    「set_key_as_user」に{"key":KEY, "value":VALUE}を貯蔵庫API呼ぶ
+ここまで。
+●(KEYを|KEYの)USERキー削除とは
+    「delete_key_as_user」に{"key":KEY}を貯蔵庫API呼ぶ
+ここまで。
+●(KEYを|KEYの)USERキー全削除とは
+    「deleteall_key_as_user」に{}を貯蔵庫API呼ぶ
+ここまで。
+# ---USERアイテム ---
+●(KEYにVALUEを)USERアイテム追加とは
+    「insert_item_as_user」に{"key": KEY, "value": VALUE}を貯蔵庫API呼ぶ
+ここまで。
+●(KEYのOFFSETからLIMITだけ)USERアイテム取得とは
+    R=「select_items_as_user」に{"key": KEY, "offset": OFFSET, "limit": LIMIT, "sort": "ASC"}を貯蔵庫API呼ぶ
+    もしR["result"]ならば
+        それは、R["values"]
+    違えば
+        それは[]
+    ここまで。
+ここまで。
+●(KEYのOFFSETからLIMITだけ)USERアイテム末尾取得とは
+    Rとは変数=「select_items_as_user」に{"key": KEY, "limit": LIMIT, "sort": "DESC"}を貯蔵庫API呼ぶ
+    もしR["result"]ならば
+        それは、R["values"]
+    違えば
+        それは[]
+    ここまで。
+ここまで。
+●(KEYのIDを)USERアイテム削除とは
+    「delete_item_as_user」に{"key": KEY, "item_id": ID}を貯蔵庫API呼ぶ
+ここまで。
+●(KEYのIDをVALUEに|VALUEへ)USERアイテム更新とは
+    「update_item_as_user」に{"key": KEY, "item_id": ID, "value": VALUE}を貯蔵庫API呼ぶ
+ここまで。
+
+# --- ユーザー名に関して ---
+●(user_idの)指定ユーザー取得とは
+    「get_user」に{"user_id":user_id}を貯蔵庫API呼ぶ
+ここまで。
+●ユーザー名取得とは
+    R=0の指定ユーザー取得
+    もし、R["result"]ならば
+        それは、R["name"]
+    違えば
+        それは、「」
+　　ここまで。
+ここまで。
+●ユーザーID取得とは
+    R=0の指定ユーザー取得
+    もし、R["result"]ならば
+        それは、R["user_id"]
+    違えば
+        それは、「」
+　　ここまで。
+ここまで。
+
+# -------------------------------------------------------------
+もし、プラグイン名＝「メイン」ならば、
+　　「<hr><h3>貯蔵庫APIについて、詳しくは、以下のURLにアクセスして確認してください。</h3>
+　　    <p><a href="https://n3s.nadesi.com/id.php?2782" target="_new">APIデモ</a>
+　　    <p><a href="https://github.com/kujirahand/nako3storage/issues/194" target="_new">API詳細</a></p><hr>」のラベル作成。
+　　 
+    「貯蔵庫APIは、ログイン可能なユーザーに対して提供するサービスです。」と表示。
+    「ログインすると、アプリ内でのみ利用可能なストレージ(ユーザー単位/アプリ単位)を提供します。」と表示。
+　　「貯蔵庫APIでは、利用者のユーザーIDとユーザー名のみを提供します。」と表示。
+    ログイン確認。
+    もし、それがいいえならば、終わる。
+    「--- ログインしたユーザーに表示 ---」と表示。
+    ユーザー名＝ユーザー名取得。
+    ユーザーID＝ユーザーID取得。
+    「あなたは、{ユーザー名}さんですね！」と表示。
+ここまで。

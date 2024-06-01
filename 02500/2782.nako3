@@ -1,37 +1,185 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?2782
-### タイトル=貯蔵庫APIテスト(ベータ版)
+### タイトル=貯蔵庫APIのデモ✨
 ### 作者=クジラ飛行机(user_id=0)
 ### ライセンス=CC0
-### 説明=貯蔵庫APIテストです。ベータ版なので今後変更される可能性があります。
+### 説明=貯蔵庫APIのデモです。「貯蔵庫API」を使うと貯蔵庫に任意のデータを保存できます✨
 ### 対象バージョン=3.6.2
-### URL=
+### URL=https://github.com/kujirahand/nako3storage/issues/194
 ### 種類=wnako
-### タグ=
-### 更新日時=2024-05-12 00:39:30
+### タグ=デモ
+### 更新日時=2024-06-01 23:04:49
 ###
 
-# 貯蔵庫APIテスト(ベータ版)
-TOKEN=「#api_token」のテキスト取得。
+# ----------------------------------------------------------------
+# なでしこ3貯蔵庫にデータを保存する便利なAPIのデモ
+# ----------------------------------------------------------------
+# 以下の宣言で便利なライブラリを取り込む
+!「https://n3s.nadesi.com/plain/api.nako3」を取り込む。
+
+# ----------------------------------------------------------------
+# デモのためのUIをHTMLで作成
+# ----------------------------------------------------------------
+「<hr>」のラベル作成
+TEST_UI=「
+<style> .box {波カッコ} border:1px solid silver; padding:1em; {波カッコ閉} </style>
+<div id="apitest">
+  <h1>貯蔵庫APIのデモ</h1>
+  <div>貯蔵庫APIを使うと、ユーザー毎、アプリ毎のストレージ(貯蔵庫サーバー内)にデータの書き込みが可能になります。</div>
+  <div>詳しい仕様は、<a href="https://github.com/kujirahand/nako3storage/issues/194" target="_new">こちら</a>をご覧ください。</div>
+  <div class="box">
+    <h3>USER - ユーザー毎のストレージ</h3>
+    <div class="box">
+        <button id="list_key_as_user">キー一覧</button>
+        <button id="set_key_as_user">キー設定</button>
+        <button id="get_key_as_user">キー取得</button>
+        <button id="delete_key_as_user">キー削除</button>
+    </div>
+    <div class="box">
+        <button id="select_item_as_user">アイテム一覧</button>
+        <button id="insert_item_as_user">アイテム追加</button>
+        <button id="delete_item_as_user">アイテム削除</button>
+        <button id="update_item_as_user">アイテム更新</button>
+    </div>
+    <select id="user_list" size="5" style="width:10em;"></select>
+  </div>
+  <hr>
+  <div class="box">
+    <h3>APP - アプリ毎のストレージ</h3>
+    <div class="box">
+        <button id="list_key_as_app">キー一覧</button>
+        <button id="set_key_as_app">キー設定</button>
+        <button id="get_key_as_app">キー取得</button>
+        <button id="delete_key_as_app">キー削除</button>
+    </div>
+    <div class="box">
+        <button id="select_item_as_app">アイテム一覧</button>
+        <button id="insert_item_as_app">アイテム追加</button>
+        <button id="delete_item_as_app">アイテム削除</button>
+        <button id="update_item_as_app">アイテム更新</button>
+    </div>
+    <select id="app_list" size="5" style="width:10em;"></select>
+  </div>
+</div>
+」のラベル作成
+TEST_UIの「display」に「none」をDOMスタイル設定
+
+●list_key_as_userとは
+　　UK=USERキー一覧取得
+　　「#user_list」にUKをセレクトボックスアイテム設定
+ここまで。
+
+●select_item_as_userとは
+　　UK=「a」の0から30だけUSERアイテム取得
+　　IT=[]
+　　UKを反復
+　　    ITに(「{対象["item_id"]}:{対象["value"]}」)を配列追加。
+　　ここまで。
+　　「#user_list」にITをセレクトボックスアイテム設定
+ここまで。
+
+●list_key_as_appとは
+　　UK=APPキー一覧取得
+　　「#app_list」にUKをセレクトボックスアイテム設定
+ここまで。
+
+●select_item_as_appとは
+　　UK=「a」の0から30だけAPPアイテム取得
+　　IT=[]
+　　UKを反復
+　　    ITに(「{対象["item_id"]}:{対象["value"]}」)を配列追加。
+　　ここまで。
+　　「#app_list」にITをセレクトボックスアイテム設定
+ここまで。
 
 
-# ログインしているか調べる
-「api.php?action=api&page=is_logined&token={TOKEN}」からAJAX_JSON取得してLに代入。
-もし、L["result"]がいいえならば
-    「ログインが必要です」と表示。
-    B=「ログイン」のボタン作成
-    Bをクリックした時には
-        BACK=「index.php?action=widget&page=2782&run=1」をURLエンコード。
-        「https://n3s-sandbox.nadesi.com/index.php?action=login&back={BACK}」にブラウザ移動。
-    ここまで。
-違えば
-　　# 貯蔵庫にデータを保存する
-　　「api.php?action=api&page=astorage_put&key=test&value=abcdefg&token={TOKEN}」からHTTP取得して表示。
-　　# 貯蔵庫からデータを取得する
-　　「api.php?action=api&page=astorage_get&key=test&token={TOKEN}」からHTTP取得して表示。
+●APIアクセステストとは
+    もし、(ログイン確認)=いいえならば、戻る。
+    TEST_UIの「display」に「block」をDOMスタイル設定
+　　＃UI
+　　ユーザー名＝ユーザー名取得
+　　USER_ID=ユーザーID取得
+　　「#list_key_as_user」に「{ユーザー名}のキー一覧」をテキスト設定。
+　　「#list_key_as_app」に「APP({APP_ID})のキー一覧」をテキスト設定。
+　　# --- USER KEY
+　　「#list_key_as_user」をクリックした時には
+　　    list_key_as_user。
+　　ここまで。
+　　「#set_key_as_user」をクリックした時には
+　　    「hoge」に「abcde」をUSERキー設定
+　　    「fuga」に「12345」をUSERキー設定
+　　    list_key_as_user。
+　　ここまで。
+　　「#get_key_as_user」をクリックした時には
+　　    HOGE=「hoge」のUSERキー取得
+　　    「HOGE={HOGE}」と言う。
+　　ここまで。
+　　「#delete_key_as_user」をクリックした時には
+　　    HOGE=「hoge」のUSERキー削除
+　　    list_key_as_user
+　　ここまで。
+　　# --- USER ITEM
+　　「#select_item_as_user」をクリックした時には
+　　    select_item_as_user。
+　　ここまで。
+　　「#insert_item_as_user」をクリックした時には
+　　    「a」に「abc{99999の乱数}」をUSERアイテム追加。
+　　    select_item_as_user。
+　　ここまで。
+　　「#delete_item_as_user」をクリックした時には
+　　    V= 「#user_list」のテキスト取得
+　　    Vを「:」で区切ってAに代入。
+　　    「a」のA[0]をUSERアイテム削除。
+　　    select_item_as_user。
+　　ここまで。
+　　「#update_item_as_user」をクリックした時には
+　　    V= 「#user_list」のテキスト取得
+　　    Vを「:」で区切ってAに代入。
+　　    「a」のA[0]を「UP---」へUSERアイテム更新。
+　　    select_item_as_user。
+　　ここまで。
+　　# --- APP KEY
+　　「#list_key_as_app」をクリックした時には
+　　    list_key_as_app。
+　　ここまで。
+　　「#set_key_as_app」をクリックした時には
+　　    「hoge」に「abcde」をAPPキー設定
+　　    「fuga」に「12345」をAPPキー設定
+　　    list_key_as_app。
+　　ここまで。
+　　「#get_key_as_app」をクリックした時には
+　　    HOGE=「hoge」のAPPキー取得
+　　    「HOGE={HOGE}」と言う。
+　　ここまで。
+　　「#delete_key_as_app」をクリックした時には
+　　    HOGE=「hoge」のAPPキー削除
+　　    list_key_as_app
+　　ここまで。
+　　# --- APP ITEM
+　　「#select_item_as_app」をクリックした時には
+　　    select_item_as_app。
+　　ここまで。
+　　「#insert_item_as_app」をクリックした時には
+　　    「a」に「abc{99999の乱数}」をAPPアイテム追加。
+　　    select_item_as_app。
+　　ここまで。
+　　「#delete_item_as_app」をクリックした時には
+　　    V= 「#app_list」のテキスト取得
+　　    Vを「:」で区切ってAに代入。
+　　    「a」のA[0]をAPPアイテム削除。
+　　    select_item_as_app。
+　　ここまで。
+　　「#update_item_as_app」をクリックした時には
+　　    V= 「#app_list」のテキスト取得
+　　    Vを「:」で区切ってAに代入。
+　　    「a」のA[0]を「UP---」へAPPアイテム更新。
+　　    select_item_as_app。
+　　ここまで。
+　　# --- LOGOUT
     B=「ログアウト」のボタン作成
     Bをクリックした時には
         BACK=「index.php?action=widget&page=2782」をURLエンコード。
         「https://n3s-sandbox.nadesi.com/index.php?action=logout&back={BACK}」にブラウザ移動。
     ここまで。
-ここまで
+ここまで。
+APIアクセステスト。

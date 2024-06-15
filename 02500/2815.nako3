@@ -8,18 +8,71 @@
 ### URL=https://github.com/weyk/nadesiko3-turtle-smooth
 ### 種類=js
 ### タグ=
-### 更新日時=2024-06-01 23:55:58
+### 更新日時=2024-06-15 12:16:37
 ###
 
 /**
  * smooth Turtle Graphics for Web browser (nadesiko3)
  * plugin_turtle_promise.ts
  */
+// import { turtleImage, elephantImage, pandaImage } from 'nadesiko3/src/plugin_turtle_images.mjs'
 const turtleImageURL = 'https://n3s.nadesi.com/image.php?f=64.png';
 const elephantImageURL = '';
 const pandaImageURL = '';
-class TurtleSmooth {
+class DrawLineEventArgs {
+    constructor(id, x1, y1, x2, y2, style) {
+        this.id = id;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        this.style = style;
+    }
+}
+class DrawCanvasEventArgs {
+    constructor(id, cmd, params, style) {
+        this.id = id;
+        this.cmd = cmd;
+        this.params = params;
+        this.style = style;
+    }
+}
+class Command {
+    constructor(cmd, args) {
+        this.cmd = cmd;
+        this.args = args !== undefined ? args : [];
+    }
+}
+class Job {
+    constructor(cmd, resolve, reject) {
+        this.resolve = resolve;
+        this.reject = reject;
+        this.command = cmd;
+    }
+}
+class AnimationJobMove {
+    constructor(len) {
+        this.cmd = 'move';
+        this.len = len;
+    }
+}
+class AnimationJobRotate {
+    constructor(deg) {
+        this.cmd = 'rotate';
+        this.deg = deg;
+    }
+}
+class AnimationJobCurve {
+    constructor(r, deg) {
+        this.cmd = 'curve';
+        this.r = r;
+        this.deg = deg;
+    }
+}
+const TypedTurtleSmoothEventTarget = EventTarget;
+class TurtleSmooth extends TypedTurtleSmoothEventTarget {
     constructor(sys, id) {
+        super();
         this.sys = sys;
         this.id = id;
         this.img = null;
@@ -30,38 +83,36 @@ class TurtleSmooth {
         this.cy = 32;
         this.x = 0;
         this.y = 0;
-        this.color = 'black';
-        this.lineWidth = 4;
+        this.penStyle = {
+            lineWidth: 4,
+            strokeStyle: 'black',
+            fillStyle: 'black',
+            font: '10px sans-serif',
+            down: true
+        };
+        this.jobStep = 'fetchJob';
+        this.currentJob = null;
+        this.animationJobs = [];
+        this.animationJob = null;
         this.spdRotate = 15 / 100;
         this.spdMove = 10 / 100;
-        this.spdForward = 10 / 100;
-        this.spdBackward = 8 / 100;
-        this.flagDown = true;
-        this.flagBegeinPath = false;
         this.f_update = true;
         this.flagLoaded = false;
         this.f_visible = true;
-        this.mlist = [];
-        this.jobType = '';
-        this.substeps = [];
-        this.substepType = '';
-        this.substepBase = 0;
-        this.substepModifier = 0;
-        this.substepTarget = 0;
-        this.substepRemain = 0;
-        this.stepWait = 0;
-        this.step = null;
-        this.jobResolve = null;
+        this.jobs = [];
+        this.jobWait = 0;
     }
     clear() {
         // 未実行の全JOBに対してresolve(1)を呼び出す。
-        for (const job of this.mlist) {
-            const resolve = job[0][0];
+        for (const job of this.jobs) {
+            const resolve = job.resolve;
             if (resolve !== null) {
                 resolve(1);
             }
         }
-        this.mlist = []; // ジョブをクリア
+        this.jobs = []; // ジョブをクリア
+        this.currentJob = null;
+        this.animationJob = null;
         if (this.canvas) {
             document.body.removeChild(this.canvas);
         }
@@ -93,6 +144,454 @@ class TurtleSmooth {
         };
         this.img.src = url;
     }
+    drawTurtle(cr) {
+        if (!this.canvas || !this.ctx || !this.img) {
+            return;
+        }
+        if (!cr.visible) {
+            return;
+        }
+        // カメの位置を移動
+        this.canvas.style.left = (cr.left + this.x - this.cx) + 'px';
+        this.canvas.style.top = (cr.top + this.y - this.cx) + 'px';
+        if (!this.f_update) {
+            return;
+        }
+        /* istanbul ignore if */
+        if (!this.flagLoaded) {
+            return;
+        }
+        this.f_update = false;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.f_visible) {
+            return;
+        }
+        if (this.dir !== 270) {
+            const rad = (this.dir + 90) * 0.017453292519943295;
+            this.ctx.save();
+            this.ctx.translate(this.cx, this.cy);
+            this.ctx.rotate(rad);
+            this.ctx.translate(-(this.img.width / 2), -(this.img.height / 2));
+            this.ctx.drawImage(this.img, 0, 0);
+            this.ctx.restore();
+        }
+        else {
+            this.ctx.drawImage(this.img, this.cx - (this.img.width / 2), this.cy - (this.img.height / 2));
+        }
+    }
+    jobAction(job) {
+        const cmd = job.command;
+        switch (cmd.cmd) {
+            case 'xy':
+                // 起点を移動する
+                this.x = cmd.args[0];
+                this.y = cmd.args[1];
+                break;
+            case 'begin':
+                // 描画を明示的に開始する
+                this.raiseDrawCanvas('beginPath', [[this.x, this.y]]);
+                break;
+            case 'close':
+                this.raiseDrawCanvas('closePath', []);
+                break;
+            case 'fill':
+                this.raiseDrawCanvas('fill', []);
+                break;
+            case 'stroke':
+                this.raiseDrawCanvas('stroke', []);
+                break;
+            case 'text':
+                this.raiseDrawCanvas('fillText', [[this.x, this.y], cmd.args[0]]);
+                break;
+            case 'textset':
+                this.penStyle.font = cmd.args[0];
+                break;
+            case 'fillStyle':
+                this.penStyle.fillStyle = cmd.args[0];
+                break;
+            case 'mv':
+            case 'directmv': {
+                // 線を引く
+                this.raiseDrawLine([this.x, this.y], [cmd.args[0], cmd.args[1]]);
+                // カメの角度を変更
+                const mvRad = Math.atan2(cmd.args[1] - this.y, cmd.args[0] - this.x);
+                this.dir = mvRad * 57.29577951308232;
+                this.f_update = true;
+                // 実際に位置を移動
+                this.x = cmd.args[0];
+                this.y = cmd.args[1];
+                break;
+            }
+            case 'fd': {
+                const fdv = cmd.args[0] * cmd.args[1];
+                const rad = this.dir * 0.017453292519943295;
+                const x2 = this.x + Math.cos(rad) * fdv;
+                const y2 = this.y + Math.sin(rad) * fdv;
+                this.raiseDrawLine([this.x, this.y], [x2, y2]);
+                this.x = x2;
+                this.y = y2;
+                break;
+            }
+            case 'curve': {
+                const r = cmd.args[0] * cmd.args[2];
+                const deg = cmd.args[1] * cmd.args[3];
+                const direction = deg < 0 ? -1 : 1;
+                const dir = (this.dir + 90 * direction + 360) % 360;
+                const rad = dir * 0.017453292519943295;
+                const dx = this.x + Math.cos(rad) * r;
+                const dy = this.y + Math.sin(rad) * r;
+                this.dir = (this.dir + (deg % 360) + 360) % 360;
+                const rad2 = this.dir * 0.017453292519943295;
+                const x2 = dx + Math.cos(rad2) * r;
+                const y2 = dy + Math.sin(rad2) * r;
+                this.raiseDrawLine([this.x, this.y], [x2, y2]);
+                this.x = x2;
+                this.y = y2;
+                this.f_update = true;
+                break;
+            }
+            case 'angle':
+            case 'directangle': {
+                this.dir = ((cmd.args[0] - 90 % 360) + 360) % 360;
+                this.f_update = true;
+                break;
+            }
+            case 'rot': {
+                const deg = cmd.args[0] * cmd.args[1];
+                this.dir = (this.dir + (deg % 360) + 360) % 360;
+                this.f_update = true;
+                break;
+            }
+            case 'color':
+                this.penStyle.strokeStyle = cmd.args[0];
+                break;
+            case 'size':
+                this.penStyle.lineWidth = cmd.args[0];
+                break;
+            case 'penOn':
+                this.penStyle.down = cmd.args[0];
+                break;
+            case 'spdR':
+                this.spdRotate = cmd.args[0];
+                break;
+            case 'spdM':
+                this.spdMove = cmd.args[0];
+                break;
+            case 'visible':
+                this.f_visible = cmd.args[0];
+                this.f_update = true;
+                break;
+        }
+    }
+    doMacro(time, defaultWait, waitForTurteImage) {
+        if (!this.flagLoaded && waitForTurteImage) {
+            // console.log('[TURTLE] waiting ...')
+            return true;
+        }
+        const immediateRun = defaultWait === 0;
+        // 以下の２つの条件を満たしている間ループする。
+        // 即時実行であるか、即時実行ではない場合は経過時間の残りがあること。
+        // 未処理のJOBが残っているか、処理中のJOBがあること。
+        while ((time > 0 || immediateRun) && (this.jobs.length > 0 || this.jobStep !== 'fetchJob')) {
+            switch (this.jobStep) {
+                case 'fetchJob':
+                    // 処理中のJOBは無いので次のJOBを取得して処理に着手する
+                    this.currentJob = this.jobs.shift() || null;
+                    this.jobStep = this.currentJob !== null ? 'preExecute' : 'fetchJob';
+                    break;
+                case 'preExecute': {
+                    const job = this.currentJob;
+                    if (job === null) {
+                        this.jobStep = 'fetchJob';
+                        break;
+                    }
+                    const cmd = job.command;
+                    this.jobWait = Math.floor(defaultWait / 2);
+                    this.jobStep = 'beforeExecute';
+                    switch (cmd.cmd) {
+                        case 'changeImage':
+                            if (this.img) {
+                                this.flagLoaded = false;
+                                this.img.src = cmd.args[0];
+                            }
+                            break;
+                        case 'mv':
+                            if (!immediateRun && (this.spdMove > 0 || this.spdRotate > 0)) {
+                                // カメの角度を算出
+                                const dx = cmd.args[0] - this.x;
+                                const dy = cmd.args[1] - this.y;
+                                const angleRad = Math.atan2(dy, dx);
+                                const angle = angleRad * 57.29577951308232;
+                                const targetdir = (angle + 360) % 360;
+                                let deg = (targetdir - this.dir + 360) % 360;
+                                if (deg > 180) {
+                                    deg = deg - 360;
+                                }
+                                // カメの移動距離を算出
+                                const fdv = Math.sqrt(dx * dx + dy * dy);
+                                this.animationJobs.push(new AnimationJobMove(fdv));
+                                this.animationJobs.push(new AnimationJobRotate(deg));
+                                this.jobStep = 'animation';
+                                this.jobWait = 0;
+                            }
+                            break;
+                        case 'fd':
+                            if (!immediateRun && this.spdMove > 0) {
+                                const fdv = cmd.args[0] * cmd.args[1];
+                                const rad = this.dir * 0.017453292519943295;
+                                this.x + Math.cos(rad) * fdv;
+                                this.y + Math.sin(rad) * fdv;
+                                this.animationJobs.push(new AnimationJobMove(fdv));
+                                this.jobStep = 'animation';
+                                this.jobWait = 0;
+                            }
+                            break;
+                        case 'angle':
+                            if (!immediateRun && this.spdRotate > 0) {
+                                const targetdir = (((cmd.args[0] - 90) % 360) + 360) % 360;
+                                let deg = (targetdir - this.dir + 360) % 360;
+                                if (deg > 180) {
+                                    deg = deg - 360;
+                                }
+                                this.animationJobs.push(new AnimationJobRotate(deg));
+                                this.jobStep = 'animation';
+                                this.jobWait = 0;
+                            }
+                            break;
+                        case 'rot':
+                            if (!immediateRun && this.spdRotate > 0) {
+                                const deg = cmd.args[0] * cmd.args[1];
+                                this.animationJobs.push(new AnimationJobRotate(deg));
+                                this.jobStep = 'animation';
+                                this.jobWait = 0;
+                            }
+                            break;
+                        case 'curve':
+                            if (!immediateRun && this.spdMove > 0) {
+                                const r = cmd.args[0] * cmd.args[2];
+                                const deg = cmd.args[1] * cmd.args[3];
+                                this.animationJobs.push(new AnimationJobCurve(r, deg));
+                                this.jobStep = 'animation';
+                                this.jobWait = 0;
+                            }
+                            break;
+                    }
+                    break;
+                }
+                case 'beforeExecute':
+                    if (time >= this.jobWait || immediateRun) {
+                        // ステップ待ち時間に到達したか、即時実行が有効となっている。
+                        // 経過時間からステップ待ち時間を減算する。
+                        time -= this.jobWait;
+                        this.jobWait = 0;
+                        this.jobStep = 'execute';
+                    }
+                    else {
+                        // ステップ待ち時間に到達していない。
+                        // 残りのステップ待ち時間から経過時間を減らして次へ。
+                        this.jobWait -= time;
+                        time = 0;
+                    }
+                    break;
+                case 'execute':
+                    if (this.currentJob !== null) {
+                        this.jobAction(this.currentJob);
+                    }
+                    this.jobWait = Math.ceil(defaultWait / 2);
+                    this.jobStep = 'afterExecute';
+                    break;
+                case 'afterExecute':
+                    if (time >= this.jobWait || immediateRun) {
+                        // ステップ待ち時間に到達したか、即時実行が有効となっている。
+                        // 経過時間からステップ待ち時間を減算する。
+                        time -= this.jobWait;
+                        this.jobWait = 0;
+                        // ステップ完了処理があるなら呼び出す。
+                        // if (tt.flagLoaded) { this.drawTurtle(tt.id) }
+                        if (this.currentJob?.resolve != null) {
+                            this.currentJob.resolve(0);
+                        }
+                        this.jobStep = 'fetchJob';
+                        this.currentJob = null;
+                    }
+                    else {
+                        // ステップ待ち時間に到達していない。
+                        // 残りのステップ待ち時間から経過時間を減らして次へ。
+                        this.jobWait -= time;
+                        time = 0;
+                    }
+                    break;
+                case 'animation': {
+                    const animJob = this.animationJobs.shift();
+                    if (animJob === undefined) {
+                        this.jobStep = 'afterAnimation';
+                        break;
+                    }
+                    const animCmd = animJob.cmd;
+                    let len;
+                    let r;
+                    let p;
+                    if (animJob instanceof AnimationJobMove) {
+                        len = animJob.len;
+                        p = [this.x, this.y];
+                    }
+                    else if (animJob instanceof AnimationJobRotate) {
+                        len = animJob.deg;
+                        p = [this.x, this.y];
+                    }
+                    else {
+                        len = animJob.deg;
+                        r = animJob.r;
+                        const direction = len > 0 ? 1 : -1;
+                        const dir = (this.dir + 90 * direction + 360) % 360;
+                        const rad = dir * 0.017453292519943295;
+                        const dx = this.x + Math.cos(rad) * r;
+                        const dy = this.y + Math.sin(rad) * r;
+                        p = [dx, dy];
+                    }
+                    this.animationJob = {
+                        type: animCmd,
+                        origin: p,
+                        dir: this.dir,
+                        targetLen: len,
+                        targetR: r,
+                        remain: Math.abs(len)
+                    };
+                    if ((animCmd === 'rotate' || animCmd === 'curve') && this.spdRotate <= 0) {
+                        this.jobStep = 'animationAdjust';
+                    }
+                    else if (animCmd === 'move' && this.spdMove <= 0) {
+                        this.jobStep = 'animationAdjust';
+                    }
+                    else {
+                        this.jobStep = 'animationStep';
+                    }
+                    break;
+                }
+                case 'animationStep':
+                    if (this.animationJob === null) {
+                        this.jobStep = 'animation';
+                        break;
+                    }
+                    if (this.animationJob.type === 'rotate') {
+                        const delta = time * this.spdRotate;
+                        if (delta < this.animationJob.remain) {
+                            const direction = this.animationJob.targetLen > 0 ? 1 : -1;
+                            this.animationJob.remain -= delta;
+                            this.dir = (this.dir + (delta * direction % 360) + 360) % 360;
+                            time = 0;
+                            this.f_update = true;
+                        }
+                        else {
+                            this.jobStep = 'animationAdjust';
+                        }
+                    }
+                    else if (this.animationJob.type === 'curve') {
+                        const deltaLen = time * this.spdMove;
+                        const r = this.animationJob.targetR;
+                        const delta = deltaLen / (Math.abs(r) * 6.283185307179586) * 360;
+                        if (delta < this.animationJob.remain) {
+                            const direction = this.animationJob.targetLen > 0 ? 1 : -1;
+                            this.animationJob.remain -= delta;
+                            this.dir = (this.dir + (delta * direction % 360) + 360) % 360;
+                            const dir = (this.dir + 90 * direction * -1 + 360) % 360;
+                            const rad = dir * 0.017453292519943295;
+                            const x2 = this.animationJob.origin[0] + Math.cos(rad) * r;
+                            const y2 = this.animationJob.origin[1] + Math.sin(rad) * r;
+                            this.raiseDrawLine([this.x, this.y], [x2, y2]);
+                            this.x = x2;
+                            this.y = y2;
+                            time = 0;
+                            this.f_update = true;
+                        }
+                        else {
+                            this.jobStep = 'animationAdjust';
+                        }
+                    }
+                    else if (this.animationJob.type === 'move') {
+                        const delta = time * this.spdMove;
+                        if (delta < this.animationJob.remain) {
+                            const direction = this.animationJob.targetLen > 0 ? 1 : -1;
+                            this.animationJob.remain -= delta;
+                            const rad = this.dir * 0.017453292519943295;
+                            const vp = delta * direction;
+                            const x2 = this.x + Math.cos(rad) * vp;
+                            const y2 = this.y + Math.sin(rad) * vp;
+                            this.raiseDrawLine([this.x, this.y], [x2, y2]);
+                            this.x = x2;
+                            this.y = y2;
+                            time = 0;
+                        }
+                        else {
+                            this.jobStep = 'animationAdjust';
+                        }
+                    }
+                    break;
+                case 'animationAdjust':
+                    if (this.animationJob === null) {
+                        this.jobStep = 'animation';
+                        break;
+                    }
+                    if (this.animationJob.type === 'rotate') {
+                        if (this.spdRotate > 0) {
+                            time -= Math.floor(this.animationJob.remain / this.spdRotate);
+                        }
+                        this.animationJob.remain = 0;
+                        this.dir = (this.animationJob.dir + (this.animationJob.targetLen % 360) + 360) % 360;
+                    }
+                    else if (this.animationJob.type === 'curve') {
+                        const r = this.animationJob.targetR;
+                        if (this.spdMove > 0) {
+                            const deltaLen = this.animationJob.remain / 360 * (Math.abs(r) * 6.283185307179586);
+                            time -= Math.floor(deltaLen / this.spdRotate);
+                        }
+                        this.animationJob.remain = 0;
+                        this.dir = (this.animationJob.dir + (this.animationJob.targetLen % 360) + 360) % 360;
+                        const direction = this.animationJob.targetLen > 0 ? 1 : -1;
+                        const dir = (this.dir + 90 * direction * -1 + 360) % 360;
+                        const rad = dir * 0.017453292519943295;
+                        const x2 = this.animationJob.origin[0] + Math.cos(rad) * r;
+                        const y2 = this.animationJob.origin[1] + Math.sin(rad) * r;
+                        this.raiseDrawLine([this.x, this.y], [x2, y2]);
+                        this.x = x2;
+                        this.y = y2;
+                        // console.log(`${this.x},${this.y},${this.dir} - ${this.animationJob.dir}`)
+                    }
+                    else if (this.animationJob.type === 'move') {
+                        if (this.spdMove > 0) {
+                            time -= Math.floor(this.animationJob.remain / this.spdMove);
+                        }
+                        this.animationJob.remain = 0;
+                        const rad = this.dir * 0.017453292519943295;
+                        const vp = this.animationJob.targetLen;
+                        const x2 = this.animationJob.origin[0] + Math.cos(rad) * vp;
+                        const y2 = this.animationJob.origin[1] + Math.sin(rad) * vp;
+                        this.raiseDrawLine([this.x, this.y], [x2, y2]);
+                        this.x = x2;
+                        this.y = y2;
+                    }
+                    this.animationJob = null;
+                    this.jobStep = 'animation';
+                    break;
+                case 'afterAnimation':
+                    this.currentJob = null;
+                    this.jobStep = 'fetchJob';
+                    break;
+            }
+            // if (this.flagLoaded) { this.drawTurtle(tt.id) }
+        }
+        return (this.jobs.length > 0 || this.jobStep !== 'fetchJob');
+    }
+    raiseDrawLine(p1, p2) {
+        const args = new DrawLineEventArgs(this.id, p1[0], p1[1], p2[0], p2[1], this.penStyle);
+        const evt = new CustomEvent('drawLine', { detail: args });
+        this.dispatchEvent(evt);
+    }
+    raiseDrawCanvas(cmd, points) {
+        const args = new DrawCanvasEventArgs(this.id, cmd, points, this.penStyle);
+        const evt = new CustomEvent('drawCanvas', { detail: args });
+        this.dispatchEvent(evt);
+    }
 }
 class TurtleSmoothSystem {
     static getInstance(sys) {
@@ -105,8 +604,6 @@ class TurtleSmoothSystem {
     }
     constructor(sys) {
         this.sys = sys;
-        this.turtles = []; // カメの一覧
-        this.target = -1;
         this.ctx = null;
         this.canvas = null;
         this.canvas_r = { left: 0, top: 0, width: 640, height: 400, visible: false };
@@ -114,6 +611,9 @@ class TurtleSmoothSystem {
         this.instanceCount = 0;
         this.lastStart = 0;
         this.fid = -1;
+        this.turtles = []; // カメの一覧
+        this.target = -1; // 操作対象のカメのID
+        this.usePathId = null; // パス描画中のカメのID
     }
     clearAll() {
         // console.log('カメ全消去 turtles=', this.turtles)
@@ -125,6 +625,10 @@ class TurtleSmoothSystem {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
         this.target = -1;
+        if (this.usePathId !== null) {
+            this.ctx?.closePath();
+        }
+        this.usePathId = null;
         this.flagSetTimer = false;
         if (this.fid !== -1) {
             cancelAnimationFrame(this.fid);
@@ -134,40 +638,11 @@ class TurtleSmoothSystem {
     }
     drawTurtle(id) {
         const tt = this.turtles[id];
-        if (!tt || !tt.canvas || !tt.ctx || !tt.img) {
-            return;
-        }
         const cr = this.canvas_r;
-        if (!cr.visible) {
+        if (!tt || !cr.visible) {
             return;
         }
-        // カメの位置を移動
-        tt.canvas.style.left = (cr.left + tt.x - tt.cx) + 'px';
-        tt.canvas.style.top = (cr.top + tt.y - tt.cx) + 'px';
-        if (!tt.f_update) {
-            return;
-        }
-        /* istanbul ignore if */
-        if (!tt.flagLoaded) {
-            return;
-        }
-        tt.f_update = false;
-        tt.ctx.clearRect(0, 0, tt.canvas.width, tt.canvas.height);
-        if (!tt.f_visible) {
-            return;
-        }
-        if (tt.dir !== 270) {
-            const rad = (tt.dir + 90) * 0.017453292519943295;
-            tt.ctx.save();
-            tt.ctx.translate(tt.cx, tt.cy);
-            tt.ctx.rotate(rad);
-            tt.ctx.translate(-(tt.img.width / 2), -(tt.img.height / 2));
-            tt.ctx.drawImage(tt.img, 0, 0);
-            tt.ctx.restore();
-        }
-        else {
-            tt.ctx.drawImage(tt.img, tt.cx - (tt.img.width / 2), tt.cy - (tt.img.height / 2));
-        }
+        tt.drawTurtle(this.canvas_r);
     }
     getCur() {
         if (this.turtles.length === 0) {
@@ -183,516 +658,109 @@ class TurtleSmoothSystem {
         this.flagSetTimer = true;
         this.play(0);
     }
-    line(tt, x1, y1, x2, y2) {
+    line(id, p1, p2, penStyle) {
         /* istanbul ignore else */
-        if (!tt.flagDown) {
+        if (!penStyle.down) {
             return;
         }
-        const ctx = this.ctx;
-        if (!ctx) {
-            return;
-        }
-        if (tt.flagBegeinPath) {
-            ctx.lineTo(x2, y2);
-        }
-        else {
-            ctx.beginPath();
-            ctx.lineWidth = tt.lineWidth;
-            ctx.strokeStyle = tt.color;
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
+        if (this.ctx) {
+            const ctx = this.ctx;
+            if (this.usePathId === id) {
+                ctx.lineTo(p2[0], p2[1]);
+            }
+            else {
+                if (this.usePathId !== null) {
+                    ctx.save();
+                }
+                ctx.beginPath();
+                ctx.lineWidth = penStyle.lineWidth;
+                ctx.strokeStyle = penStyle.strokeStyle;
+                ctx.fillStyle = penStyle.fillStyle;
+                ctx.font = penStyle.font;
+                ctx.moveTo(p1[0], p1[1]);
+                ctx.lineTo(p2[0], p2[1]);
+                ctx.stroke();
+                if (this.usePathId !== null) {
+                    ctx.restore();
+                }
+            }
         }
     }
-    clearTemporaryLine(tt) {
+    draw(id, cmd, params, style) {
+        switch (cmd) {
+            case 'beginPath':
+                if (this.usePathId === null) {
+                    this.usePathId = id;
+                    this.ctx?.beginPath();
+                    const p = params[0];
+                    this.ctx?.moveTo(p[0], p[1]);
+                }
+                else {
+                    throw new Error('既にパス描画中のため、パス描画を開始できません');
+                }
+                break;
+            case 'closePath':
+                if (this.usePathId === id) {
+                    this.usePathId = null;
+                }
+                if (this.usePathId === null) {
+                    this.ctx?.closePath();
+                }
+                break;
+            case 'fillText': {
+                const ctx = this.ctx;
+                if (ctx === null) {
+                    return;
+                }
+                if (this.usePathId !== null) {
+                    ctx.save();
+                }
+                const p = params[0];
+                const s = params[1];
+                ctx.lineWidth = style.lineWidth;
+                ctx.strokeStyle = style.strokeStyle;
+                ctx.fillStyle = style.fillStyle;
+                ctx.font = style.font;
+                ctx.fillText(s, p[0], p[1]);
+                if (this.usePathId !== null) {
+                    ctx.restore();
+                }
+                break;
+            }
+            case 'fill':
+                if (this.usePathId === id) {
+                    this.usePathId = null;
+                    this.ctx?.closePath();
+                }
+                this.ctx?.fill();
+                break;
+            case 'stroke':
+                if (this.usePathId === id) {
+                    this.usePathId = null;
+                    this.ctx?.closePath();
+                }
+                this.ctx?.stroke();
+                break;
+            default:
+                throw new Error(`カメから不明な描画要求(${cmd})を受け取りました`);
+        }
     }
-    addMacro(command) {
+    addJob(command) {
         const tt = this.getCur();
+        const cmd = command.shift();
         return new Promise((resolve, reject) => {
-            const cmd = [[resolve, reject], command];
-            tt.mlist.push(cmd);
+            const job = new Job(new Command(cmd, command), resolve, reject);
+            tt.jobs.push(job);
             this.setTimer();
         });
-    }
-    doMacro(tt, time, defaultWait, waitForTurteImage) {
-        if (!tt.flagLoaded && waitForTurteImage) {
-            // console.log('[TURTLE] waiting ...')
-            return true;
-        }
-        const immediateRun = defaultWait === 0;
-        // 以下の２つの条件を満たしている間ループする。
-        // 即時実行であるか、即時実行ではない場合は経過時間の残りがあること。
-        // 未処理のJOBが残っているか、処理中のJOBがあること。
-        while ((time > 0 || immediateRun) && (tt.mlist.length > 0 || tt.jobType !== '')) {
-            if (tt.jobType === 'substep') {
-                if (tt.substepType === '') {
-                    // 処理中のサブステップは無いので次のサブステップに着手する
-                    if (tt.substeps.length > 0) {
-                        const sa = tt.substeps.shift();
-                        const subcmd = (sa !== undefined) ? sa[0] : '';
-                        switch (subcmd) {
-                            case 'turn': {
-                                tt.substepType = 'turn';
-                                tt.substepBase = tt.dir;
-                                tt.substepModifier = 0;
-                                tt.substepTarget = sa[1];
-                                tt.substepRemain = Math.abs(sa[1]);
-                                break;
-                            }
-                            case 'move': {
-                                tt.substepType = 'move';
-                                tt.substepBase = [tt.x, tt.y];
-                                tt.substepModifier = sa[2];
-                                tt.substepTarget = sa[1];
-                                tt.substepRemain = Math.abs(sa[1]);
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        // 残りのサブステップは無いのでJOBの完了処理としてステップの処理を予約する
-                        tt.jobType = 'step';
-                        tt.stepWait = 0;
-                    }
-                }
-                else {
-                    switch (tt.substepType) {
-                        case 'turn': {
-                            if (typeof tt.substepBase === 'number') {
-                                if (tt.spdRotate <= 0 || time * tt.spdRotate >= tt.substepRemain) {
-                                    if (tt.spdRotate > 0) {
-                                        time -= Math.floor(tt.substepRemain / tt.spdRotate);
-                                    }
-                                    tt.substepRemain = 0;
-                                    tt.dir = (tt.substepBase + (tt.substepTarget % 360) + 360) % 360;
-                                    tt.substepType = '';
-                                }
-                                else {
-                                    const delta = time * tt.spdRotate;
-                                    const direction = tt.substepTarget > 0 ? 1 : -1;
-                                    tt.substepRemain -= delta;
-                                    tt.dir = (tt.dir + (delta * direction % 360) + 360) % 360;
-                                    time = 0;
-                                }
-                            }
-                            tt.f_update = true;
-                            break;
-                        }
-                        case 'move': {
-                            if (typeof tt.substepBase !== 'number') {
-                                if (tt.spdMove <= 0 || time * tt.spdMove >= tt.substepRemain) {
-                                    if (tt.spdMove > 0) {
-                                        time -= Math.floor(tt.substepRemain / tt.spdMove);
-                                    }
-                                    tt.substepRemain = 0;
-                                    const deg = (tt.dir + tt.substepModifier) % 360;
-                                    const rad = deg * 0.017453292519943295;
-                                    const vp = tt.substepTarget;
-                                    const x2 = tt.substepBase[0] + Math.cos(rad) * vp;
-                                    const y2 = tt.substepBase[1] + Math.sin(rad) * vp;
-                                    this.line(tt, tt.x, tt.y, x2, y2);
-                                    tt.x = x2;
-                                    tt.y = y2;
-                                    tt.substepType = '';
-                                }
-                                else {
-                                    const delta = time * tt.spdMove;
-                                    const direction = tt.substepTarget > 0 ? 1 : -1;
-                                    tt.substepRemain -= delta;
-                                    const deg = (tt.dir + tt.substepModifier) % 360;
-                                    const rad = deg * 0.017453292519943295;
-                                    const vp = delta * direction;
-                                    const x2 = tt.x + Math.cos(rad) * vp;
-                                    const y2 = tt.y + Math.sin(rad) * vp;
-                                    this.line(tt, tt.x, tt.y, x2, y2);
-                                    tt.x = x2;
-                                    tt.y = y2;
-                                    time = 0;
-                                }
-                            }
-                            tt.f_update = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (tt.jobType === 'step') {
-                // ステップの処理をチェック・実行する
-                if (time >= tt.stepWait || immediateRun) {
-                    // ステップ待ち時間に到達したか、即時実行が有効となっている。
-                    // 経過時間からステップ待ち時間を減算する。
-                    time -= tt.stepWait;
-                    tt.stepWait = 0;
-                    // ステップ完了処理があるなら呼び出す。
-                    if (tt.step) {
-                        tt.step();
-                    }
-                    tt.jobType = '';
-                    tt.step = null;
-                    if (tt.flagLoaded) {
-                        this.drawTurtle(tt.id);
-                    }
-                    if (tt.jobResolve != null) {
-                        tt.jobResolve(0);
-                    }
-                }
-                else {
-                    // ステップ待ち時間に到達していない。
-                    // 残りのステップ待ち時間から経過時間を減らして次へ。
-                    tt.stepWait -= time;
-                    time = 0;
-                }
-            }
-            else if (tt.jobType === '') {
-                // 処理中のJOBは無いので次のJOBを取得して処理に着手する
-                const ma = tt.mlist.shift();
-                const resolve = ma[0][0];
-                const reject = ma[0][1];
-                const m = ma[1];
-                const cmd = (m !== undefined) ? m[0] : '';
-                switch (cmd) {
-                    case 'xy':
-                        // 起点を移動する
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, x, y) {
-                            return function () {
-                                tt.x = x;
-                                tt.y = y;
-                            };
-                        })(tt, m[1], m[2]);
-                        break;
-                    case 'begin':
-                        // 描画を明示的に開始する
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, ctx) {
-                            return function () {
-                                if (ctx) {
-                                    ctx.beginPath();
-                                    ctx.moveTo(tt.x, tt.y);
-                                }
-                                tt.flagBegeinPath = true;
-                            };
-                        })(tt, this.ctx);
-                        break;
-                    case 'close':
-                        // パスを閉じる
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, ctx) {
-                            return function () {
-                                if (ctx) {
-                                    ctx.closePath();
-                                }
-                                tt.flagBegeinPath = false;
-                            };
-                        })(tt, this.ctx);
-                        break;
-                    case 'fill':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, ctx) {
-                            return function () {
-                                if (tt.flagBegeinPath) {
-                                    if (ctx) {
-                                        ctx.closePath();
-                                    }
-                                    tt.flagBegeinPath = false;
-                                }
-                                if (ctx) {
-                                    ctx.fill();
-                                }
-                            };
-                        })(tt, this.ctx);
-                        break;
-                    case 'stroke':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, ctx) {
-                            return function () {
-                                if (tt.flagBegeinPath) {
-                                    if (ctx) {
-                                        ctx.closePath();
-                                    }
-                                    tt.flagBegeinPath = false;
-                                }
-                                if (ctx) {
-                                    ctx.stroke();
-                                }
-                            };
-                        })(tt, this.ctx);
-                        break;
-                    case 'text':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, ctx, text) {
-                            return function () {
-                                if (ctx) {
-                                    ctx.fillText(text, tt.x, tt.y);
-                                }
-                            };
-                        })(tt, this.ctx, m[1]);
-                        break;
-                    case 'textset':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (ctx, font) {
-                            return function () {
-                                if (ctx) {
-                                    ctx.font = m[1];
-                                }
-                            };
-                        })(this.ctx, m[1]);
-                        break;
-                    case 'fillStyle':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (ctx, style) {
-                            return function () {
-                                if (ctx) {
-                                    ctx.fillStyle = style;
-                                }
-                            };
-                        })(this.ctx, m[1]);
-                        break;
-                    case 'mv': {
-                        tt.jobType = 'substep';
-                        // 引数を取り出す
-                        const x2 = m[1];
-                        const y2 = m[2];
-                        // カメの角度を算出
-                        const dx = x2 - tt.x;
-                        const dy = y2 - tt.y;
-                        const angleRad = Math.atan2(dy, dx);
-                        const angle = angleRad * 57.29577951308232;
-                        const targetdir = (angle + 360) % 360;
-                        let deg = (targetdir - tt.dir + 360) % 360;
-                        if (deg > 180) {
-                            deg = deg - 360;
-                        }
-                        // カメの移動距離を算出
-                        const fdv = Math.sqrt(dx * dx + dy * dy);
-                        if (tt.spdRotate > 0 || tt.spdMove > 0) {
-                            tt.jobType = 'substep';
-                            tt.substeps.push(['turn', deg]);
-                            tt.substeps.push(['move', fdv, 0]);
-                        }
-                        else {
-                            tt.jobType = 'step';
-                            tt.stepWait = defaultWait;
-                        }
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, dir, x1, y1, deg, x2, y2, turtlesmooth) {
-                            return function () {
-                                // 線を引く
-                                turtlesmooth.line(tt, tt.x, tt.y, x2, y2);
-                                // カメの角度を変更
-                                tt.dir = (dir + deg + 360) % 360;
-                                // 実際に位置を移動
-                                tt.x = x2;
-                                tt.y = y2;
-                                tt.f_update = true;
-                            };
-                        })(tt, tt.dir, tt.x, tt.y, deg, x2, y2, this);
-                        break;
-                    }
-                    case 'directmv': {
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, turtlesmooth) {
-                            return function () {
-                                // 線を引く
-                                turtlesmooth.line(tt, tt.x, tt.y, m[1], m[2]);
-                                // カメの角度を変更
-                                const mvRad = Math.atan2(m[2] - tt.y, m[1] - tt.x);
-                                tt.dir = mvRad * 57.29577951308232;
-                                tt.f_update = true;
-                                // 実際に位置を移動
-                                tt.x = m[1];
-                                tt.y = m[2];
-                            };
-                        })(tt, this);
-                        break;
-                    }
-                    case 'fd': {
-                        const fdv = m[1] * m[2];
-                        const rad = tt.dir * 0.017453292519943295;
-                        const x2 = tt.x + Math.cos(rad) * fdv;
-                        const y2 = tt.y + Math.sin(rad) * fdv;
-                        if (tt.spdMove > 0) {
-                            tt.jobType = 'substep';
-                            tt.substeps.push(['move', fdv, 0]);
-                        }
-                        else {
-                            tt.jobType = 'step';
-                            tt.stepWait = defaultWait;
-                        }
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, x1, y1, x2, y2, turtlesmooth) {
-                            return function () {
-                                turtlesmooth.clearTemporaryLine(tt);
-                                turtlesmooth.line(tt, tt.x, tt.y, x2, y2);
-                                tt.x = x2;
-                                tt.y = y2;
-                            };
-                        })(tt, tt.x, tt.y, x2, y2, this);
-                        break;
-                    }
-                    case 'angle': {
-                        tt.jobType = 'substep';
-                        const angle = m[1];
-                        const targetdir = (((angle - 90) % 360) + 360) % 360;
-                        let deg = (targetdir - tt.dir + 360) % 360;
-                        if (deg > 180) {
-                            deg = deg - 360;
-                        }
-                        if (tt.spdRotate > 0) {
-                            tt.jobType = 'substep';
-                            tt.substeps.push(['turn', deg]);
-                        }
-                        else {
-                            tt.jobType = 'step';
-                            tt.stepWait = defaultWait;
-                        }
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, dir, deg) {
-                            return function () {
-                                tt.dir = (dir + (deg % 360) + 360) % 360;
-                                tt.f_update = true;
-                            };
-                        })(tt, tt.dir, deg);
-                        break;
-                    }
-                    case 'directangle': {
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, angle) {
-                            return function () {
-                                tt.dir = ((angle - 90 % 360) + 360) % 360;
-                                tt.f_update = true;
-                            };
-                        })(tt, m[1]);
-                        break;
-                    }
-                    case 'rot': {
-                        const deg = m[1] * m[2];
-                        if (tt.spdRotate > 0) {
-                            tt.jobType = 'substep';
-                            tt.substeps.push(['turn', deg]);
-                        }
-                        else {
-                            tt.jobType = 'step';
-                            tt.stepWait = defaultWait;
-                        }
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, dir, deg) {
-                            return function () {
-                                tt.dir = (dir + (deg % 360) + 360) % 360;
-                                tt.f_update = true;
-                            };
-                        })(tt, tt.dir, deg);
-                        break;
-                    }
-                    case 'color':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, ctx, c) {
-                            return function () {
-                                tt.color = c;
-                                if (ctx) {
-                                    ctx.strokeStyle = tt.color;
-                                }
-                            };
-                        })(tt, this.ctx, m[1]);
-                        break;
-                    case 'size':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, ctx, w) {
-                            return function () {
-                                tt.lineWidth = w;
-                                if (ctx) {
-                                    ctx.lineWidth = tt.lineWidth;
-                                }
-                            };
-                        })(tt, this.ctx, m[1]);
-                        break;
-                    case 'penOn':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, pen) {
-                            return function () {
-                                tt.flagDown = pen;
-                            };
-                        })(tt, m[1]);
-                        break;
-                    case 'spdR':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, spd) {
-                            return function () {
-                                tt.spdRotate = spd;
-                            };
-                        })(tt, m[1]);
-                        break;
-                    case 'spdM':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, spd) {
-                            return function () {
-                                tt.spdMove = spd;
-                            };
-                        })(tt, m[1]);
-                        break;
-                    case 'visible':
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = (function (tt, v) {
-                            return function () {
-                                tt.f_visible = v;
-                                tt.f_update = true;
-                            };
-                        })(tt, m[1]);
-                        break;
-                    case 'changeImage':
-                        if (tt.img) {
-                            tt.flagLoaded = false;
-                            tt.img.src = m[1];
-                        }
-                        tt.jobType = 'step';
-                        tt.stepWait = defaultWait;
-                        tt.jobResolve = resolve;
-                        tt.step = function () { };
-                        break;
-                }
-            }
-            if (tt.flagLoaded) {
-                this.drawTurtle(tt.id);
-            }
-        }
-        return (tt.mlist.length > 0 || tt.jobType !== '');
     }
     doMacroAll(time, defaultWait, waitForTurteImage) {
         let hasNext = false;
         for (const tt of this.turtles) {
-            hasNext = this.doMacro(tt, time, defaultWait, waitForTurteImage) || hasNext;
+            hasNext = tt.doMacro(time, defaultWait, waitForTurteImage) || hasNext;
+            if (tt.flagLoaded) {
+                this.drawTurtle(tt.id);
+            }
         }
         return hasNext;
     }
@@ -782,6 +850,12 @@ class TurtleSmoothSystem {
         const tt = new TurtleSmooth(this.sys, id);
         this.turtles.push(tt);
         this.target = id;
+        tt.addEventListener('drawLine', (e) => {
+            this.line(e.detail.id, [e.detail.x1, e.detail.y1], [e.detail.x2, e.detail.y2], e.detail.style);
+        });
+        tt.addEventListener('drawCanvas', (e) => {
+            this.draw(e.detail.id, e.detail.cmd, e.detail.params, e.detail.style);
+        });
         // 画像を読み込む
         tt.loadImage(imageUrl, (tt) => {
             this.drawTurtle(tt.id);
@@ -877,7 +951,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (url, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['changeImage', url]);
+            return turtlesmooth.addJob(['changeImage', url]);
         }
     },
     'カメ速度': { type: 'const', value: 100 }, // @かめそくど
@@ -896,7 +970,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (xy, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['mv', xy[0], xy[1]]);
+            return turtlesmooth.addJob(['mv', xy[0], xy[1]]);
         }
     },
     'カメ起点移動': {
@@ -905,7 +979,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (xy, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['xy', xy[0], xy[1]]);
+            return turtlesmooth.addJob(['xy', xy[0], xy[1]]);
         }
     },
     'カメ進': {
@@ -917,7 +991,7 @@ const PluginTurtleSmooth = {
             if (typeof v === 'string') {
                 v = parseFloat(v);
             }
-            return turtlesmooth.addMacro(['fd', v, 1]);
+            return turtlesmooth.addJob(['fd', v, 1]);
         }
     },
     'カメ戻': {
@@ -929,7 +1003,7 @@ const PluginTurtleSmooth = {
             if (typeof v === 'string') {
                 v = parseFloat(v);
             }
-            return turtlesmooth.addMacro(['fd', v, -1]);
+            return turtlesmooth.addJob(['fd', v, -1]);
         }
     },
     'カメ角度設定': {
@@ -941,7 +1015,7 @@ const PluginTurtleSmooth = {
             if (typeof deg === 'string') {
                 deg = parseFloat(deg);
             }
-            return turtlesmooth.addMacro(['angle', deg]);
+            return turtlesmooth.addJob(['angle', deg]);
         }
     },
     'カメ右回転': {
@@ -953,7 +1027,7 @@ const PluginTurtleSmooth = {
             if (typeof deg === 'string') {
                 deg = parseFloat(deg);
             }
-            return turtlesmooth.addMacro(['rot', deg, 1]);
+            return turtlesmooth.addJob(['rot', deg, 1]);
         }
     },
     'カメ左回転': {
@@ -965,7 +1039,7 @@ const PluginTurtleSmooth = {
             if (typeof deg === 'string') {
                 deg = parseFloat(deg);
             }
-            return turtlesmooth.addMacro(['rot', deg, -1]);
+            return turtlesmooth.addJob(['rot', deg, -1]);
         }
     },
     'カメペン色設定': {
@@ -974,7 +1048,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (c, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['color', c]);
+            return turtlesmooth.addJob(['color', c]);
         }
     },
     'カメペンサイズ設定': {
@@ -983,7 +1057,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (w, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['size', w]);
+            return turtlesmooth.addJob(['size', w]);
         }
     },
     'カメペン設定': {
@@ -992,7 +1066,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (v, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['penOn', v]);
+            return turtlesmooth.addJob(['penOn', v]);
         }
     },
     'カメパス開始': {
@@ -1001,7 +1075,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['begin']);
+            return turtlesmooth.addJob(['begin']);
         }
     },
     'カメパス閉': {
@@ -1010,7 +1084,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['close']);
+            return turtlesmooth.addJob(['close']);
         }
     },
     'カメパス線引': {
@@ -1019,7 +1093,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['stroke']);
+            return turtlesmooth.addJob(['stroke']);
         }
     },
     'カメパス塗': {
@@ -1028,7 +1102,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['fill']);
+            return turtlesmooth.addJob(['fill']);
         }
     },
     'カメ文字描画': {
@@ -1037,7 +1111,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (s, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['text', s]);
+            return turtlesmooth.addJob(['text', s]);
         }
     },
     'カメ文字設定': {
@@ -1053,7 +1127,7 @@ const PluginTurtleSmooth = {
             else if (s.match(/^\d+(px|em)$/)) {
                 s = s + ' serif';
             }
-            return turtlesmooth.addMacro(['textset', s]);
+            return turtlesmooth.addJob(['textset', s]);
         }
     },
     'カメ塗色設定': {
@@ -1062,7 +1136,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (c, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['fillStyle', c]);
+            return turtlesmooth.addJob(['fillStyle', c]);
         }
     },
     'カメ全消去': {
@@ -1088,7 +1162,7 @@ const PluginTurtleSmooth = {
                 c = c.replace(/^([a-zA-Z_]+)\s*(\d+)/, '$1,$2');
                 c = c.replace(/^([a-zA-Z_]+)\s*=/, '$1,');
                 const ca = c.split(/\s*,\s*/);
-                promise = turtlesmooth.addMacro(ca);
+                promise = turtlesmooth.addJob(ca);
             }
             if (promise === null) {
                 promise = new Promise(resolve => resolve(0));
@@ -1102,7 +1176,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['visible', false]);
+            return turtlesmooth.addJob(['visible', false]);
         }
     },
     'カメ表示': {
@@ -1111,7 +1185,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['visible', true]);
+            return turtlesmooth.addJob(['visible', true]);
         }
     },
     'カメクリック時': {
@@ -1169,13 +1243,61 @@ const PluginTurtleSmooth = {
             return turtlesmooth.turtles.length;
         }
     },
+    'カメ右曲': {
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            return turtlesmooth.addJob(['curve', r, deg, 1, 1]);
+        }
+    },
+    'カメ左曲': {
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            return turtlesmooth.addJob(['curve', r, deg, 1, -1]);
+        }
+    },
+    'カメ右曲戻': {
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            return turtlesmooth.addJob(['curve', r, deg, -1, 1]);
+        }
+    },
+    'カメ左曲戻': {
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            return turtlesmooth.addJob(['curve', r, deg, -1, -1]);
+        }
+    },
     'カメ直接移動': {
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (xy, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['directmv', xy[0], xy[1]]);
+            return turtlesmooth.addJob(['directmv', xy[0], xy[1]]);
         }
     },
     'カメ直接角度設定': {
@@ -1187,7 +1309,7 @@ const PluginTurtleSmooth = {
             if (typeof deg === 'string') {
                 deg = parseFloat(deg);
             }
-            return turtlesmooth.addMacro(['directangle', deg]);
+            return turtlesmooth.addJob(['directangle', deg]);
         }
     },
     'カメ位置取得': {
@@ -1236,7 +1358,7 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (spd, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['spdM', spd]);
+            return turtlesmooth.addJob(['spdM', spd]);
         }
     },
     'カメ回転速度設定': {
@@ -1245,11 +1367,10 @@ const PluginTurtleSmooth = {
         pure: true,
         fn: function (spd, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addMacro(['spdR', spd]);
+            return turtlesmooth.addJob(['spdR', spd]);
         }
     }
 };
-// export default PluginTurtleSmooth;
 // scriptタグで取り込んだ時、自動で登録する
 // @ts-ignore TS2339
 if (typeof (navigator) === 'object' && typeof (navigator.nako3)) {

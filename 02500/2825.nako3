@@ -1,0 +1,41 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2825
+### タイトル=スゴロクその1（共通テスト2021年情報関連基礎より）
+### 作者=Hanako.S(user_id=0)
+### ライセンス=CC0
+### 説明=共通テスト2021年情報関連基礎のプログラミング関連問題のプログラムを実際につくってみました。オバケが登場しないバージョンです。
+### 対象バージョン=3.6.7
+### URL=
+### 種類=wnako
+### タグ=共通テスト
+### 更新日時=2024-06-18 13:21:40
+###
+
+Masu=[0,1,1,-1,0.5,1,0,1,0,1,1,-1,0.5,1,-1,1]
+Koma=[[],[],[]]
+Saikoro=[[],[],[]]
+ninzu=2
+owari=0
+r=0
+iを１からninzuまで繰り返す
+　　Koma@i,r=1
+ここまで。
+(owari=0)の間
+　　r=r+1
+　　iを１からninzuまで繰り返す
+　　　　Saikoro@i,r=6の乱数+1
+　　　　k=Koma@i,(r-1)
+　　　　bairitu=Masu@k
+　　　　もし、（bairitu=0）かつ（Saikoro@i,r>=4）ならば、
+　　　　　　bairitu=1
+　　　　ここまで。
+　　　　idou=（Saikoro@i,r*bairitu）の整数部分
+　　　　Koma@i,r=k+idou
+　　　　もし、Koma@i,r<1ならば、Koma@i,r=1
+　　　　もし、Koma@i,r>=15ならば、
+　　　　　　Koma@i,r=15
+　　　　　　owari=1
+　　　　ここまで。
+　　ここまで。
+　　「ラウンド｛r｝　N：目｛Saikoro@1,r｝　マス｛Koma@1,r｝　　S：目｛Saikoro@2,r｝　マス｛Koma@2,r｝」を表示。
+ここまで。

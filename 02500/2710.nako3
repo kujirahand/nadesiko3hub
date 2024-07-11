@@ -1,6 +1,6 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?2710
-### タイトル=N目並べ(二人対戦用)
+### タイトル=n目並べ(m人対戦用) n,m ∈ ℕ
 ### 作者=クレスト(user_id=0)
 ### ライセンス=MIT
 ### 説明=2人以上対象の四目並べ。四目並べを作っていたら、五目並べを作りたくなり色々した
@@ -8,20 +8,20 @@
 ### URL=
 ### 種類=wnako
 ### タグ=ゲーム,四目並べ,五目並べ,対戦ゲーム,暇つぶし,初心者
-### 更新日時=2024-02-08 21:50:37
+### 更新日時=2024-07-11 14:34:16
 ###
 
 # N目並べ
 X=0
 Y=0
-countlimit = 15
+countlimit = 10
 count = countlimit
 NumberTimes = []
 Observer = 0 #0がプレイ中、1がゲーム終了を示す
 Winer = 0 #勝者の番号
 #それぞれ縦のマス目の数と横のマス目の数
-Horizontal_row = 10
-Vertical_row = 10
+Horizontal_row = 15
+Vertical_row = 15
 Width = (描画中キャンバスの"height"をDOM属性取得)/(Vertical_row+2)#Widthはキャンバス上のマスをどれだけ離すか。
 Stage = 盤面初期化 #Stageは集合。Stageは左から順に縦列を設定している。
 Who = 1 #whoは手番の人。1で赤。2で青。
@@ -59,7 +59,7 @@ main__盤面描画
             全タイマー停止
         count = countlimit
     盤面描画
-    [Width*6,Width-5]へ" 残り{count}秒です"を文字描画
+    [Width,Width-5]へ" {count}秒"を文字描画
 
 
 
@@ -71,7 +71,7 @@ Resetボタンをクリックした時には:
 Gravityボタン=「Gravity」のボタン作成
 Gravityボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
 Gravityボタンをクリックした時には:
-    もしGravity=1ならば:
+    もしGravity==1ならば:
         Gravity=0
     違えば:
         Gravity=Gravity+1
@@ -80,10 +80,19 @@ Gravityボタンをクリックした時には:
 Typeボタン="Type"のボタン作成
 Typeボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
 Typeボタンをクリックした時には:
-    もしType=Type_Limitならば:
+    もしType==Type_Limitならば:
         Type=2
     違えば:
         Type=Type+1
+    初期化
+
+lengthボタン="length"のボタン作成
+lengthボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
+lengthボタンをクリックした時には:
+    もしLimit==7なら:
+        Limit=3
+    違えば:
+        Limit=Limit+1
     初期化
 
 Reroll = "Reroll"のボタン作成
@@ -98,6 +107,7 @@ Rerollをクリックした時には:
         Observer = 0
         main__盤面描画
 
+
 描画中キャンバスをマウス押した時には:
     もしObserver=0なら:
         X＝FLOOR(マウスX/Width)-1
@@ -111,7 +121,7 @@ Rerollをクリックした時には:
         "{Limit}個揃ってるよ！"と言う
     盤面描画
     
-    [Width*6,Width-5]へ" 残り{count}秒です"を文字描画
+    [Width,Width-5]へ" {count}秒"を文字描画
     count = countlimit
     #*/
 
@@ -191,7 +201,7 @@ Rerollをクリックした時には:
     "bold {Width}px serif"に描画フォント設定
     もしObserver=0なら:
         Colors[Who]に塗色設定
-        [0,Width-5]へ" 今は{Who}番です"を文字描画
+        [Width*3,Width-5]へ" {Who}番です {Type}人用 重力{Gravity} 長さ{Limit}"を文字描画
     違えば:
         Colors[Winer]に塗色設定
-        [0,Width-5]へ" {Winer} の勝ちです"を文字描画
+        [Width*3,Width-5]へ" {Winer} の勝ちです"を文字描画

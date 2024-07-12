@@ -1,6 +1,6 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?2710
-### タイトル=n目並べ(m人対戦用) n,m ∈ ℕ
+### タイトル=n目並べ(m人対戦用) n,m ∈ ℕ, n > 2, m > 1
 ### 作者=クレスト(user_id=0)
 ### ライセンス=MIT
 ### 説明=2人以上対象の四目並べ。四目並べを作っていたら、五目並べを作りたくなり色々した
@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=ゲーム,四目並べ,五目並べ,対戦ゲーム,暇つぶし,初心者
-### 更新日時=2024-07-11 14:34:16
+### 更新日時=2024-07-12 13:06:47
 ###
 
 # N目並べ
@@ -43,7 +43,9 @@ Gravity = 1 #落下するかどうか。1ならあり。0ならなし
 main__盤面描画
 
 
-1秒毎には:
+"request"を1秒毎
+
+●request:
     count = count - 1
     もしcount == 0なら:
         もしObserver == 0ならば:
@@ -51,13 +53,11 @@ main__盤面描画
                 Y＝乱数(Vertical_row)
                 もし(盤面範囲(X,Y))ならば:
                     Y=石落下場所(X)
-                    Stage[X,Y]=Who
-                    チェック
-                    手番交代
-        違えば:
-            "{Limit}個揃ってるよ！"と言う
-            全タイマー停止
-        count = countlimit
+                    もしStage[X,Y] == 0なら:
+                        Stage[X,Y] = Who
+                        チェック
+                        手番交代
+         count = countlimit
     盤面描画
     [Width,Width-5]へ" {count}秒"を文字描画
 
@@ -86,13 +86,13 @@ Typeボタンをクリックした時には:
         Type=Type+1
     初期化
 
-lengthボタン="length"のボタン作成
-lengthボタンに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
-lengthボタンをクリックした時には:
-    もしLimit==7なら:
-        Limit=3
+timer_button="timer"のボタン作成
+timer_buttonに{ "文字サイズ": "30px"}をDOMスタイル一括設定。
+timer_buttonをクリックした時には:
+    もしcountlimit == 10なら:
+        countlimit = 2
     違えば:
-        Limit=Limit+1
+        countlimit = countlimit+2
     初期化
 
 Reroll = "Reroll"のボタン作成
@@ -123,21 +123,24 @@ Rerollをクリックした時には:
     
     [Width,Width-5]へ" {count}秒"を文字描画
     count = countlimit
-    #*/
 
 ●初期化:
+    全タイマー停止
     Stage = 盤面初期化
     NumberTimes = []
     Who = 1
     count = countlimit
     Observer = 0
     盤面描画
+    "request"を1秒毎
+
 
 ●チェック:
     Directionを反復:
         定数[ax,ay,bx,by]=対象
         counter = 一方(一方(Limit-1,ax,ay),bx,by)
         もしcounter < 1なら:
+            全タイマー停止
             Observer = 1
             Winer = Who
             抜ける

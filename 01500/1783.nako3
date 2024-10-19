@@ -8,16 +8,16 @@
 ### URL=https://qiita.com/snowdrops89/items/7e9db5d926a1b69783b3
 ### 種類=js
 ### タグ=
-### 更新日時=2024-09-04 23:32:15
+### 更新日時=2024-10-19 14:39:16
 ###
 
 /*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-　nadesiko3-FileReader.js　v2.0.0
+　nadesiko3-FileReader.js　v2.0.1
 
 　File APIで、ローカルのファイルを読み込むためのプラグイン。
 　なでしこv3.6以降への対応。
 
-　作者:雪乃☆雫　／　ライセンス:CC0　／　制作時のナデシコバージョン:3.6.16
+　作者:雪乃☆雫　／　ライセンス:CC0　／　制作時のナデシコバージョン:3.6.23
 *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*/
 const PluginFileReader = {
   'meta': {
@@ -25,7 +25,7 @@ const PluginFileReader = {
     value: { // プラグインに関する情報を指定する
       pluginName: 'nadesiko3-FileReader', // プラグインの名前
       description: 'File APIで、ローカルのファイルを読み込むためのプラグイン', // プラグインの説明
-      pluginVersion: '2.0.0', // プラグインのバージョン
+      pluginVersion: '2.0.1', // プラグインのバージョン
       nakoRuntime: ['wnako'], // 対象ランタイム
       nakoVersion: '3.6.2' // 要求なでしこバージョン
     }
@@ -117,7 +117,7 @@ const PluginFileReader = {
     type: 'func',
     josi: [['と'],['で'],['の', 'を']],
     fn: function (fn, cha, file, sys) {
-      if (!file.type.match('text.*')&& !file.name.match('.+\.('+ sys.__v0['テキストファイル追加拡張子'] +')')) {
+      if (!file.type.match('text.*')&& !file.name.match('.+\.('+ sys.__getSysVar('テキストファイル追加拡張子') +')')) {
         console.error("テキストファイル開時：『"+file.name+"』は、テキストファイルではありません。");
         return false;
       }

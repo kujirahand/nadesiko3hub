@@ -1,0 +1,560 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2886
+### タイトル=WebPageEditor blackback
+### 作者=クレスト(user_id=0)
+### ライセンス=N3S_ONLY
+### 説明=背景を黒くしたのみ、他にやった事は無し
+### 対象バージョン=3.6.25
+### URL=
+### 種類=wnako
+### タグ=w_noname
+### 更新日時=2024-11-01 18:57:33
+###
+
+# Web Page Editor
+
+EditorHTML = 『
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Page Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600&&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"/>
+  <style type="text/css">
+  body {
+    position: fixed;
+    margin: 0px;
+    background-color: #303030;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  button {
+    all: unset;
+    appearance: none;
+    border: 0;
+    border-radius: 4px;
+    color: #f0f0f0;
+    background: #4e3cd6;
+    font-family: Poppins;
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+  
+  .titleBar {
+    height: 36px;
+    background: #4e3cd6;
+  }
+  
+  .menuBar {
+    display: flex;
+    padding: 0px 12px;
+    height: 42px;
+    background: #222;
+  }
+  
+  .playButton {
+    margin: 0 auto;
+    text-align: center;
+    font-size: 42px;
+  }
+  
+  .menuText {
+    color: #cccccc;
+    font-family: sans-serif;
+    font-weight: 600;
+    vertical-align: 8px;
+  }
+  
+  .menuLine {
+    border-left: 3px solid #888888;
+    margin: 0px 10px;
+    position: relative;
+    top: -5px;
+  }
+  
+  #typeSelect {
+    display: flex;
+    height: 36px;
+    color: #f0f0f0;
+    padding: 0px 2px;
+  }
+  
+  .typeButton {
+    all: unset;
+    z-index: 2147483648;
+    border: solid;
+    border-width: 3px 3px 0px 3px;
+    border-radius: 4px;
+    border-color: #333;
+    background: #333;
+    font-family: Poppins;
+    font-size: 16px;
+    padding: 2px 8px;
+    width: 128px;
+    margin: 2px 2px -3px 2px;
+    border-radius: 4px 4px 0px 0px;
+  }
+  
+  #consoleSelect {
+    position: absolute;
+    bottom: 159px;
+  }
+  
+  .consoleButton {
+    all: unset;
+    position: relative;
+    bottom: 0px;
+    z-index: 2147483648;
+    border: solid;
+    border-width: 3px 3px 0px 3px;
+    border-radius: 4px;
+    border-color: #333;
+    background: #333;
+    color: #f0f0f0;
+    font-family: Poppins;
+    font-size: 16px;
+    padding: 2px 8px;
+    width: 128px;
+    margin: 2px 2px -3px 2px;
+    border-radius: 4px 4px 0px 0px;
+  }
+  
+  #editSpace {
+    position: fixed;
+    top: 114px;
+    bottom: 0px;
+    width: 100vw;
+  }
+  
+  #editor {
+    position: absolute;
+    top: 0px; bottom: 160px;
+    border: solid;
+    border-width: 3px 0px 0px 0px;
+    border-color: #4e3cd6;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  
+  #consoleArea {
+    position: absolute;
+    bottom: 30px; 
+    background: #333;
+    border: solid;
+    border-width: 2px 0px 0px 0px;
+    border-color: #666;
+    box-sizing: border-box;
+    width: 100%;
+    height: 130px;
+    overflow: scroll;
+  }
+  
+  #status {
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    background: #666;
+    width: 100%;
+    height: 30px;
+  }
+  
+  #player {
+    position: fixed;
+    border: 4px solid;
+    border-color: #666;
+    border-radius: 8px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+  }
+  
+  .aText {
+    font-family: Fira Code;
+    color: #e0e0e0;
+    margin: 20px;
+  }
+  </style>
+</head>
+<body>
+  <div class="titleBar">
+    <h2 style="padding: 0px 16px; font-family: Poppins; color: #f0f0f0">Web Page Editor</h2>
+  </div>
+  <div class="menuBar">
+    <div style="position: relative; top: 6px">
+      <label class="material-symbols-outlined" onclick="undo()" style="font-size: 30px; color: #cccccc">undo</label>
+      <span class="material-symbols-outlined" onclick="redo()" style="font-size: 30px; color: #cccccc">redo</span>
+      <span class="menuLine"></span>
+      <span onclick="saveLocalStorage()">
+        <span class="material-symbols-outlined" style="font-size: 30px; color: #cccccc">update</span>
+        <span class="menuText">一時保存</span>
+      </span>
+      <span class="menuLine"></span>
+      <span onclick="loadLocalStorage()">
+        <span class="material-symbols-outlined" style="font-size: 30px; color: #cccccc">history</span>
+        <span class="menuText">一時データ読込</span>
+      </span>
+      <span class="menuLine"></span>
+      <span onclick="downloadDoc()">
+        <span class="material-symbols-outlined" style="font-size: 30px; color: #cccccc">save</span>
+        <span class="menuText">端末に保存</span>
+      </span>
+      <span class="menuLine"></span>
+      <span onclick="loadDoc()">
+        <span class="material-symbols-outlined" style="font-size: 30px; color: #cccccc">upload</span>
+        <span class="menuText">読み込み</span>
+      </span>
+      <span class="menuLine"></span>
+      <span onclick="play(false)">
+        <span class="material-symbols-outlined" style="font-size: 30px; color: #1cad47">flag</span>
+        <span class="menuText">実行</span>
+      </span>
+      <span class="menuLine"></span>
+      <span onclick="play(true)">
+        <span class="material-symbols-outlined" style="font-size: 30px; color: #1cad47">flag_circle</span>
+        <span class="menuText">デバッグ</span>
+      </span>
+    </div>
+  </div>
+  <div id="typeSelect">
+    <span id="html-button" class="typeButton" onclick="htmlClick(); typeSelectClick(this)">HTML</span>
+    <span id="css-button" class="typeButton" onclick="cssClick(); typeSelectClick(this)">CSS</span>
+    <span id="js-button" class="typeButton" onclick="jsClick(); typeSelectClick(this)">JavaScript</span>
+  </div>
+  <script>
+    const typeSelect = document.getElementById("typeSelect")
+    function typeSelectClick(clicked) {
+      for (const button of typeSelect.children) {
+        button.style.borderColor = "#555"
+        button.style.zIndex = 0
+      }
+      clicked.style.borderColor = "#4e3cd6"
+      clicked.style.zIndex = 1
+    }
+  </script>
+  <div>
+    <div id="editSpace">
+      <div id="editor" style="font-family: Fira Code;"></div>
+      
+  <div id="consoleSelect">
+    <span class="consoleButton" onclick="annotationClick(); consoleSelectClick(this)">Info</span>
+    <span class="consoleButton" onclick="consoleClick(); consoleSelectClick(this)">Console</span>
+  </div>
+  <script>
+    const consoleSelect = document.getElementById("consoleSelect")
+    
+    let consoleType = "info"
+    
+    function consoleSelectClick(clicked) {
+      for (const button of consoleSelect.children) {
+        button.style.borderColor = "#555"
+        button.style.zIndex = 9999
+      }
+      clicked.style.borderColor = "#4e3cd6"
+      clicked.style.zIndex = 10000
+    }
+    
+    function consoleClick() {
+      consoleType = "console"
+      for (o of consoleObj.children) {
+        o.remove()
+      }
+      consoleObj.innerHTML = consoleContent
+    }
+    
+    function annotationClick() {
+      consoleType = "info"
+      for (o of consoleObj.children) {
+        o.remove()
+      }
+    }
+    consoleSelectClick(consoleSelect.children[0])
+  </script>
+      <div id="consoleArea">
+        <code id="console"></code>
+        <code id="status">
+          <div id="statusArea" hidden>
+            <span class="material-symbols-outlined" style="position: relative; top: 3px; left: 3px; color: #42a7f5">info</span>
+            <span id="statusText" style="vertical-align: 3px; color: #eeeeee; font-family: Fira Code, sans-serif; font-weight: 600; font-size: 16px;"></span>
+          </div>
+        </code>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/ext-language_tools.js"></script>
+  <script>
+    let editor = ace.edit("editor")
+    editor.$blockScrolling = Infinity
+    
+    editor.setOptions({
+      fontFamily: "Fira Code",
+      fontOpticalSizing: "auto",
+      fontStyle: "normal",
+      fontSize: "13.5pt",
+      tabSize: 2,
+      
+      enableBasicAutocompletion: true,
+      enableLiveAutocompletion: true,
+      
+      useSvgGutterIcons: true
+    })
+    editor.setTheme("ace/theme/tomorrow_night_eighties")
+    editor.getSession().setMode("ace/mode/javascript")
+  </script>
+  <script>
+  let htmlDoc = "<!DOCTYPE html>\n<html lang=\"ja\">\n<head></head>\n<body></body>\n</html>"
+  let cssDoc = "body { background-color: #000000; }"
+  let jsDoc = ""
+  docType = ""
+  
+  function saveDoc() {
+    switch (docType) {
+      case "html":
+        htmlDoc = editor.getValue()
+        break
+      case "css":
+        cssDoc = editor.getValue()
+        break
+      case "js":
+        jsDoc = editor.getValue()
+        break
+      default:
+        break
+    }
+  }
+  
+  function setDoc() {
+    switch (docType) {
+      case "html":
+        editor.setValue(htmlDoc)
+        break
+      case "css":
+        editor.setValue(cssDoc)
+        break
+      case "js":
+        editor.setValue(jsDoc)
+        break
+      default:
+        break
+    }
+  }
+  
+  function htmlClick() {
+    saveDoc()
+    docType = "html"
+    editor.setValue(htmlDoc)
+    editor.getSession().setUndoManager(new ace.UndoManager())
+    editor.getSession().setMode("ace/mode/html")
+  }
+  
+  function cssClick() {
+    saveDoc()
+    docType = "css"
+    editor.setValue(cssDoc)
+    editor.getSession().setUndoManager(new ace.UndoManager())
+    editor.getSession().setMode("ace/mode/css")
+  }
+  
+  function jsClick() {
+    saveDoc()
+    docType = "js"
+    editor.setValue(jsDoc)
+    editor.getSession().setUndoManager(new ace.UndoManager())
+    editor.getSession().setMode("ace/mode/javascript")
+  }
+  
+  const consoleObj = document.getElementById("console")
+  
+  function undo() {
+    editor.getSession().getUndoManager().undo()
+  }
+  
+  function redo() {
+    editor.getSession().getUndoManager().redo()
+  }
+  
+  function toJsonString() {
+    let data = {
+      html: htmlDoc,
+      css: cssDoc,
+      js: jsDoc
+    }
+    return JSON.stringify(data)
+  }
+  
+  function saveLocalStorage() {
+    saveDoc()
+    localStorage.setItem("web-page-editor-saved", toJsonString())
+    showStatusMessage("一時保存されました")
+  }
+  
+  function loadLocalStorage() {
+    let data = JSON.parse(localStorage.getItem("web-page-editor-saved"))
+    if (data != null) {
+      if (confirm("一時保存されたデータを読み込みますか？")) {
+        htmlDoc = data.html
+        cssDoc = data.css
+        jsDoc = data.js
+        setDoc()
+        showStatusMessage("一時保存されたデータを読み込みました")
+      }
+    } else {
+        showStatusMessage("一時保存されたデータはありません")
+    }
+  }
+  
+  function downloadDoc() {
+    saveDoc()
+    console.log(toJsonString())
+    navigator.share({ text: toJsonString() })
+  }
+  
+  function loadDoc() {
+    const doc = window.prompt("読み込むテキスト(貼り付け):")
+    data = JSON.parse(doc)
+    if (data != null) {
+      htmlDoc = data.html
+      cssDoc = data.css
+      jsDoc = data.js
+      setDoc()
+      showStatusMessage("テキストが読み込まれました")
+    }
+  }
+  
+  let consoleContent = ""
+  function play(isDebug) {
+    saveDoc()
+    saveLocalStorage()
+    
+    if(document.getElementById("player") != null) {
+      document.getElementById("player").remove()
+    }
+    
+    const w = window.open()
+    w.console.log = function(text) {
+      function getDateValue(v) {
+        v = v.toString()
+        if (v.length < 2) { v = "0" + v }
+        return v
+      }
+      let date = new Date()
+      let hh = getDateValue(date.getHours())
+      let mm = getDateValue(date.getMinutes())
+      let ss = getDateValue(date.getSeconds())
+      let hhmmss = hh + ":" + mm + ":" + ss
+      
+      consoleContent += "<code class=\"aText\">" + hhmmss + "\> " + text + "</code><br>"
+      if ((consoleContent.match(/<br>/g) || []).length > 5) {
+        consoleContent = consoleContent.substr(consoleContent.indexOf("<br>", 0)+4)
+      }
+      if (consoleType == 'console') {
+        consoleObj.innerHTML = consoleContent
+      }
+    }
+    let jsOut = isDebug ? 'onerror = (event, source, lineno, colno, error) => { let line = lineno - 1 == 0 ? \'行番号不明\' : lineno - 1 + \'行目\'; alert(`${line}: エラー\\n${error}`) }\n' + jsDoc: jsDoc
+    
+    w.document.write("<html><head><title>Web Page Editor - Player</title><style type=\"text/css\">" + cssDoc + "</style></head><body>" + htmlDoc + "<script>" + jsOut + "<\/script><\/body><\/html>")
+  }
+  
+  function ShowAnnotations() {
+    let annotations = editor.getSession().getAnnotations()
+    consoleObj.innerHTML = ""
+    
+    let aTexts = []
+    let aLines = []
+    let aTypes = []
+    for (const a of annotations) {
+      if (!aTexts.includes(a.text)) {
+        aTexts.push(a.text)
+        aLines.push([a.row])
+        aTypes.push(a.type)
+      } else {
+        aLines[aTexts.indexOf(a.text)].push(a.row)
+      }
+    }
+    
+    for (let i = 0; i < aTexts.length; i++) {
+      const div = document.createElement("div")
+      div.style.height = "20px"
+      
+      const aIcon = document.createElement("span")
+      aIcon.className = "material-symbols-outlined"
+      aIcon.style.position = "relative"
+      aIcon.style.top = "8px"
+      aIcon.style.left = "8px"
+      switch(aTypes[i]) {
+        case "error":
+          aIcon.style.color = "#e01010"
+          aIcon.innerText = "error"
+          break
+        case "warning":
+          aIcon.style.color = "#e0e020"
+          aIcon.innerText = "warning"
+          break
+        case "info":
+          aIcon.style.color = "#42a7f5"
+          aIcon.innerText = "info"
+          break
+      }
+      div.appendChild(aIcon)
+      
+      const aText = document.createElement("span")
+      aText.className = "aText"
+      
+      let lineText = ""
+      if (aLines[i].length > 2) { lineText = "..."; aLines[i].length = 2 }
+      lineText = aLines[i].join() + lineText
+      aText.innerText = "Line " + lineText + "  " + aTexts[i]
+      div.appendChild(aText)
+      
+      consoleObj.appendChild(div)
+    }
+  }
+  
+  function ShowAnnotationsLoop() {
+    if (consoleType == "info") { ShowAnnotations() }
+    setTimeout(ShowAnnotationsLoop, 1000)
+  }
+  
+  ShowAnnotationsLoop()
+  
+  const playground = document.getElementById("playground")
+  function closeClick() {
+    if(document.getElementById("player") != null) {
+      document.getElementById("player").remove()
+    }
+    playground.hidden = true
+  }
+  
+  const statusArea = document.getElementById("statusArea")
+  const statusText = document.getElementById("statusText")
+  
+  function showStatusMessage(text) {
+    statusArea.hidden = false
+    statusText.innerText = text
+    
+    setTimeout(() => {
+      statusArea.hidden = true
+    }, 5000)
+  }
+  
+  htmlClick()
+  typeSelectClick(document.getElementById("html-button"))
+  </script>
+</body>
+</html>
+
+』
+
+EditorJS = 『
+let obj = window.open()
+obj.document.open()
+obj.document.write(sys.__findVar("EditorHTML"))
+obj.document.close()
+』
+JS実行(EditorJS)

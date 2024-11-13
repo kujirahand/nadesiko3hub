@@ -1,0 +1,85 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2896
+### タイトル=gridjsでｖ１のグリッドっぽいやつ作りたい
+### 作者=雪乃☆雫(user_id=0)
+### ライセンス=CC0
+### 説明=しかし編集機能が無い😭
+### 対象バージョン=3.6.26
+### URL=
+### 種類=wnako
+### タグ=テスト
+### 更新日時=2024-11-13 15:00:09
+###
+
+＃grid.jsの取り込み
+!「https://n3s.nadesi.com/plain/LoadScript.js」を取り込む。
+「https://unpkg.com/gridjs/dist/gridjs.umd.js」のライブラリ読み込み。
+「https://unpkg.com/gridjs/dist/theme/mermaid.min.css」のCSSリンク作成。
+
+＃表示データを取得
+URL=「https://n3s.nadesi.com/image.php?f=535.csv」
+データはURLからHTTP取得して、それをCSV取得。
+データの０から１を配列取り出して、それ[0]をタイトルに代入。
+「h1」のDOM部品作成。
+それに「東京の真夏日と猛暑日の推移」をテキスト設定。
+
+＃グリッド作成
+「div」のDOM部品作成。※ nako3_divに直接作成するとクリアされない設定が残り、もう一度実行した時に正常に動作しないので、divを作ってその中に作ることにする。
+グリッド＝『new gridjs.Grid({
+        //項目名
+        columns: sys.__findVar("タイトル"),
+
+        //データ
+        data: sys.__findVar("データ"),
+
+        //オプション
+        pagination: {limit: 15}, // ページネーション
+        search: true,       // 検索
+        sort:true,          // ソート
+        resizable: true,    // サイズ変更
+        width: "80%",       //表示幅
+        //height: "600px",    //表示高さ
+        //fixedHeader: true,  // ヘッダー固定
+
+        //スタイル
+        style:{ th:{"background-color":"#99B",  
+                    "color":"#333",
+                    "text-align": "center",
+                    "line-height":"1.5em"
+                    },
+                tr:{
+                    "background-color":"white"
+                },
+                td:{"background-color":"rgba(0, 0, 0, 0)",
+                    "font-size":"10pt"}
+               
+               },
+
+        //言語
+        language: {
+            'search': {
+                'placeholder': '🔍 ここに入力して検索'
+            },
+            'pagination': {
+                'previous': '⇦前へ',
+                'next': '次へ⇨',
+                'showing': ' ',
+                'results': '件中',
+                of: '/',
+                to: '～'
+            }
+        },
+    }).render(document.getElementById("nadesi-dom-"+(sys.__getSysVar("DOM部品個数")-1)));』をJS実行。
+
+＃イベント
+『  sys.__findVar("グリッド").on('rowClick', (...args) => {
+        console.log('row: ' + JSON.stringify(args), args);
+        sys.__exec("行色変更",[args[0].target.parentElement])
+    });』をJS実行。
+
+前クリック行＝空。
+●(クリック行の)行色変更
+    もし、前クリック行が空でなければ、前クリック行の「背景色」に白色をDOMスタイル設定。
+    クリック行の「背景色」に「#CCF」をDOMスタイル設定。
+    前クリック行＝クリック行。
+ここまで。

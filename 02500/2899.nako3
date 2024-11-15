@@ -1,0 +1,242 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2899
+### タイトル=Jspreadsheetでエクセル？っぽいものつくりたい
+### 作者=雪乃☆雫(user_id=0)
+### ライセンス=CC0
+### 説明=貯蔵庫のCSSを攻略するのツライ😭
+### 対象バージョン=3.6.26
+### URL=
+### 種類=wnako
+### タグ=テスト
+### 更新日時=2024-11-15 18:16:10
+###
+
+＃Jspreadsheetの取り込み
+!「https://n3s.nadesi.com/plain/LoadScript.js」を取り込む。
+「https://bossanova.uk/jspreadsheet/v4/jexcel.js」のライブラリ読み込み。
+「https://bossanova.uk/jspreadsheet/v4/jexcel.css」のCSSリンク作成。
+「https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.js」のライブラリ読み込み。
+「https://cdn.jsdelivr.net/npm/jsuites/dist/jsuites.min.css」のCSSリンク作成。
+
+＃データ作成
+タイトル＝[
+        { title:'残り日数',type: 'text', width:100 },
+        { title:'日付',type: 'calendar',options: { format:'YYYY/MM/DD' }, width:120 },
+        { title:'曜日',type: 'text', width:50 },
+        { title:'完了',type: 'checkbox', width:50 },
+        { title:'予定',type: 'text', width:300 },
+    ]
+
+＃＃カレンダー
+csv＝空。
+スタイル＝空辞書。
+
+開始日＝今日。
+終了日＝「2024/12/25」
+予定データ＝{
+    "2024/12/01":"アドベントカレンダー開始日",
+    "2024/12/25":"アドベントカレンダー最終日"
+    }
+対象日＝開始日。
+対象秒＝対象日をUNIXTIME変換。
+残り日数＝開始日と終了日の日数差。
+残り日数+1回
+  F曜日＝対象日の曜日。
+  //スタイル作成
+  もし、F曜日＝「日」ならば、
+    スタイル["C{回数}"]＝「background-color: red;」。
+  違えば、もし、F曜日＝「土」ならば、
+    スタイル["C{回数}"]＝「background-color: blue;」。
+  違えば、
+    スタイル["C{回数}"]＝「background-color: #eee;」。
+  ここまで。
+  F日付＝対象日//の「/」を「,」に置換。
+  F予定＝予定データ[対象日]
+  もし（F予定＝未定義）ならば、F予定=空。
+  csv＝csvに「残り{残り日数}日,{F日付},{F曜日},false,{F予定}」を一行追加。。
+  残り日数＝残り日数−1
+  対象秒＝対象秒＋(60 * 60 * 24)
+  対象日＝対象秒を日時変換して「 」まで切り取る。
+ここまで。
+データ＝csvをCSV取得。
+
+y＝空。対象要素＝空。
+●(セルのxyと値で)完了設定
+    列,行＝xy。y＝行。対象要素＝セル["parentElement"]。
+    もし（列＝３）ならば、
+        もし（値＝TRUE）ならば、
+            対象要素の「背景色」に黄色をDOMスタイル設定。
+        違えば、
+            対象要素の「背景色」に白色をDOMスタイル設定。
+        ここまで。
+    ここまで。
+ここまで。
+
+ID＝「Jspreadsheet」
+「div」のDOM部品作成。
+それの「id」にIDをDOM属性設定。
+
+スプレッドシート＝『
+var changed = function(instance, cell, x, y, value) {
+    jspreadsheet.getColumnNameFromId([x,y]);
+        console.log([instance, cell, x, y, value]);
+        sys.__exec("完了設定",[cell,[x,y],value]);
+}
+
+jspreadsheet(document.getElementById(sys.__findVar("ID")), {
+    //項目名
+    columns:sys.__findVar("タイトル"),
+    
+    //データ
+    data:sys.__findVar("データ"),
+    
+    //オプション
+    minDimensions: [10,10], // 最小[列,行]数
+    
+    //スタイル
+    style: sys.__findVar("スタイル"),
+    
+    onchange: changed,
+});
+』をJS実行。
+
+「style」のDOM部品作成。
+それに『
+#nako3_div .jexcel {
+    border-collapse: separate;
+    table-layout: fixed;
+    white-space:  nowrap;
+    empty-cells: show;
+    border: 0px;
+    background-color: #fff;
+    width: 0;
+
+    border-top: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;}
+#nako3_div .jexcel_container.with-toolbar #nako3_div .jexcel > thead > tr > td {
+    top: 0;
+}
+
+#nako3_div .jexcel > thead > tr > td
+{
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    background-color: #f3f3f3;
+    padding: 2px;
+    cursor: pointer;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index:2;
+}
+
+#nako3_div .jexcel > tbody > tr > td
+{
+    border-top:1px solid #ccc;
+    border-left:1px solid #ccc;
+    border-right:1px solid transparent;
+    border-bottom:1px solid transparent;
+    padding:4px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    line-height:1em;
+}
+#nako3_div .jexcel > thead > tr > td.selected
+{
+    background-color:#dcdcdc;
+}
+
+#nako3_div .jexcel > tbody > tr > td:first-child
+{
+    position:relative;
+    background-color:#f3f3f3;
+    text-align:center;
+}
+
+#nako3_div .jexcel > tbody > tr.selected > td:first-child
+{
+    background-color:#dcdcdc;
+}
+#nako3_div .jexcel > tbody > tr > td > select,
+#nako3_div .jexcel > tbody > tr > td > input,
+#nako3_div .jexcel > tbody > tr > td > textarea
+{
+    border:0px;
+    border-radius:0px;
+    outline:0px;
+    width:100%;
+    margin:0px;
+    padding:0px;
+    padding-right:2px;
+    background-color:transparent;
+    box-sizing: border-box;
+}
+
+
+#nako3_div .jexcel .highlight {
+    background-color:rgba(0,0,0,0.05);
+}
+
+#nako3_div .jexcel .highlight-selected
+{
+    background-color:rgba(0,0,0,0.0);
+}
+
+
+#nako3_div .jexcel .highlight-top {
+    border-top:1px solid #000; /* var(--jexcel-border-color);*/
+    box-shadow: 0px -1px #ccc;
+}
+
+#nako3_div .jexcel .highlight-left {
+    border-left:1px solid #000; /* var(--jexcel-border-color);*/
+    box-shadow: -1px 0px #ccc;
+}
+
+#nako3_div .jexcel .highlight-right {
+    border-right:1px solid #000; /* var(--jexcel-border-color);*/
+}
+
+#nako3_div .jexcel .highlight-bottom {
+    border-bottom:1px solid #000; /* var(--jexcel-border-color);*/
+}
+
+#nako3_div .jexcel .highlight-top.highlight-left {
+    box-shadow: -1px -1px #ccc;
+    -webkit-box-shadow: -1px -1px #ccc;
+    -moz-box-shadow: -1px -1px #ccc;
+}
+
+#nako3_div .jexcel .selection
+{
+    background-color:rgba(0,0,0,0.05);
+}
+#nako3_div .jexcel .selection-left
+{
+    border-left:1px dotted #000;
+}
+#nako3_div .jexcel .selection-right
+{
+    border-right:1px dotted #000;
+}
+#nako3_div .jexcel .selection-top
+{
+    border-top:1px dotted #000;
+}
+#nako3_div .jexcel .selection-bottom
+{
+    border-bottom:1px dotted #000;
+}
+#nako3_div .jexcel > thead > tr #nako3_div .jexcel_filter > td > input
+{
+    border:0px;
+    width:100%;
+    outline:none;
+}
+』をHTML設定。

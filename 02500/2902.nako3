@@ -1,0 +1,196 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2902
+### タイトル=コンテキスト2Dの属性設定取得支援プラグイン
+### 作者=てぃふと@うぇいく(user_id=0)
+### ライセンス=CC0
+### 説明=Canvasのコンテキスト2Dの属性を設定・取得するのを支援するプラグイン。命令は１つだけ。『(CTXにCTXへ)CTX2D支援設定』することで属性の設定・取得の際に「$」(11/19時点)構文が使えるようになる。
+### 対象バージョン=3.6.28
+### URL=
+### 種類=js
+### タグ=
+### 更新日時=2024-11-19 20:56:14
+###
+
+// 属性名の実際のプロパティ名と和名別名の対応表。
+// 逆参照する際には和名別名の配列の最初のエントリのものを使う。
+const ctx2DAttrWa = {
+  "canvas": ["キャンバス"],
+  "direction": ["書字方向"],
+  "fillStyle": ["塗りスタイル", "塗スタイル", "塗り色", "塗色"],
+  "filter": ["フィルター"],
+  "font": ["フォント", "描画フォント"],
+  "fontKerning": ["フォントカーニング", "文字カーニング"],
+  "fontStretch": ["フォント拡縮方法", "フォント拡縮", "文字拡縮方法", "文字拡縮"],
+  "fontVariantCaps": ["大文字化方法"],
+  "globalAlpha": ["既定透明度", "既定不透明度"],
+  "globalCompositeOperation": ["画像合成演算方法", "画像合成演算", "合成演算方法", "合成演算"],
+  "imageSmoothingEnabled": ["画像平滑化", "平滑化"],
+  "imageSmoothingQuality": ["画像平滑化品質", "平滑化品質"],
+  "letterSpacing": ["文字間隔"],
+  "lineCap": ["線端点", "端点"],
+  "lineDashOffset": ["破線オフセット", "点線オフセット"],
+  "lineJoin": ["線接続点", "接続点"],
+  "lineWidth": ["線太さ", "線太"],
+  "miterLimit": ["マイター制限比率", "マイター制限"],
+  "shadowBlur": ["影暈し", "影暈", "影ぼかし"],
+  "shadowColor": ["影色"],
+  "shadowOffsetX": ["影オフセットX", "影配置X", "影位置X", "影X"],
+  "shadowOffsetY": ["影オフセットY", "影配置Y", "影位置Y", "影Y"],
+  "strokeStyle": ["線スタイル", "線色"],
+  "textAlign": ["テキスト配置"],
+  "textBaseline": ["テキスト基準線", "テキストベースライン", "ベースライン"],
+  "textRendering": ["テキスト描画方法", "文字描画方法"],
+  "wordSpacing": ["単語間隔"]
+}
+
+// 属性が列挙値を持つ場合の実際の有効な値と和名別名の対応表。
+// 逆参照する際には和名別名の配列の最初のエントリのものを使う。
+const ctx2DValueByAttrWa = {
+  "direction": {
+    "ltr": ["左書き", "左書"],
+    "rtl": ["右書き", "右書"],
+    "inherit": ["継承"],
+  },
+  "fontKerning": {
+    "auto": ["自動"],
+    "normal": ["通常", "標準", "適用"],
+    "none": ["無し", "なし"],
+  },
+  "fontStretch": {
+    "ultra-condensed": ["超縮小", "超短縮"],
+    "extra-condensed": null,
+    "condensed": ["縮小", "短縮"],
+    "semi-condensed": ["微縮小", "微短縮"],
+    "normal": ["通常", "標準", "既定"],
+    "semi-expanded": ["微拡大", "微拡張"],
+    "expanded": ["拡大", "拡張"],
+    "extra-expanded": null,
+    "ultra-expanded": ["超拡大", "超拡張"]
+  },
+  "imageSmoothingQuality": {
+    "low": ["低品質", "低"],
+    "medium": ["中品質", "中"],
+    "high": ["高品質", "高"]
+  },
+  "lineCap": {
+    "butt": ["無し", "なし", "既定"],
+    "round": ["丸", "●"],
+    "square": ["四角", "■"]
+  },
+  "lineJoin": {
+    "round": ["丸", "●"],
+    "bevel": ["面取り", "面取"],
+    "miter": ["角", "三角", "▲"]
+  },
+  "textAlign": {
+    "left": ["左寄せ", "左寄", "左揃え", "左揃", "左"],
+    "right": ["右寄せ", "右寄", "右揃え", "右揃", "右"],
+    "center": ["中央揃え", "中央揃", "中央寄せ", "中央寄", "中央"],
+    "start": ["先頭", "先端", "開始", "通常", "標準", "既定"],
+    "end": ["終端", "終了"]
+  },
+  "textBaseline": {
+    "top": ["上端", "上辺", "上"],
+    "hanging": ["ハンギング"],
+    "middle": ["中段", "中央", "真ん中", "真中", "中"],
+    "alphabetic": ["英語仕様", "通常", "標準", "既定"],
+    "ideographic": ["表意文字仕様"],
+    "bottom": ["下辺", "底辺", "下端", "下"],
+  },
+  "textRendering": {
+    "auto": ["自動", "通常", "標準", "既定"],
+    "optimizeSpped": ["速度最適化", "速度優先", "速さ最適化", "速最適化", "速さ優先", "速優先", "速度", "速さ", "速"],
+    "optimizeLegibility": ["見た目最適化", "見目最適化", "見た目優先", "見目優先", "見た目", "見目"],
+    "geometricPrecision": ["形状正確性", "字形正確性", "正確さ", "正確"] 
+  }
+}
+
+const ctx2DAttrWaNor = {}
+const ctx2DAttrWaRev = {}
+const ctx2DValueByAttrWaNor = {}
+const ctx2DValueByAttrWaRev = {}
+
+const PluginContext2DAttr = {
+  'meta': {
+    type: 'const',
+    value: {
+      pluginName: 'plugin_ctx2dattr', // プラグインの名前
+      description: 'CanvasのContext2Dに対して$による和属性支援を提供するプラグイン', // プラグインの説明
+      pluginVersion: '3.6.0', // プラグインのバージョン
+      nakoRuntime: ['wnako'], // 対象ランタイム
+      nakoVersion: '3.6.0' // 要求なでしこバージョン
+    }
+  },
+  '初期化': {
+    type: 'func',
+    josi: [],
+    pure: true,
+    fn: function (sys) {
+      for (let attrName of Object.keys(ctx2DAttrWa)) {
+        let waList = ctx2DAttrWa[attrName]
+        if (waList) {
+          for (const wa of waList) {
+            ctx2DAttrWaNor[wa] = attrName
+          }
+          ctx2DAttrWaRev[attrName] = waList[0]
+        }
+      }
+      for (let attrName of Object.keys(ctx2DValueByAttrWa)) {
+        ctx2DValueByAttrWaNor[attrName] = {}
+        ctx2DValueByAttrWaRev[attrName] = {}
+        for (let valueName of Object.keys(ctx2DValueByAttrWa[attrName])) {
+          let waList = ctx2DValueByAttrWa[attrName][valueName]
+          if (waList) {
+            for (const wa of waList) {
+              ctx2DValueByAttrWaNor[attrName][wa] = valueName
+            }
+            ctx2DValueByAttrWaRev[attrName][valueName] = waList[0]
+          }
+        }
+      }
+    }
+  },
+  // @Context2D支援
+  'CTX2D支援設定': { // CTXに$構文による属性の設定・取得が可能となるよう支援機能を設定する // @CTX2Dしえんせってい
+    type: 'func',
+    josi: [['に', 'へ']],
+    pure: true,
+    fn: function (ctx, sys) {
+      if (!ctx instanceof CanvasRenderingContext2D) {
+        return
+      }
+      ctx.__setProp = (prop, value, sys) => {
+        const wa = ctx2DAttrWaNor
+        if (wa[prop] !== undefined) {
+          prop = wa[prop]
+        }
+        const wav = ctx2DValueByAttrWaNor
+        if (wav[prop] !== undefined) {
+          if (wav[prop][value] !== undefined) {
+            value = wav[prop][value]
+          }
+        }
+        ctx[prop] = value
+      }
+
+      ctx.__getProp = (prop, sys) => {
+        const wa =  ctx2DAttrWaNor
+        if (wa[prop] !== undefined) {
+          prop = wa[prop]
+        }
+        value = ctx[prop]
+        const wav = ctx2DValueByAttrWaRev
+        if (wav[prop] !== undefined) {
+          if (wav[prop][value] !== undefined) {
+            value = wav[prop][value]
+          }
+        }
+        return value
+      }
+    }
+  }
+}
+
+if (typeof (navigator) === 'object' && typeof (navigator.nako3)) {
+  navigator.nako3.addPluginObject('PluginContext2DAttr', PluginContext2DAttr)
+}

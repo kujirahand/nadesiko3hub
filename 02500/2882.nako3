@@ -8,7 +8,7 @@
 ### URL=http://westfarland.html.xdomain.jp/game/nk3/yuueikingyo20.html
 ### 種類=wnako
 ### タグ=ゲーム
-### 更新日時=2024-10-27 16:53:19
+### 更新日時=2024-11-20 21:50:16
 ###
 
 終了フラグはオフ。
@@ -94,6 +94,8 @@ DOCUMENTをキー押した時には
 
 　　# キー設定
 　　DOCUMENTをキー押した時には
+　　　　# ブラウザデフォルトの動作をキャンセル
+　　　　対象イベントのDOMイベント処理停止。
 　　　　kk=押されたキー
 　　　　もし、（kk=「ArrowRight」）かつ（金魚vx<5）ならば、金魚vx=金魚vx+1。
 　　　　もし、（kk=「ArrowLeft」）かつ（金魚vx>-5）ならば、金魚vx=金魚vx-1。

@@ -1,14 +1,14 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?1902
 ### タイトル=CSV to LuaMacros変換機
-### 作者=賢者ユメミノウツツ(user_id=63)
+### 作者=賢者ユメミノウツツ(user_id=0)
 ### ライセンス=MIT
 ### 説明=LuaMacrosというソフトのソースコードをCSVから書いてくれるプログラムです。詳しい解説はコチラ → https://qiita.com/JKyumekamui/items/3659bf15869875040173
 ### 対象バージョン=3.3.80
 ### URL=https://qiita.com/JKyumekamui/items/3659bf15869875040173
 ### 種類=wnako
 ### タグ=
-### 更新日時=2023-05-15 08:17:02
+### 更新日時=2025-01-17 17:45:47
 ###
 
 // https://n3s.nadesi.com/plain/735.nako3　より一部を抜粋・改変して使っています。
@@ -18,6 +18,7 @@
 !「https://n3s.nadesi.com/plain/nadesiko3-FileReader.js」を取込む。
 WINDOWへドロップ禁止。
 ＃ テキスト
+「デバイスIDはLuamacros上で"lmc_print_devices()"を実行することで知ることができます。」のラベル作成して改行作成。
 「CSVファイルを選択してください。または、テキストエリアにドロップしてください。」のラベル作成。改行作成。改行作成。
 
 ファイル選択作成してテキストファイル選択に代入。
@@ -70,7 +71,7 @@ WINDOWへドロップ禁止。
 　HIDテキストの「幅」に「10em」をDOMスタイル設定。
 　HIDテキストの「高さ」に「2.5ex」をDOMスタイル設定。
 　HIDテキストの「resize」に「none」をDOMスタイル設定。
-　HIDテキストに「UNKNOWN_ID」をテキスト設定　// 俺のキーボードは 359BC1BB
+　HIDテキストに「UNKNOWN_ID」をテキスト設定　// 俺のキーボードは ~~359BC1BB~~2375B635
 
 「↓」のラベル作成して矢印ラベル1に代入。改行作成。改行作成。
 
@@ -84,7 +85,9 @@ WINDOWへドロップ禁止。
 ここまで。
 「←工事中です……」のラベル作成して工事中ラベルに代入。改行作成。改行作成。#クリックするとクリップボードにコピーされます。
 #コピーされるはずだったのですがされねえ！？
-「」のラベル作成してコピーラベルに代入。
+「」のラベル作成してコピーラベルに代入。改行作成。
+「詳細はQiitaを読んでください：」のラベル作成。
+空のラベル作成して「<a href="https://qiita.com/JKyumekamui/items/3659bf15869875040173" target="_blank" rel="noopener noreferrer">https://qiita.com/JKyumekamui/items/3659bf15869875040173</a>」をHTML設定
 
 #-------------------------------
 
@@ -98,7 +101,7 @@ WINDOWへドロップ禁止。
     HID＝HIDテキストのテキスト取得
     // こっそり自分用機能
     もし、HID＝「MINE」ならば、
-        HID＝「146EB8F5」
+        HID＝「2375B635」
     ここまで。
     S＝Sの「--lmc_device_set_name("CSVLMConverter","ID")」を「lmc_device_set_name("CSVLMConverter","{HID}") 」に置換
     S＝Sに「」を一行追加。

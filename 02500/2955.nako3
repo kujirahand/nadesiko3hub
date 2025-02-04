@@ -1,0 +1,66 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2955
+### タイトル=リバーシ2人対戦
+### 作者=クレスト(user_id=0)
+### ライセンス=CC0
+### 説明=JavaScriptから戻ってきて書いたもの。明らかになでしこの趣向と関係ない()
+### 対象バージョン=3.6.44
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2025-02-04 17:19:34
+###
+
+// リバーシ 2人対戦
+
+変数 is_gaming = true
+
+定数 cells = 8
+定数 canvas = 描画中キャンバス
+canvas.width  = 800
+canvas.height = 800
+
+定数 width  = canvas.width  / cells
+定数 height = canvas.height / cells
+
+定数 stage = []
+set_stage()
+stage[0][0] = 0
+main__set_stone(0, 0)
+表示(stage[0][0])
+
+変数 present = 0
+
+●set_stage:
+  定数 row = []
+  cells回:
+    配列追加(row, undefined)
+  
+  cells回:
+    配列追加(stage, 配列複製(row))
+
+描画中キャンバスをマウス押時には:
+  もしis_gamingなら:
+    x ＝ FLOOR(マウスX / width)
+    y ＝ FLOOR(マウスY / width)
+    set_stone(x, y)
+
+●set_stone(x, y):
+  もし!in_area(x, y) || stage[x][y] == undefinedなら:
+    表示("hoo")
+    戻
+  表示("hi")
+
+●can_reverse(x, y):
+  変数 flag = false
+  
+
+●check_ray(x, y, dx, dy):
+  変数 px = x + dx
+  変数 py = y + dy
+  (in_area(px, py) && stage[px][py] == present)の間:
+    px = px + dx
+    py = py + dy
+
+●in_area(x, y):
+  0 =< x && x < width && 0 =< ｙ && ｙ < heightを戻

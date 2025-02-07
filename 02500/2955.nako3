@@ -3,79 +3,106 @@
 ### タイトル=2人リバーシ
 ### 作者=クレスト(user_id=0)
 ### ライセンス=MIT
-### 説明=まだ普通のリバーシ。人数、初期配置、広さ等を拡張してみたいと思っている。このプログラムはJavaScriptから戻ってきて書いたもの。そのせいで明らかになでしこの趣向を無視しているがお許しくだされ
+### 説明=まだ普通のリバーシ。人数、初期配置、広さ等を拡張してみたいと思っている。ドモルガンの法則を多用したり、図形的にプログラムを設定しているため見にくい…。このプログラムはJavaScriptから戻ってきて書いたもの。そのせいで明らかになでしこの趣向を無視しているがお許しを
 ### 対象バージョン=3.6.44
 ### URL=
 ### 種類=wnako
 ### タグ=リバーシ,オセロ,ゲーム,対戦ゲーム,テーブルゲーム,コード説明未記載,未完成,未改造
-### 更新日時=2025-02-06 20:44:13
+### 更新日時=2025-02-07 17:17:57
 ###
 
 // リバーシ 2人対戦
-変数 is_gaming = true
-変数 is_loading = false
 
-定数 cells = 8
+// 変更可能
+定数 is_hex  = false
+定数 cells   = 8
+定数 players = 2
+変数 present = 0
+変数 option  = 0
+
+// 変更不可
+変数 is_loading = false
 定数 rect  = [cells, cells]
+定数 stage = []
+
 定数 canvas = 描画中キャンバス
 canvas.width  = 700
 canvas.height = 700
-
 定数 width  = canvas.width  / rect[0]
 定数 height = canvas.height / rect[1]
-定数 stage = []
-変数 present = 0
-
-変数 players = 2
 
 set_stage()
-stage[3][3] = 0
-stage[4][4] = 0
-stage[3][4] = 1
-stage[4][3] = 1
+set_for_start()
 draw()
 
 描画中キャンバスをマウス押時には:
-  もし!is_gamingなら 戻
   もしis_loadingなら 戻
   is_loading = !is_loading
   
   x ＝ FLOOR(マウスX / width)
   y ＝ FLOOR(マウスY / height)
   もしset_stone(x, y)なら:
-    next_turn()
-  draw()
-  
+    iを1からplayersまで繰り返す:
+      next_turn()
+      もしcan_put()なら 抜
+      もしi != playersなら 続
+      表示("結果 : " & get_scores())
+      抜
+    draw()
   is_loading = !is_loading
 
-●set_stage:
+●set_stage():
+  もしis_hexなら:
+    rect[0] = 8 + option * 2
+    rect[1] = 8 + option * 2
+  
   定数 row = []
   rect[1]回:
     配列追加(row, undefined)
   rect[0]回:
     配列追加(stage, 配列複製(row))
 
+●set_for_start():
+  もしrect[0] < 2 || rect[1] < 2なら 戻
+  定数 half_width  = FLOOR(rect[0] / 2) - 1
+  定数 half_height = FLOOR(rect[1] / 2) - 1
+  stage[half_width    ][half_height    ] = 0
+  stage[half_width + 1][half_height + 1] = 0
+  stage[half_width    ][half_height + 1] = 1
+  stage[half_width + 1][half_height    ] = 1
+
+
 ●set_stone(x, y):
-  もし(!in_area(x, y) || stage[x][y] != undefined)なら falseを戻
+  // 範囲内である かつ 空のマスであるか
+  もし!in_area(x, y) || (is_hex && !in_hex(x, y))なら falseを戻
+  もしstage[x][y] != undefinedなら falseを戻
+  
   定数 places = get_places(x, y)
   もし要素数(places) == 0なら falseを戻
+  
   stage[x][y] = present
-  rowで0から要素数(places)まで繰り返す:
-    places[row]を反復:
-      stage[対象[0]][対象[1]] = present
+  rowでplacesを反復:
+    pointでrowを反復:
+      stage[point[0]][point[1]] = present
   trueを戻
 
 ●get_places(x, y):
-  もし!in_area(x, y) || stage[x][y] != undefinedなら []を戻
+  // 範囲内である かつ 空のマスであるか
+  もし!in_area(x, y) || (is_hex && !in_hex(x, y))なら []を戻
+  もしstage[x][y] != undefinedなら []を戻
   定数 vectors = [[1, 0], [1, 1]]
   定数 places  = []
   4回:
-    定数 line1 = get_line(x, y, vectors[0][0], vectors[0][1])
-    定数 line2 = get_line(x, y, vectors[1][0], vectors[1][1])
-    もし要素数(line1) > 0なら 配列追加(places, line1)
-    もし要素数(line2) > 0なら 配列追加(places, line2)
     vectors[0] = [-vectors[0][1], vectors[0][0]]
     vectors[1] = [-vectors[1][1], vectors[1][0]]
+    定数 line1 = get_line(x, y, vectors[0][0], vectors[0][1])
+    もし要素数(line1) > 0なら 配列追加(places, line1)
+    
+    // 六角形の時、傾きが-1の直線と並行なベクトルをのぞく
+    もしis_hex && (vectors[1][0] - vectors[1][1] != 0)なら 続
+    
+    定数 line2 = get_line(x, y, vectors[1][0], vectors[1][1])
+    もし要素数(line2) > 0なら 配列追加(places, line2)
   placesを戻
 
 ●get_line(x, y, dx, dy):
@@ -85,7 +112,7 @@ draw()
   (cells - 1)回:
     px = px + dx
     py = py + dy
-    もし!in_area(px, py)なら []を戻
+    もし!in_area(px, py) || is_hex && !in_hex(px, py)なら []を戻
     もしstage[px][py] == undefinedなら []を戻
     もしstage[px][py] == presentなら placesを戻
     配列追加(places, [px, py])
@@ -94,10 +121,14 @@ draw()
 ●in_area(x, y):
   0 =< x && x < rect[0] && 0 =< ｙ && ｙ < rect[1]を戻
 
+●in_hex(x, y):
+  (in_area(x, y) && ABS(y - x) < 5 + option)を戻
+
 ●next_turn():
   present = (present + 1) % players
 
 ●draw():
+  もしrect[0] < 1 || rect[1] < 1なら 戻
   iで0からrect[0] - 1まで繰り返す:
     jで0からrect[1] - 1まで繰り返す:
       塗色設定("rgb(0, 128, 64)")
@@ -107,3 +138,19 @@ draw()
       定数 value = FLOOR(255 * e / (players - 1))
       塗色設定(RGB(value, value, value))
       円描画([(i + 0.5) * width, (j + 0.5) * height], width / 3)
+
+●can_put():
+  xで0からrect[0] - 1まで繰り返す:
+    yで0からrect[1] - 1まで繰り返す:
+      もしstage[x][y] != undefinedなら 続
+      もし要素数(get_places(x, y)) > 0なら trueを戻
+  falseを戻
+
+●get_scores():
+  定数 scores = []
+  players回 配列追加(scores, 0)
+  rowでstageを反復:
+    eでrowを反復:
+      もしe == undefinedなら 続
+      scores[e] = scores[e] + 1
+  scoresを戻

@@ -1,0 +1,27 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2980
+### タイトル=ESModuleを用いたプラグインのテスト (おまじないつき)
+### 作者=みけCAT(user_id=0)
+### ライセンス=CC0
+### 説明=「プラグイン側の実装 - (1)取り込む文を使う場合」に沿い、「取り込む」で要求されるおまじないを追加したプラグインのテスト
+### 対象バージョン=3.7.1
+### URL=https://nadesi.com/v3/doc/index.php?%E6%96%87%E6%B3%95%2FJS%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3%E3%81%AE%E4%BD%9C%E3%82%8A%E6%96%B9&show
+### 種類=js
+### タグ=サンプル,プラグイン
+### 更新日時=2025-02-19 04:14:26
+###
+
+export default {
+  'プラグインテスト': { type: 'const', value: 42 }, // @ぷらぐいんてすと
+  'meta': {
+    type: 'const',
+    value: {
+      pluginName: 'plugin_esmodule_test',
+      description: 'ESModuleを用いたプラグインのテスト',
+      pluginVersion: '1.0.0',
+      nakoRuntime: ['wnako', 'cnako', 'phpnako'],
+      nakoVersion: '3.6.0'
+    }
+  },
+}
+// navigator.nako3.addPluginObject

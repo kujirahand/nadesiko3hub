@@ -1,0 +1,89 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?2993
+### タイトル=ドットマトリクスLED風表示
+### 作者=みけCAT(user_id=0)
+### ライセンス=MIT
+### 説明=ドットマトリクスLED風に「大石泉すき」の文字を流す。美咲ゴシックを使用。
+### 対象バージョン=3.7.3
+### URL=https://note.com/mi_ke_cat/n/nf9a4da477f40
+### 種類=wnako
+### タグ=大石泉すき
+### 更新日時=2025-03-16 23:37:37
+###
+
+画像URLは「data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAICAYAAAC/K3xHAAAApUlEQVQ4T81T0RKAMAjK///o2rroyEPZ3tpTbSqgGOc4x3Mi4qDf+3beVUfF5rucqzA6/BIcnJ2AleJKJISsNKDLtwJGwDuBHMzd3OlcFQui3ZQ6HCUmVibgOuTeYcVJfMemzo53XScAgAycv2chkOPvap8Usaq+tRAEKKKc3AHk3B278XQcWWkh7ED2OzrJS8wFeElz9ytSTpiq70R9LOSC//h+AcfTrOkYDa7yAAAAAElFTkSuQmCC」。
+列数は16。
+
+●(IMGの)画像データ取得とは
+  定数の画像幅はIMG$width。
+  定数の画像高はIMG$height。
+  定数のキャンバスは「canvas」のDOM要素作成。
+  キャンバスの「width」に画像幅をDOM属性設定。
+  キャンバスの「height」に画像高をDOM属性設定。
+  キャンバスで描画開始。
+  IMGを[0,0]に画像描画。
+  定数の画像データは描画中コンテキストの「getImageData」を[0,0,画像幅,画像高]でJSメソッド実行。
+  定数の画像データ本体は画像データ$data。
+  定数の取得結果は空配列。
+  行で0から(画像高-1)まで繰り返す
+    定数の取得結果行は空配列。
+    列で0から(画像幅-1)まで繰り返す
+      取得結果行に(画像データ本体[(行×画像幅+列)×4]が128未満)を配列追加。
+    ここまで。
+    取得結果に取得結果行を配列追加。
+  ここまで。
+  取得結果を戻す。
+ここまで。
+
+表示画像は画像URLの画像読み待つ。
+画像データは表示画像の画像データ取得。
+行数は画像データの表行数。
+
+●(LEDをVに)点灯設定とは
+  もし、Vならば
+    LEDの「色」に赤色をDOMスタイル設定。
+  違えば
+    LEDの「色」に灰色をDOMスタイル設定。
+  ここまで。
+ここまで。
+
+●LED作成とは
+  定数のLEDは「●」のラベル作成。
+  LEDをオフに点灯設定。
+  LEDを戻す。
+ここまで。
+
+マトリクスは「DIV」のDOM部品作成。
+マトリクスに{
+  display: "inline-block",
+  padding: "0.2em",
+  whiteSpace: "nowrap",
+  lineHeight: "1em"
+}をDOMスタイル一括設定。
+マトリクスの「背景色」に黒色をDOMスタイル設定。
+
+マトリクスにDOM親要素設定。
+LED配列は空配列。
+(行数）回
+  LED行は空配列。
+  (列数)回
+    LED作成してLED行に配列追加。
+  ここまで。
+  LED配列にLED行を配列追加。
+  改行作成。
+ここまで。
+
+●(OFFSETで)画像LED表示とは
+  行で0から(行数-1)まで繰り返す
+    列で0から(列数-1)まで繰り返す
+      定数の表示列は(OFFSET+列)を(画像データの表列数)で割った余り。
+      LED配列[行][列]を画像データ[行][表示列]に点灯設定。
+    ここまで。
+  ここまで。
+ここまで。
+
+表示位置は0。
+0.2秒毎には
+  表示位置で画像LED表示。
+  表示位置は(表示位置+1)を(画像データの表列数)で割った余り。
+ここまで。

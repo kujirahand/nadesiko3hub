@@ -1,17 +1,17 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?521
 ### タイトル=ThreeJSによる3Dサンプル-3Dモデルの読み込み
-### 作者=てぃふと@うぇいく(user_id=2)
+### 作者=てぃふと@うぇいく(user_id=0)
 ### ライセンス=CC0
 ### 説明=モデルデータがCROSでうまく取得できないのでいったん非公開(ドメイン変更の影響)。ThreeJSにてglTF形式のモデルを読み込んで表示。OrbitControlとGLTFLoaderを使用。モデルは「"Oz Nerol's study room" by Lorenzo Penco is licensed under Creative Commons Attribution.」。プログラムのライセンスはCC0です（表示しているモデルのライセンスは異なるので注意）
-### 対象バージョン=3.2.6
+### 対象バージョン=3.7.3
 ### URL=
 ### 種類=wnako
 ### タグ=
-### 更新日時=2021-07-31 22:31:27
+### 更新日時=2025-04-19 22:47:02
 ###
 
-!「https://n3s.nadesi.com/plain/576.js」を取り込む
+!「https://n3s.nadesi.com/plain/plugin_weykthree.js」を取り込む
 # モデルのライセンスに関する情報
 # "Oz Nerol's study room" by Lorenzo Penco is licensed under Creative Commons Attribution.
 # "Oz Nerol's study room" (https://skfb.ly/onK8x)

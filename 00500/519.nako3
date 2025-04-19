@@ -1,17 +1,17 @@
 ### [作品情報]
 ### 掲載URL=https://n3s.nadesi.com/id.php?519
 ### タイトル=ThreeJSによる3Dサンプル-基本形状(球と板)の表示
-### 作者=てぃふと@うぇいく(user_id=2)
+### 作者=てぃふと@うぇいく(user_id=0)
 ### ライセンス=CC0
 ### 説明=ThreeJSのプラグインを利用。マウスで視点が動きます。Gridヘルパ、Axesヘルパ、Orbitコントロールを利用。
-### 対象バージョン=3.2.5
+### 対象バージョン=3.7.3
 ### URL=
 ### 種類=wnako
 ### タグ=
-### 更新日時=2021-06-22 22:34:59
+### 更新日時=2025-04-19 22:49:03
 ###
 
-!「https://n3s.nadesi.com/plain/576.js」を取り込む
+!「https://n3s.nadesi.com/plain/plugin_weykthree.js」を取り込む
 WEBGLキャンバスはNULL
 レンダラは空
 ココは空

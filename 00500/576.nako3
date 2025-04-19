@@ -8,7 +8,7 @@
 ### URL=https://github.com/weyk/nadesiko3-three
 ### 種類=js
 ### タグ=
-### 更新日時=2024-06-08 22:55:09
+### 更新日時=2025-04-19 22:41:19
 ###
 
 /**
@@ -262,7 +262,7 @@ const PluginWeykThree = {
     'TJSベースURL': { type: 'var', value: 'https://cdn.jsdelivr.net/npm/three@0.127.0' }, // @TJSべーすURL
     'TJSライブラリ名': { type: 'var', value: 'three.module.js' }, // @TJSらいぶらりめい
     // @ライブラリ・プラグイン
-    'TJSライブラリ読込': {
+    'TJSライブラリ読込': { // @ThreeJSのライブラリを動的に読み込む // @TJSらいぶらりよみこむ
         type: 'func',
         josi: [],
         asyncFn: true,
@@ -286,7 +286,7 @@ const PluginWeykThree = {
             }
         }
     },
-    'TJSライブラリ読込後': {
+    'TJSライブラリ読込後': { // @ThreeJSのライブラリを動的に読み込む // @TJSらいぶらりよみこみご
         type: 'func',
         josi: [['に']],
         pure: true,
@@ -309,7 +309,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSプラグイン読込': {
+    'TJSプラグイン読込': { // @ThreeJSのプラグインを動的に読み込む // @TJSぷらぐいんよみこむ
         type: 'func',
         josi: [['を']],
         asyncFn: true,
@@ -356,7 +356,7 @@ const PluginWeykThree = {
             return totalPromise;
         }
     },
-    'TJSプラグイン読込後': {
+    'TJSプラグイン読込後': { // @ThreeJSのプラグインを動的に読み込む // @TJSぷらぐいんよみこみご
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -393,7 +393,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS待': {
+    'TJS待': { // @Promiseの終了を待って結果を返す // @TJSまつ
         type: 'func',
         josi: [['を']],
         asyncFn: true,
@@ -403,7 +403,7 @@ const PluginWeykThree = {
         }
     },
     // @ThreeJS操作
-    'TJS全消去': {
+    'TJS全消去': { // @ThreeJSの作成済みのオブジェクトを全て破棄する // @TJSぜんしょうきょ
         type: 'func',
         josi: [],
         pure: true,
@@ -413,7 +413,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS描画準備': {
+    'TJS描画準備': { // @指定したDOMのIDに対する描画を準備し、描画オブジェクトを返す // @TJSびょうがじゅんび
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
@@ -428,7 +428,7 @@ const PluginWeykThree = {
             return weykthree.setupRenderer(to);
         }
     },
-    'TJS描画先取得': {
+    'TJS描画先取得': { // @描画オブジェクトの描画先となるDOM要素を返す // @TJSびょうがさきしゅとく
         type: 'func',
         josi: [['の', 'から']],
         pure: true,
@@ -437,7 +437,7 @@ const PluginWeykThree = {
             return renderer.domElement;
         }
     },
-    'TJS描画': {
+    'TJS描画': { // @指定した描画オブジェクトに対してシーン・カメラで描画する // @TJSびょうが
         type: 'func',
         josi: [['に'], ['を'], ['で']],
         pure: true,
@@ -447,7 +447,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSシーン作成': {
+    'TJSシーン作成': { // @ThreeJSのシーンを作成し、シーンオブジェクトを返す // @TJSしーんさくせい
         type: 'func',
         josi: [],
         pure: true,
@@ -462,7 +462,7 @@ const PluginWeykThree = {
             return scene;
         }
     },
-    'TJSグループ作成': {
+    'TJSグループ作成': { // @ThreeJSのグループを作成して返す // @TJSぐるーぷさくせい
         type: 'func',
         josi: [],
         pure: true,
@@ -475,7 +475,7 @@ const PluginWeykThree = {
             return group;
         }
     },
-    'TJS背景設定': {
+    'TJS背景設定': { // @指定したシーンの背景を設定する // @TJSはいけいせってい
         type: 'func',
         josi: [['に', 'へ'], ['を']],
         pure: true,
@@ -486,7 +486,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS霧効果設定': {
+    'TJS霧効果設定': { // @指定したシーンに霧の効果を設定する // @TJSきりこうかせってい
         type: 'func',
         josi: [['に', 'へ'], ['を']],
         pure: true,
@@ -496,7 +496,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSクリア': {
+    'TJSクリア': { // @指定したレンダリングのクリアする // @TJSくりあ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -506,7 +506,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSクリア色設定': {
+    'TJSクリア色設定': { // @指定したレンダリングの際にクリアする色として使用する色を設定する // @TJSくりあしょくせってい
         type: 'func',
         josi: [['に', 'へ'], ['を']],
         pure: true,
@@ -516,7 +516,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSクリア透過設定': {
+    'TJSクリア透過設定': { // @指定したレンダリングの際にクリアする色の透過度を設定する // @TJSくりあとうかせってい
         type: 'func',
         josi: [['に', 'へ'], ['を']],
         pure: true,
@@ -526,7 +526,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS影処理有効': {
+    'TJS影処理有効': { // @影の投影処理を有効にする // @TJSかげしょりゆうこう
         type: 'func',
         josi: [['の', 'を']],
         pure: true,
@@ -536,7 +536,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS影処理無効': {
+    'TJS影処理無効': { // @影の投影処理を無効にする // @TJSかげしょりむこう
         type: 'func',
         josi: [['の', 'を']],
         pure: true,
@@ -546,7 +546,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS影処理取得': {
+    'TJS影処理取得': { // @影の投影処理を有効・無効を取得して返す // @TJSかげしょりしゅとく
         type: 'func',
         josi: [['の', 'から']],
         pure: true,
@@ -556,7 +556,7 @@ const PluginWeykThree = {
         }
     },
     // @基本型操作
-    'TJS四元数作成': {
+    'TJS四元数作成': { // @四元数(quotanion)を作成して返す // @TJSしげんすうさくせい
         type: 'func',
         josi: [],
         pure: true,
@@ -565,7 +565,7 @@ const PluginWeykThree = {
             return new three.Quaternion();
         }
     },
-    'TJS四元数アングル取得': {
+    'TJS四元数アングル取得': { // @四元数を基準として指定した３次元ベクトルとの角度を計算して返す // @TJSしげんすうあんぐるしゅとく
         type: 'func',
         josi: [['から'], ['の']],
         pure: true,
@@ -580,7 +580,7 @@ const PluginWeykThree = {
             return angle;
         }
     },
-    'TJSVec3': {
+    'TJSVec3': { // @ThreeJsのVector3を作成して返す // @TJSVec3
         type: 'func',
         josi: [['の', 'で', 'から']],
         pure: true,
@@ -596,7 +596,7 @@ const PluginWeykThree = {
             return new three.Vector3(pos.x, pos.y, pos.z);
         }
     },
-    'TJSVec2設定': {
+    'TJSVec2設定': { // @Vector2に値を設定する // @TJSVec2せってい
         type: 'func',
         josi: [['の'], ['に'], ['を']],
         pure: true,
@@ -620,7 +620,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS加算': {
+    'TJS加算': { // @Vec3にVec3を加算する // @TJSかさん
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -630,7 +630,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSスカラー乗算': {
+    'TJSスカラー乗算': { // @Vec3をスカラーで乗算する // @TJSすからーじょうざん
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -640,7 +640,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS四元数適用': {
+    'TJS四元数適用': { // @なにかに対して四元数(quotanion)を適用すて姿勢を更新する // @TJSしげんすうてきよう
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -655,7 +655,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSマトリクス適用': {
+    'TJSマトリクス適用': { // @なにかに対してマトリクスを適用して位置・姿勢を更新する // @TJSまとりくすてきよう
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -681,7 +681,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @共通操作
-    'TJS位置設定': {
+    'TJS位置設定': { // @positionを持つなにかに対して指定した座標に配置する // @TJSいちせってい
         type: 'func',
         josi: [['を'], ['に']],
         pure: true,
@@ -695,7 +695,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS位置取得': {
+    'TJS位置取得': { // @positionを持つなにかから座標の情報を得る // @TJSいちしゅとく
         type: 'func',
         josi: [['から', 'の']],
         pure: true,
@@ -704,7 +704,7 @@ const PluginWeykThree = {
             return obj.position;
         }
     },
-    'TJSワールド位置取得': {
+    'TJSワールド位置取得': { // @位置(position)を持つなにかからワールドでのその情報を得る // @TJSわーるどいちしゅとく
         type: 'func',
         josi: [['から', 'の'], ['に', 'へ']],
         pure: true,
@@ -714,7 +714,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSワールドマトリクス取得': {
+    'TJSワールドマトリクス取得': { // @ワールドマトリクスを持つなにかからワールドマトリクスを得る // @TJSわーるどまとりくすしゅとく
         type: 'func',
         josi: [['から', 'の']],
         pure: true,
@@ -723,7 +723,7 @@ const PluginWeykThree = {
             return obj.matrixWorld;
         }
     },
-    'TJS四元数設定': {
+    'TJS四元数設定': { // @四元数(quotanion)を持つなにかに対して指定した姿勢を設定する // @TJSしげんすうせってい
         type: 'func',
         josi: [['を'], ['に']],
         pure: true,
@@ -737,7 +737,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS四元数取得': {
+    'TJS四元数取得': { // @四元数(quotanion)を持つなにかからその情報を得る // @TJSしげんすうしゅとく
         type: 'func',
         josi: [['から', 'の']],
         pure: true,
@@ -746,7 +746,7 @@ const PluginWeykThree = {
             return obj.quaternion;
         }
     },
-    'TJSワールド四元数取得': {
+    'TJSワールド四元数取得': { // @四元数(quotanion)を持つなにかからワールドでのその情報を得る // @TJSわーるどしげんすうしゅとく
         type: 'func',
         josi: [['から', 'の'], ['に', 'へ']],
         pure: true,
@@ -756,7 +756,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSワールド方向取得': {
+    'TJSワールド方向取得': { // @方向(direction)を持つなにかからワールドでのその情報を得る // @TJSわーるどほうこうしゅとく
         type: 'func',
         josi: [['から', 'の'], ['に', 'へ']],
         pure: true,
@@ -766,7 +766,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSサイズ設定': {
+    'TJSサイズ設定': { // @setSizeを持つオブジェクトにサイズの設定を行う // @TJSさいずせってい
         type: 'func',
         josi: [['に'], ['を', 'へ']],
         pure: true,
@@ -782,7 +782,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS拡大': {
+    'TJS拡大': { // @scaleを持つオブジェクトにスケールの設定を行う // @TJSかくだい
         type: 'func',
         josi: [['を'], ['で', 'に']],
         pure: true,
@@ -798,7 +798,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS移動': {
+    'TJS移動': { // @translateを持つオブジェクトを平行移動する // @TJS移動
         type: 'func',
         josi: [['を'], ['で', 'に'], ['だけ']],
         pure: true,
@@ -821,7 +821,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS表示': {
+    'TJS表示': { // @visibleを持つオブジェクトのvisibleにtrueを設定する // @TJSひょうじ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -831,7 +831,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS非表示': {
+    'TJS非表示': { // @visibleを持つオブジェクトのvisibleにfalseを設定する // @TJSひひょうじ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -841,7 +841,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS有効化': {
+    'TJS有効化': { // @なにかを有効にする // @TJSゆうこうか
         type: 'func',
         josi: [['の', 'を']],
         pure: true,
@@ -854,7 +854,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS無効化': {
+    'TJS無効化': { // @なにかを無効にする // @TJSむこうか
         type: 'func',
         josi: [['の', 'を']],
         pure: true,
@@ -867,7 +867,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSトラバース': {
+    'TJSトラバース': { // @traverse可能ななにかに対してtraverseする // @TJとらばーす
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -880,7 +880,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS影受設定': {
+    'TJS影受設定': { // @receiveShadowを持つオブジェクトにその値を設定する // @TJSかげうけせってい
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -893,7 +893,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS影受取得': {
+    'TJS影受取得': { // @receiveShadowを持つオブジェクトからその値を取得する // @TJSかげうけしゅとく
         type: 'func',
         josi: [['から', 'の']],
         pure: true,
@@ -905,7 +905,7 @@ const PluginWeykThree = {
             return obj.receiveShadow;
         }
     },
-    'TJS影投設定': {
+    'TJS影投設定': { // @castShadowを持つオブジェクトにその値を設定する // @TJSかげなげせってい
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -918,7 +918,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS影投取得': {
+    'TJS影投取得': { // @castShadowを持つオブジェクトからその値を取得する // @TJSかげなげしゅとく
         type: 'func',
         josi: [['から', 'の']],
         pure: true,
@@ -930,7 +930,7 @@ const PluginWeykThree = {
             return obj.castShadow;
         }
     },
-    'TJS登場': {
+    'TJS登場': { // @指定したシーンやグループに指定したなにかを追加する // @TJSとうじょう
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -940,7 +940,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS退場': {
+    'TJS退場': { // @指定したシーンやグループから指定したなにかを削除する // @TJSたいじょう
         type: 'func',
         josi: [['から'], ['を']],
         pure: true,
@@ -950,7 +950,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS自主退場': {
+    'TJS自主退場': { // @指定したなにかをそれが属している親から削除する // @TJSじしゅたいじょう
         type: 'func',
         josi: [['を', 'が']],
         pure: true,
@@ -964,7 +964,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @カメラ
-    'TJS透視投影カメラ作成': {
+    'TJS透視投影カメラ作成': { // @透視投影カメラを作成しそのオブジェクトを返す // @TJSとうしとうえいかめらさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -981,7 +981,7 @@ const PluginWeykThree = {
             return camera;
         }
     },
-    'TJS環境撮影カメラ作成': {
+    'TJS環境撮影カメラ作成': { // @環境マップ撮影用のCubeカメラを作成しそのオブジェクトを返す // @TJSかんきょうさつえいかめらさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -997,7 +997,7 @@ const PluginWeykThree = {
             return camera;
         }
     },
-    'TJSカメラ上方設定': {
+    'TJSカメラ上方設定': { // @カメラの上として扱う方向を指定する // @TJSかめらじょうほうせってい
         type: 'func',
         josi: [['を'], ['に']],
         pure: true,
@@ -1033,7 +1033,7 @@ const PluginWeykThree = {
             camera.up.z = dir[2];
         }
     },
-    'TJS投影マトリクス更新': {
+    'TJS投影マトリクス更新': { // @カメラの投影マトリクスを更新する // @TJSとうえいまとりくすこうしん
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1046,7 +1046,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS視点設定': {
+    'TJS視点設定': { // @カメラを向ける先の座標を指定する。カメラ以外にも使用可能 // @TJSしてんせってい
         type: 'func',
         josi: [['を'], ['に', 'へ']],
         pure: true,
@@ -1060,7 +1060,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSカメラ最近距離設定': {
+    'TJSカメラ最近距離設定': { // @指定したカメラの視界となる最小の距離を設定する。 // @TJSかめらさいきんきょりせってい
         type: 'func',
         josi: [['の'], ['に'], ['を']],
         pure: true,
@@ -1073,7 +1073,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSカメラ矩形距離設定': {
+    'TJSカメラ矩形距離設定': { // @指定したカメラの視界範囲の左上右下の距離を設定する。 // @TJSかめらくけいきょりせってい
         type: 'func',
         josi: [['の'], ['に'], ['を']],
         pure: true,
@@ -1100,7 +1100,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSカメラ最遠距離設定': {
+    'TJSカメラ最遠距離設定': { // @指定したカメラの視界となる最大の距離を設定する。 // @TJSかめらさいえんきょりせってい
         type: 'func',
         josi: [['の'], ['に'], ['を']],
         pure: true,
@@ -1113,7 +1113,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSカメラ視野角設定': {
+    'TJSカメラ視野角設定': { // @指定した光源のシャドー光源が角度を設定する。 // @TJSかめらしやかくせってい
         type: 'func',
         josi: [['の'], ['に'], ['を']],
         pure: true,
@@ -1126,7 +1126,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS環境撮影用レンダーターゲット作成': {
+    'TJS環境撮影用レンダーターゲット作成': { // @環境マップ撮影時の撮影先となるレンダーターゲットを作成しそのオブジェクトを返す // @TJSかんきょうさつえいようれんだーたーげっとさくせい
         type: 'func',
         josi: [['を'], ['で']],
         pure: true,
@@ -1135,7 +1135,7 @@ const PluginWeykThree = {
             return new three.WebGLCubeRenderTarget(size, opts);
         }
     },
-    'TJS環境カメラ撮影': {
+    'TJS環境カメラ撮影': { // @指定した描画オブジェクトに対してシーン・カメラで描画する // @TJSびょうが
         type: 'func',
         josi: [['に'], ['を'], ['で']],
         pure: true,
@@ -1149,7 +1149,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @光源・シャドー光源
-    'TJS環境光源作成': {
+    'TJS環境光源作成': { // @環境光の光源を作成する // @TJSかんきょうこうげんさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1158,7 +1158,7 @@ const PluginWeykThree = {
             return new three.AmbientLight(color);
         }
     },
-    'TJS点光源作成': {
+    'TJS点光源作成': { // @点の光源を作成する // @TJSてんこうげんさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1170,7 +1170,7 @@ const PluginWeykThree = {
             return new three.PointLight(param[0], param[1], param[2], param[3]);
         }
     },
-    'TJS平行光源作成': {
+    'TJS平行光源作成': { // @平行な光が降り注ぐ光源を作成する // @TJSへいこうこうげんさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1182,7 +1182,7 @@ const PluginWeykThree = {
             return new three.DirectionalLight(param[0], param[1]);
         }
     },
-    'TJSスポット光源作成': {
+    'TJSスポット光源作成': { // @スポット光源を作成する // @TJSすぽっとこうさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1194,7 +1194,7 @@ const PluginWeykThree = {
             return new three.SpotLight(param[0], param[1], param[2], param[3], param[4], param[5]);
         }
     },
-    'TJSマップサイズ設定': {
+    'TJSマップサイズ設定': { // @指定したシャドー光源のシャドーマップのサイズを設定する。２のべき乗にすること // @TJSまっぷさいずせってい
         type: 'func',
         josi: [['の'], ['に'], ['を']],
         pure: true,
@@ -1212,7 +1212,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @構造(ジオメトリ)に対する操作
-    'TJS属性設定': {
+    'TJS属性設定': { // @ジオメトリに指定した名前の属性を属性バッファを設定する // @TJSぞくせいせってい
         type: 'func',
         josi: [['の'], ['に'], ['を']],
         pure: true,
@@ -1222,7 +1222,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSインデックス設定': {
+    'TJSインデックス設定': { // @ジオメトリにインデックスを設定する。属性の参照がインデックス経由になる // @TJSいんでっくすせってい
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -1232,7 +1232,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS境界箱計算': {
+    'TJS境界箱計算': { // @指定したジオメトリの境界を箱型として計算する // @TJSきょいかいはこけいさん
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1242,7 +1242,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS境界球計算': {
+    'TJS境界球計算': { // @指定したジオメトリの境界を球型として計算する // @TJSきょいかいきゅうけいさん
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1252,7 +1252,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS法線計算': {
+    'TJS法線計算': { // @指定したジオメトリの法線を計算する // @TJSほうせんけいさん
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1262,7 +1262,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJS回転': {
+    'TJS回転': { // @ジオメトリを指定した軸に沿って回転する // @TJSかいてん
         type: 'func',
         josi: [['を'], ['で'], ['だけ']],
         pure: true,
@@ -1284,7 +1284,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @属性バッファ・バッファ
-    'TJS属性バッファ作成': {
+    'TJS属性バッファ作成': { // @ジオメトリの属性に設定するバッファを作成して返す。型付配列と１件分のデータ数を指定する // @TJSぞくせいばっふぁさくせい
         type: 'func',
         josi: [['から', 'を'], ['の', 'で']],
         pure: true,
@@ -1293,7 +1293,7 @@ const PluginWeykThree = {
             return new three.BufferAttribute(ary, num);
         }
     },
-    'TJSインターリーブバッファ作成': {
+    'TJSインターリーブバッファ作成': { // @インターリーブのあるバッファを作成して返す。型付配列と１頂点毎のデータ数を指定する // @TJSいんたーりーぶばっふぁさくせい
         type: 'func',
         josi: [['から', 'を'], ['の', 'で']],
         pure: true,
@@ -1302,7 +1302,7 @@ const PluginWeykThree = {
             return new three.InterleavedBuffer(ary, stride);
         }
     },
-    'TJSインターリーブ属性作成': {
+    'TJSインターリーブ属性作成': { // @インターリーブバッファから属性バッファを作成して返す。インターリーブバッファとオフセットと１件分のデータ数を指定する // @TJSいんたーりーぶぞくせいさくせい
         type: 'func',
         josi: [['で'], ['から'], ['の']],
         pure: true,
@@ -1311,7 +1311,7 @@ const PluginWeykThree = {
             return new three.InterleavedBufferAttribute(buf, num, off);
         }
     },
-    'TJS変更有無設定': {
+    'TJS変更有無設定': { // @属性バッファ・インターリーブバッファに変更の有無を設定する // @TJSへんこううむせってい
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -1334,7 +1334,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @基本構造(ジオメトリ)
-    'TJS空構造作成': {
+    'TJS空構造作成': { // @空のジオメトリを作成して返す // @TJSからこうぞうさくせい
         type: 'func',
         josi: [],
         pure: true,
@@ -1343,7 +1343,7 @@ const PluginWeykThree = {
             return new three.BufferGeometry();
         }
     },
-    'TJS板作成': {
+    'TJS板作成': { // @板(平面)のジオメトリを作成して返す // @TJSいたさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1362,7 +1362,7 @@ const PluginWeykThree = {
             return new three.PlaneGeometry(width, height, widthSegments, heightSegments);
         }
     },
-    'TJS箱作成': {
+    'TJS箱作成': { // @箱(直方体)のジオメトリを作成して返す // @TJSはこさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1383,7 +1383,7 @@ const PluginWeykThree = {
             return new three.BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments);
         }
     },
-    'TJS球体作成': {
+    'TJS球体作成': { // @球体(多面体)のジオメトリを作成して返す // @TJSきゅうたいさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1405,7 +1405,7 @@ const PluginWeykThree = {
             return new three.SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thettaStart, thetaLength);
         }
     },
-    'TJSシリンダ体作成': {
+    'TJSシリンダ体作成': { // @シリンダのジオメトリを作成して返す // @TJSしりんだたいさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1429,7 +1429,7 @@ const PluginWeykThree = {
         }
     },
     // @マテリアル(質感)
-    'TJS基本表面材質作成': {
+    'TJS基本表面材質作成': { // @mesh用の光源に因らない基本的なmateriaを作成して返す // @TJSきほんひょうめんざしつさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1438,7 +1438,7 @@ const PluginWeykThree = {
             return new three.MeshBasicMaterial(opts);
         }
     },
-    'TJS拡散反射材質作成': {
+    'TJS拡散反射材質作成': { // @mesh用の光沢を除く拡散反射するmaterialを作成して返す // @TJSかくさんはんしゃざしつさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1447,7 +1447,7 @@ const PluginWeykThree = {
             return new three.MeshLambertMaterial(opts);
         }
     },
-    'TJS光沢拡散反射材質作成': {
+    'TJS光沢拡散反射材質作成': { // @mesh用の光沢を含む拡散反射するmaterialを作成して返す // @TJSこうたくかくさんはんしゃざしつさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1456,7 +1456,7 @@ const PluginWeykThree = {
             return new three.MeshPhongMaterial(opts);
         }
     },
-    'TJS標準材質作成': {
+    'TJS標準材質作成': { // @mesh用の標準的な機能を網羅したmateriaを作成して返す // @TJSひょうじゅんざしつさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1465,7 +1465,7 @@ const PluginWeykThree = {
             return new three.MeshStandardMaterial(opts);
         }
     },
-    'TJSシェーダ材質作成': {
+    'TJSシェーダ材質作成': { // @mesh用のシェーダを使用したmateriaを作成して返す // @TJSしぇーだざしつさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1475,7 +1475,7 @@ const PluginWeykThree = {
         }
     },
     // @メッシュ(質感＋構造)
-    'TJSメッシュ作成': {
+    'TJSメッシュ作成': { // @meshを作成して返す // @TJSめっしゅさくせい
         type: 'func',
         josi: [['と'], ['の']],
         pure: true,
@@ -1484,7 +1484,7 @@ const PluginWeykThree = {
             return new three.Mesh(geo, mat);
         }
     },
-    'TJS点メッシュ作成': {
+    'TJS点メッシュ作成': { // @Point用のmeshを作成して返す // @TJSてんめっしゅさくせい
         type: 'func',
         josi: [['と'], ['の']],
         pure: true,
@@ -1494,7 +1494,7 @@ const PluginWeykThree = {
         }
     },
     // @テクスチャ
-    'TJSテクスチャローダ作成': {
+    'TJSテクスチャローダ作成': { // @テクスチャのローダを作成して返す // @TJSてくすちゃろーださくせい
         type: 'func',
         josi: [['を', 'の', 'で']],
         pure: true,
@@ -1508,7 +1508,7 @@ const PluginWeykThree = {
             return loader;
         }
     },
-    'TJSテクスチャ読込': {
+    'TJSテクスチャ読込': { // @テクスチャを読み込んでそのテクスチャを返す // @TJSてくすしゃよみこみ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1526,7 +1526,7 @@ const PluginWeykThree = {
             return ctl.load(url);
         }
     },
-    'TJSテクスチャ保障読込': {
+    'TJSテクスチャ保障読込': { // @テクスチャを読み込むPromiseを返す // @TJSてくすしゃほしょうよみこみ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1545,7 +1545,7 @@ const PluginWeykThree = {
         },
         return_none: false
     },
-    'TJS立方体テクスチャ読込': {
+    'TJS立方体テクスチャ読込': { // @立方体状のテクスチャを読み込んでそのテクスチャを返す // @TJSりっぽうたいてくすしゃよみこみ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1563,7 +1563,7 @@ const PluginWeykThree = {
             return ctl.load(url);
         }
     },
-    'TJS立方体テクスチャ保障読込': {
+    'TJS立方体テクスチャ保障読込': { // @立方体状のテクスチャを読み込むPromiseを返す // @TJSりっぽうたいてくすしゃほしょうよみこみ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1581,7 +1581,7 @@ const PluginWeykThree = {
             return ctl.loadAsync(url);
         }
     },
-    'TJSキャンバステクスチャ作成': {
+    'TJSキャンバステクスチャ作成': { // @キャンバスからテクスチャを作成してそのテクスチャを返す // @TJSきゃんばすてくすちゃさくせい
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1595,7 +1595,7 @@ const PluginWeykThree = {
         },
         return_none: false
     },
-    'TJS読込': {
+    'TJS読込': { // @なんらかのローダを使用して指定したURLから読み込んで返す // @TJSよみこみ
         type: 'func',
         josi: [['から'], ['を']],
         pure: true,
@@ -1606,7 +1606,7 @@ const PluginWeykThree = {
             });
         }
     },
-    'TJS保障読込': {
+    'TJS保障読込': { // @なんらかのローダを使用して指定したURLから読み込むPromiseを返す // @TJSほしょうよみこみ
         type: 'func',
         josi: [['から'], ['を']],
         pure: true,
@@ -1616,7 +1616,7 @@ const PluginWeykThree = {
         }
     },
     // @フォッグ
-    'TJSフォッグ作成': {
+    'TJSフォッグ作成': { // @霧の効果を作成して返す // @TJSふぉっぐさくせい
         type: 'func',
         josi: [['で'], ['から'], ['までの']],
         pure: true,
@@ -1626,7 +1626,7 @@ const PluginWeykThree = {
         }
     },
     // @レイキャスタ
-    'TJSレイキャスタ作成': {
+    'TJSレイキャスタ作成': { // @レイキャスターを作成して返す // @TJSれいきゃすたーさくせい
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1635,7 +1635,7 @@ const PluginWeykThree = {
             return new three.Raycaster();
         }
     },
-    'TJSカメラ起点レイ': {
+    'TJSカメラ起点レイ': { // @レイキャスタをカメラからの視点で設定する // @TJSかめらどうき
         type: 'func',
         josi: [['で'], ['に', 'を'], ['から']],
         pure: true,
@@ -1658,7 +1658,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSレイ命中取得': {
+    'TJSレイ命中取得': { // @対象に対しレイキャスターのレイがヒットした情報を配列で返す // @TJSれいめいちゅうしゅとく
         type: 'func',
         josi: [['で'], ['に']],
         pure: true,
@@ -1667,7 +1667,7 @@ const PluginWeykThree = {
             return raycaster.intersectObject(obj);
         }
     },
-    'TJSレイ命中一覧取得': {
+    'TJSレイ命中一覧取得': { // @リストの中のレイキャスターのレイがヒットした情報を配列で返す // @TJSれいめいちゅういちらんしゅとく
         type: 'func',
         josi: [['で'], ['に']],
         pure: true,
@@ -1676,7 +1676,7 @@ const PluginWeykThree = {
             return raycaster.intersectObjects(lists);
         }
     },
-    'TJSレイ原点取得': {
+    'TJSレイ原点取得': { // @レイキャスターのレイの原点(起点)を返す // @TJSれいげんてんしゅとく
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1685,7 +1685,7 @@ const PluginWeykThree = {
             return raycaster.ray.origin;
         }
     },
-    'TJSレイ方向取得': {
+    'TJSレイ方向取得': { // @レイキャスターのレイの方向を返す // @TJSれいほうこうしゅとく
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1695,7 +1695,7 @@ const PluginWeykThree = {
         }
     },
     // @アニメーション
-    'TJSアニメーションミキサー作成': {
+    'TJSアニメーションミキサー作成': { // @指定したモデルのアニメーションミキサーを作成して返す // @TJSあにめーしょんみきさーさくせい
         type: 'func',
         josi: [['の', 'から']],
         pure: true,
@@ -1704,7 +1704,7 @@ const PluginWeykThree = {
             return new three.AnimationMixer(model);
         }
     },
-    'TJSクリップアクション取得': {
+    'TJSクリップアクション取得': { // @ミキサーから指定のクリップのアクションを取得する // @TJSくりっぷあくしょんしゅとく
         type: 'func',
         josi: [['から'], ['の']],
         pure: true,
@@ -1713,7 +1713,7 @@ const PluginWeykThree = {
             return mixer.clipAction(clip);
         }
     },
-    'TJSアクション比重設定': {
+    'TJSアクション比重設定': { // @アクションに対して比重を設定する // @TJSあくしょんひじゅうせってい
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -1723,7 +1723,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSアクション再生時間倍率設定': {
+    'TJSアクション再生時間倍率設定': { // @アクションに再生する時間の倍率を設定する // @TJSあくしょんさいせいじかんばんりつせってい
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -1733,7 +1733,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSアクション再生': {
+    'TJSアクション再生': { // @指定したアクションの再生を開始する // @TJSあくしょんさいせい
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1743,7 +1743,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSアクション停止': {
+    'TJSアクション停止': { // @指定したアクションを停止する // @TJSあくしょんていし
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1754,7 +1754,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @ローダー
-    'TJSGLTFローダ作成': {
+    'TJSGLTFローダ作成': { // @glTF形式のモデル用のローダを返す // @TJSGLTFろーださくせい
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1776,7 +1776,7 @@ const PluginWeykThree = {
             return loader;
         }
     },
-    'TJSGLTF保障読込': {
+    'TJSGLTF保障読込': { // @glTF形式のモデルを読み込むPromiseを返す // @TJSGLTFほしょうよみこみ
         type: 'func',
         josi: [['を']],
         pure: true,
@@ -1802,7 +1802,7 @@ const PluginWeykThree = {
             return loader.loadAsync(url);
         }
     },
-    'TJSMD2複合キャラクタローダ作成': {
+    'TJSMD2複合キャラクタローダ作成': { // @MD2形式の複合キャラクタのモデル用のローダを返す // @TJSMD2ふくごうきゃらくたろーださくせい
         type: 'func',
         josi: [],
         pure: true,
@@ -1816,7 +1816,7 @@ const PluginWeykThree = {
         }
     },
     // @コントローラ
-    'TJS衛星軌道コントローラ作成': {
+    'TJS衛星軌道コントローラ作成': { // @OrbitControlerを作成して返す // @TJSえいせいきどうこんとろーらさくせい
         type: 'func',
         josi: [['に'], ['の']],
         pure: true,
@@ -1832,7 +1832,7 @@ const PluginWeykThree = {
             return new threeExt.OrbitControls(camera, dom);
         }
     },
-    'TJS一人称視点コントローラ作成': {
+    'TJS一人称視点コントローラ作成': { // @FirstPersonControlsを作成して返す // @TJSいちにんしょうしてんこんとろーらさくせい
         type: 'func',
         josi: [['に'], ['の']],
         pure: true,
@@ -1848,7 +1848,7 @@ const PluginWeykThree = {
             return new threeExt.FirstPersonControls(camera, dom);
         }
     },
-    'TJS飛行視点コントローラ作成': {
+    'TJS飛行視点コントローラ作成': { // @FlyControlsを作成して返す // @TJSひこうしてんこんとろーらさくせい
         type: 'func',
         josi: [['に'], ['の']],
         pure: true,
@@ -1864,7 +1864,7 @@ const PluginWeykThree = {
             return new threeExt.FlyControls(camera, dom);
         }
     },
-    'TJS更新': {
+    'TJS更新': { // @指定したなにかを更新(update)する // @TJSこうしん
         type: 'func',
         josi: [['の', 'を'], ['で']],
         pure: true,
@@ -1875,7 +1875,7 @@ const PluginWeykThree = {
         return_none: true
     },
     // @効果
-    'TJS両目効果作成': {
+    'TJS両目効果作成': { // @StereoEffectを作成して返す // @TJSりょうめこうかさくせい
         type: 'func',
         josi: [['に']],
         pure: true,
@@ -1889,7 +1889,7 @@ const PluginWeykThree = {
         }
     },
     // @ヘルパ
-    'TJS軸線ヘルパ作成': {
+    'TJS軸線ヘルパ作成': { // @長さがlenのAxesHelperを作成して返す // @TJSじくせんへるぱさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1901,7 +1901,7 @@ const PluginWeykThree = {
             return new three.AxesHelper(len);
         }
     },
-    'TJSグリッドヘルパ作成': {
+    'TJSグリッドヘルパ作成': { // @GridHelperを作成して返す // @TJSぐりっどへるぱさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1917,7 +1917,7 @@ const PluginWeykThree = {
             return new three.GridHelper(size, divisions, colorCenterLine, colorGrid);
         }
     },
-    'TJS矢印ヘルパ作成': {
+    'TJS矢印ヘルパ作成': { // @起点とベクターを指定して矢印を用事するArrowHelperを作成して返す // @TJSやじるしへるぱさくせい
         type: 'func',
         josi: [['の']],
         pure: true,
@@ -1933,7 +1933,7 @@ const PluginWeykThree = {
             return new three.ArrowHelper(dir, origin, len, color);
         }
     },
-    'TJS矢印方向設定': {
+    'TJS矢印方向設定': { // @矢印ヘルパの方向を設定する // @TJSやじるしほうこうせってい
         type: 'func',
         josi: [['に'], ['を']],
         pure: true,
@@ -1943,7 +1943,7 @@ const PluginWeykThree = {
         },
         return_none: true
     },
-    'TJSスケルトン付複製': {
+    'TJSスケルトン付複製': { // @SkeletonUtilの機能でObject3Dをボーン込みで複製して返す // @TJSすけるとんつきふくせい
         type: 'func',
         josi: [['の', 'を', 'から']],
         pure: true,

@@ -8,441 +8,106 @@
 ### URL=https://github.com/weyk/nadesiko3-turtle-smooth
 ### 種類=js
 ### タグ=
-### 更新日時=2024-06-24 21:33:42
+### 更新日時=2025-04-19 22:40:48
 ###
 
 /**
  * smooth Turtle Graphics for Web browser (nadesiko3)
  * plugin_turtle_promise.ts
  */
-// import { turtleImage, elephantImage, pandaImage } from 'nadesiko3/src/plugin_turtle_images.mjs'
 const turtleImageURL = 'https://n3s.nadesi.com/image.php?f=64.png';
 const elephantImageURL = '';
 const pandaImageURL = '';
 const cancerImageURL = 'https://n3s.nadesi.com/image.php?f=533.png';
 const ebiImageURL = '';
 const sharkImageURL = '';
-class DrawCanvasEventArgs {
-    constructor(id, cmd, params) {
-        this.id = id;
-        this.cmd = cmd;
-        this.params = params;
-    }
-}
-function isCmdStatic(c) {
-    return c.cmd !== undefined && c.cmdAlias !== undefined;
-}
-function isParseStatic(c) {
-    return typeof c.parse === 'function';
-}
-class CommandBase {
-    get cmd() {
-        const c = this.constructor;
-        if (isCmdStatic(c)) {
-            return c.cmd;
-        }
-        return undefined;
-    }
-    get cmdAlias() {
-        const c = this.constructor;
-        if (isCmdStatic(c)) {
-            return c.cmdAlias;
-        }
-        return undefined;
-    }
-    parse(ca) {
-        const c = this.constructor;
-        if (isParseStatic(c)) {
-            return c.parse(ca);
-        }
-        return null;
-    }
-}
-class CommandSetVisible extends CommandBase {
-    constructor(v) {
-        super();
-        this.visible = !!v;
-    }
-    static parse(ca) {
-        return new CommandSetVisible(ca[1]);
-    }
-}
-CommandSetVisible.cmd = 'visible';
-CommandSetVisible.cmdAlias = [];
-class CommandDrawText extends CommandBase {
-    constructor(text) {
-        super();
-        this.text = text;
-    }
-    static parse(ca) {
-        return new CommandDrawText(ca[1]);
-    }
-}
-CommandDrawText.cmd = 'text';
-CommandDrawText.cmdAlias = [];
-class CommandPath extends CommandBase {
-    constructor(pathCmd) {
-        super();
-        this.pathCmd = pathCmd;
-    }
-    static parse(ca) {
-        const cmdIndex = ca[0] === 'path' ? 1 : 0;
-        const cmd = ca[cmdIndex];
-        if (cmd === 'begin' || cmd === 'close') {
-            return new CommandPath(cmd);
-        }
-        return null;
-    }
-}
-CommandPath.cmd = 'path';
-CommandPath.cmdAlias = ['begin', 'close'];
-class CommandRaw extends CommandBase {
-    constructor(rawCmd) {
-        super();
-        this.rawCmd = rawCmd;
-    }
-    static parse(ca) {
-        const cmdIndex = ca[0] === 'raw' ? 1 : 0;
-        const cmd = ca[cmdIndex];
-        if (cmd === 'stroke' || cmd === 'fill') {
-            return new CommandRaw(cmd);
-        }
-        return null;
-    }
-}
-CommandRaw.cmd = 'raw';
-CommandRaw.cmdAlias = ['stroke', 'fill'];
-class CommandSetStyle extends CommandBase {
-    constructor(name, value) {
-        super();
-        this.name = name;
-        this.value = value;
-    }
-    static parse(ca) {
-        const cmdIndex = ca[0] === 'style' ? 1 : 0;
-        const cmd = ca[cmdIndex];
-        const value = ca[cmdIndex + 1];
-        if (cmd === 'fillStyle') {
-            return new CommandSetStyle('fillStyle', value);
-        }
-        else if (cmd === 'strokeStyle') {
-            return new CommandSetStyle('strokeStyle', value);
-        }
-        else if (cmd === 'lineWidth' || cmd === 'size') {
-            return new CommandSetStyle('lineWidth', value);
-        }
-        else if (cmd === 'font' || cmd === 'textset') {
-            return new CommandSetStyle('font', value);
-        }
-        else if (cmd === 'penDown' || cmd === 'penOn') {
-            return new CommandSetStyle('font', value);
-        }
-        return null;
-    }
-}
-CommandSetStyle.cmd = 'style';
-CommandSetStyle.cmdAlias = ['fillStyle', 'strokeStyle', 'lineWidth', 'font', 'penDown', 'size', 'textset', 'penOn'];
-class CommandSetTurtleImage extends CommandBase {
-    constructor(url) {
-        super();
-        this.url = url;
-    }
-    static parse(ca) {
-        return new CommandSetTurtleImage(ca[1]);
-    }
-}
-CommandSetTurtleImage.cmd = 'changemodel';
-CommandSetTurtleImage.cmdAlias = [];
-class CommandCurve extends CommandBase {
-    constructor(r, deg, fb, lr) {
-        super();
-        this.r = r;
-        this.deg = deg;
-        this.fb = fb;
-        this.lr = lr;
-    }
-    static parse(ca) {
-        let r = null;
-        let deg = null;
-        let fb = null;
-        let lr = null;
-        for (const p of ca) {
-            if (p === 'curve') ;
-            else if (p === 'l' || p === 'left') {
-                lr = 'l';
-            }
-            else if (p === 'r' || p === 'right') {
-                lr = 'r';
-            }
-            else if (p === 'f' || p === 'forward') {
-                fb = 'f';
-            }
-            else if (p === 'b' || p === 'backward' || p === 'back') {
-                fb = 'b';
-            }
-            else {
-                if (r === null) {
-                    r = parseFloat(p);
-                }
-                else if (deg === null) {
-                    deg = parseFloat(p);
-                }
-            }
-        }
-        if (fb === null) {
-            fb = 'f';
-        }
-        if (r === null || deg === null || lr === null) {
-            return null;
-        }
-        return new CommandCurve(r, deg, fb, lr);
-    }
-}
-CommandCurve.cmd = 'curve';
-CommandCurve.cmdAlias = [];
-class CommandSetMoveSpeed extends CommandBase {
-    constructor(spd) {
-        super();
-        this.spd = spd;
-    }
-    static parse(ca) {
-        return new CommandSetMoveSpeed(parseFloat(ca[1]));
-    }
-}
-CommandSetMoveSpeed.cmd = 'spdM';
-CommandSetMoveSpeed.cmdAlias = [];
-class CommandSetRotateSpeed extends CommandBase {
-    constructor(spd) {
-        super();
-        this.spd = spd;
-    }
-    static parse(ca) {
-        return new CommandSetRotateSpeed(parseFloat(ca[1]));
-    }
-}
-CommandSetRotateSpeed.cmd = 'spdR';
-CommandSetRotateSpeed.cmdAlias = [];
-class CommandMove extends CommandBase {
-    constructor(p, direct) {
-        super();
-        this.p = p;
-        this.direct = !!direct;
-    }
-    static parse(ca) {
-        return new CommandMove([parseFloat(ca[1]), parseFloat(ca[2])], false);
-    }
-}
-CommandMove.cmd = 'mv';
-CommandMove.cmdAlias = [];
-class CommandAngle extends CommandBase {
-    constructor(deg, direct) {
-        super();
-        this.deg = deg;
-        this.direct = !!direct;
-    }
-    static parse(ca) {
-        return new CommandAngle(parseFloat(ca[1]), false);
-    }
-}
-CommandAngle.cmd = 'angle';
-CommandAngle.cmdAlias = [];
-class CommandWalk extends CommandBase {
-    constructor(len, direction) {
-        super();
-        this.len = len;
-        this.direction = direction;
-    }
-    static parse(ca) {
-        if (ca[0] === 'fd') {
-            const cmd = ca[2];
-            const value = parseFloat(ca[1]);
-            switch (cmd) {
-                case 'f':
-                case '1':
-                    return new CommandWalk(value, 'f');
-                case 'b':
-                case '-1':
-                    return new CommandWalk(value, 'b');
-                case 'l':
-                    return new CommandWalk(value, 'l');
-                case 'r':
-                    return new CommandWalk(value, 'r');
-            }
-        }
-        else {
-            const cmd = ca[0];
-            const value = parseFloat(ca[1]);
-            if (cmd === 'forward') {
-                return new CommandWalk(value, 'f');
-            }
-            else if (cmd === 'backward' || cmd === 'back') {
-                return new CommandWalk(value, 'b');
-            }
-            else if (cmd === 'left') {
-                return new CommandWalk(value, 'l');
-            }
-            else if (cmd === 'right') {
-                return new CommandWalk(value, 'r');
-            }
-        }
-        return null;
-    }
-}
-CommandWalk.cmd = 'fd';
-CommandWalk.cmdAlias = ['forward', 'back', 'backward', 'left', 'right'];
-class CommandRotate extends CommandBase {
-    constructor(deg, lr) {
-        super();
-        this.deg = deg;
-        this.lr = lr;
-    }
-    static parse(ca) {
-        if (ca[0] === 'rot' || ca[0] === 'rotate') {
-            const cmd = ca[2];
-            const value = parseFloat(ca[1]);
-            switch (cmd) {
-                case 'r':
-                case '1':
-                    return new CommandRotate(value, 'r');
-                case 'l':
-                case '-1':
-                    return new CommandRotate(value, 'l');
-            }
-        }
-        else {
-            const cmd = ca[0];
-            const value = parseFloat(ca[1]);
-            if (cmd === 'rotR' || cmd === 'rotateR') {
-                return new CommandRotate(value, 'r');
-            }
-            else if (cmd === 'rptL' || cmd === 'roteteL') {
-                return new CommandRotate(value, 'l');
-            }
-        }
-        return null;
-    }
-}
-CommandRotate.cmd = 'rot';
-CommandRotate.cmdAlias = ['rotR', 'rotL', 'rotate', 'rotateR', 'rotateL'];
-class CommandJump extends CommandBase {
-    constructor(p) {
-        super();
-        this.p = p;
-    }
-    static parse(ca) {
-        return new CommandJump([parseFloat(ca[1]), parseFloat(ca[2])]);
-    }
-}
-CommandJump.cmd = 'xy';
-CommandJump.cmdAlias = ['warp', 'jump'];
-class CommandFactory {
-    constructor() {
-        this.commands = [];
-        this.cmds = new Map();
-    }
-    regist(command) {
-        this.commands.push(command);
-        const cmd = command;
-        if (isCmdStatic(cmd)) {
-            this.cmds.set(cmd.cmd, command);
-            for (const alias of cmd.cmdAlias) {
-                this.cmds.set(alias, command);
-            }
-        }
-    }
-    initRegist() {
-        const commandList = [
-            CommandMove,
-            CommandWalk,
-            CommandRotate,
-            CommandJump,
-            CommandAngle,
-            CommandRaw,
-            CommandPath,
-            CommandDrawText,
-            CommandSetStyle,
-            CommandSetVisible,
-            CommandSetTurtleImage,
-            CommandCurve,
-            CommandSetMoveSpeed,
-            CommandSetRotateSpeed
-        ];
-        for (const command of commandList) {
-            this.regist(command);
-        }
-    }
-    parse(s) {
-        let c = s;
-        c = c.replace(/^([a-zA-Z_]+)\s*(\d+)/, '$1,$2');
-        c = c.replace(/^([a-zA-Z_]+)\s*=/, '$1,');
-        const ca = c.split(/\s*,\s*/);
-        const cmdCon = this.cmds.get(ca[0]);
-        let command = null;
-        if (isParseStatic(cmdCon)) {
-            command = cmdCon.parse(ca);
-        }
-        return command;
-    }
-}
-class Job {
-    constructor(cmd, resolve, reject) {
-        this.resolve = resolve;
-        this.reject = reject;
-        this.command = cmd;
-    }
-}
-class AnimationJobMove {
-    constructor(len, dir) {
-        this.cmd = 'move';
-        this.len = len;
-        this.dir = dir;
-    }
-}
-class AnimationJobRotate {
-    constructor(deg, lr) {
-        this.cmd = 'rotate';
-        this.deg = deg;
-        this.lr = lr;
-    }
-}
-class AnimationJobCurve {
-    constructor(r, deg, fb, lr) {
-        this.cmd = 'curve';
-        this.r = r;
-        this.deg = deg;
-        this.fb = fb;
-        this.lr = lr;
-    }
-}
-const TypedTurtleSmoothEventTarget = EventTarget;
-class TurtleSmooth extends TypedTurtleSmoothEventTarget {
-    constructor(id) {
-        super();
-        this.id = id;
-        this.img = null;
-        this.canvas = null;
-        this.ctx = null;
-        this.type = 'カニ';
-        this.dir = 270; // 上向き
-        this.iw = 32;
-        this.ih = 32;
-        this.cw = this.iw * 1.5;
-        this.ch = this.ih * 1.5;
-        this.x = 0;
-        this.y = 0;
-        this.jobStep = 'fetchJob';
-        this.currentJob = null;
-        this.animationJobs = [];
-        this.animationJob = null;
-        this.spdRotate = 15 / 100;
-        this.spdMove = 10 / 100;
-        this.f_update = true;
-        this.flagLoaded = false;
-        this.f_visible = true;
+
+let Runner$1 = class Runner {
+    constructor(tt) {
+        this.tt = tt;
         this.jobs = [];
-        this.jobWait = 0;
+        this.currentJob = null;
+        this.jobStep = 'fetch';
     }
-    clear() {
+    reset() {
+        this.jobs = [];
+        this.currentJob = null;
+        this.jobStep = 'fetch';
+    }
+    add(jobs) {
+        this.jobs.push(...jobs);
+    }
+    hasJob() {
+        return this.jobs.length > 0 || this.currentJob !== null || this.jobStep !== 'fetch';
+    }
+    run(time, immediateRunAction) {
+        while ((time > 0 || immediateRunAction) && this.hasJob()) {
+            switch (this.jobStep) {
+                case 'fetch':
+                    this.fetch();
+                    break;
+                case 'setup':
+                    this.setup();
+                    break;
+                case 'tick':
+                    time = this.tick(time, immediateRunAction);
+                    break;
+                case 'end':
+                    time = this.end(time);
+                    break;
+            }
+        }
+        return time;
+    }
+    fetch() {
+        // 処理中のJOBは無いので次のJOBを取得して処理に着手する
+        this.currentJob = this.jobs.shift() || null;
+        this.jobStep = this.currentJob !== null ? 'setup' : 'fetch';
+    }
+    setup() {
+        if (!this.currentJob) {
+            this.jobStep = 'fetch';
+            return;
+        }
+        this.currentJob.setup(this.tt);
+        this.jobStep = 'tick';
+    }
+    tick(time, immediateRunAction) {
+        if (!this.currentJob) {
+            this.jobStep = 'fetch';
+            return time;
+        }
+        if (immediateRunAction) {
+            this.jobStep = 'end';
+            return time;
+        }
+        const remainTime = this.currentJob.tick(this.tt, time);
+        if (remainTime > 0) {
+            this.jobStep = 'end';
+        }
+        return remainTime;
+    }
+    end(time) {
+        if (!this.currentJob) {
+            this.jobStep = 'fetch';
+            return time;
+        }
+        const remainTime = this.currentJob.end(this.tt, time);
+        this.jobStep = 'fetch';
+        this.currentJob = null;
+        return remainTime;
+    }
+};
+
+class Runner {
+    constructor(tt) {
+        this.tt = tt;
+        this.jobs = [];
+        this.jobStep = 'fetch';
+        this.currentJob = null;
+        this.animationRunner = new Runner$1(tt);
+    }
+    reset() {
         // 未実行の全JOBに対してresolve(1)を呼び出す。
         for (const job of this.jobs) {
             const resolve = job.resolve;
@@ -452,7 +117,118 @@ class TurtleSmooth extends TypedTurtleSmoothEventTarget {
         }
         this.jobs = []; // ジョブをクリア
         this.currentJob = null;
-        this.animationJob = null;
+        this.jobStep = 'fetch';
+    }
+    add(command) {
+        const promise = command.getPromise();
+        this.jobs.push(command);
+        return promise;
+    }
+    hasJob() {
+        return this.jobs.length > 0 || this.currentJob !== null || this.jobStep !== 'fetch';
+    }
+    run(time, waitTime, immediateRun, immediateRunAction) {
+        while (((immediateRun && immediateRunAction) || time > 0) && this.hasJob()) {
+            switch (this.jobStep) {
+                case 'fetch':
+                    this.fetch();
+                    break;
+                case 'setup':
+                    this.setup(waitTime, immediateRun, immediateRunAction);
+                    break;
+                case 'tick':
+                    time = this.tick(time, immediateRun, immediateRunAction);
+                    break;
+                case 'end':
+                    time = this.end(time);
+                    break;
+            }
+        }
+        return time;
+    }
+    fetch() {
+        // 処理中のJOBは無いので次のJOBを取得して処理に着手する
+        this.currentJob = this.jobs.shift() || null;
+        this.jobStep = this.currentJob !== null ? 'setup' : 'fetch';
+    }
+    setup(waitTime, immediateRun, immediateRunAction) {
+        if (!this.currentJob) {
+            this.jobStep = 'fetch';
+            return;
+        }
+        if (!immediateRunAction && this.currentJob.useAnimation(this.tt)) {
+            this.animationRunner.add(this.currentJob.generateAnimationJob(this.tt));
+        }
+        else {
+            this.currentJob.setup(this.tt, waitTime, immediateRun);
+        }
+        this.jobStep = 'tick';
+    }
+    tick(time, immediateRun, immediateRunAction) {
+        if (!this.currentJob) {
+            this.jobStep = 'fetch';
+            return time;
+        }
+        let remainTime;
+        if (this.animationRunner.hasJob()) {
+            remainTime = this.animationRunner.run(time, immediateRunAction);
+            if (!this.animationRunner.hasJob()) {
+                this.jobStep = 'end';
+            }
+        }
+        else {
+            remainTime = this.currentJob.tick(this.tt, time, immediateRun);
+            if (remainTime > 0 || immediateRun) {
+                this.jobStep = 'end';
+            }
+        }
+        return remainTime;
+    }
+    end(time) {
+        if (!this.currentJob) {
+            this.jobStep = 'fetch';
+            return time;
+        }
+        const remainTime = this.currentJob.end(this.tt, time);
+        this.jobStep = 'fetch';
+        this.currentJob = null;
+        return remainTime;
+    }
+}
+
+class DrawCanvasEventArgs {
+    constructor(id, cmd, params) {
+        this.id = id;
+        this.cmd = cmd;
+        this.params = params;
+    }
+}
+const TypedTurtleSmoothEventTarget = EventTarget;
+class TurtleSmooth extends TypedTurtleSmoothEventTarget {
+    constructor(id, soul) {
+        super();
+        this.id = id;
+        this.img = null;
+        this.canvas = null;
+        this.soul = soul;
+        this.ctx = null;
+        this.dir = 270; // 上向き
+        this.iw = 32;
+        this.ih = 32;
+        this.cw = this.iw * 1.5;
+        this.ch = this.ih * 1.5;
+        this.x = 0;
+        this.y = 0;
+        this.jobRunner = new Runner(this);
+        this.spdRotate = 15 / 100;
+        this.spdMove = 10 / 100;
+        this.f_update = true;
+        this.flagLoaded = false;
+        this.f_visible = true;
+        this.jobWait = 0;
+    }
+    clear() {
+        this.jobRunner.reset();
         if (this.ctx) {
             this.ctx = null;
         }
@@ -538,472 +314,21 @@ class TurtleSmooth extends TypedTurtleSmoothEventTarget {
             this.ctx.drawImage(this.img, this.cw - this.iw, this.ch - this.ih);
         }
     }
-    jobAction(job) {
-        const cmd = job.command;
-        if (cmd instanceof CommandJump) {
-            // 起点を移動する
-            this.x = cmd.p[0];
-            this.y = cmd.p[1];
-        }
-        else if (cmd instanceof CommandMove) {
-            // 線を引く
-            this.raiseDrawCanvas('line', [[this.x, this.y], cmd.p]);
-            // カメの角度を変更
-            const mvRad = Math.atan2(cmd.p[1] - this.y, cmd.p[0] - this.x);
-            this.dir = mvRad * 57.29577951308232;
-            this.f_update = true;
-            // 実際に位置を移動
-            this.x = cmd.p[0];
-            this.y = cmd.p[1];
-        }
-        else if (cmd instanceof CommandAngle) {
-            this.dir = ((cmd.deg - 90 % 360) + 360) % 360;
-            this.f_update = true;
-        }
-        else if (cmd instanceof CommandWalk) {
-            const fdv = cmd.len;
-            const dir = cmd.direction;
-            const dirDeg = { 'l': 270, 'r': 90, 'f': 0, 'b': 180 };
-            const deg = (this.dir + dirDeg[dir]) % 360;
-            const rad = deg * 0.017453292519943295;
-            const x2 = this.x + Math.cos(rad) * fdv;
-            const y2 = this.y + Math.sin(rad) * fdv;
-            this.raiseDrawCanvas('line', [[this.x, this.y], [x2, y2]]);
-            this.x = x2;
-            this.y = y2;
-        }
-        else if (cmd instanceof CommandCurve) {
-            const r = cmd.r;
-            const deg = cmd.deg * (cmd.fb === 'b' ? -1 : 1);
-            const dirDirection = cmd.lr === 'l' ? -1 : 1;
-            const degDirection = deg < 0 ? -1 : 1;
-            const dir = (this.dir + 90 * dirDirection + 360) % 360;
-            const rad = dir * 0.017453292519943295;
-            const ox = this.x + Math.cos(rad) * r;
-            const oy = this.y + Math.sin(rad) * r;
-            const deg1 = (dir + 180) % 360;
-            const deg2 = (deg1 + (deg * dirDirection) % 360 + 360) % 360;
-            const rad2 = deg2 * 0.017453292519943295;
-            this.raiseDrawCanvas('arc', [[ox, oy], r, deg1, deg2, degDirection * dirDirection]);
-            this.dir = (this.dir + (deg * dirDirection) % 360 + 360) % 360;
-            this.x = ox + Math.cos(rad2) * r;
-            this.y = oy + Math.sin(rad2) * r;
-            this.f_update = true;
-        }
-        else if (cmd instanceof CommandRotate) {
-            const deg = cmd.deg * (cmd.lr === 'l' ? -1 : 1);
-            this.dir = (this.dir + (deg % 360) + 360) % 360;
-            this.f_update = true;
-        }
-        else if (cmd instanceof CommandSetVisible) {
-            this.f_visible = cmd.visible;
-            this.f_update = true;
-        }
-        else if (cmd instanceof CommandSetMoveSpeed) {
-            this.spdMove = cmd.spd;
-        }
-        else if (cmd instanceof CommandSetRotateSpeed) {
-            this.spdRotate = cmd.spd;
-        }
-        else if (cmd instanceof CommandSetStyle) {
-            this.raiseDrawCanvas(cmd.name, [cmd.value]);
-        }
-        else if (cmd instanceof CommandRaw) {
-            this.raiseDrawCanvas(cmd.rawCmd, []);
-        }
-        else if (cmd instanceof CommandPath) {
-            if (cmd.pathCmd === 'begin') {
-                this.raiseDrawCanvas('beginPath', [this.x, this.y]);
-            }
-            else {
-                this.raiseDrawCanvas('closePath', []);
-            }
-        }
-        else if (cmd instanceof CommandDrawText) {
-            this.raiseDrawCanvas('fillText', [[this.x, this.y], cmd.text]);
-        }
+    addCommand(command) {
+        this.soul.walkValidation(command);
+        return this.jobRunner.add(command);
     }
-    runJob(time, defaultWait, waitForTurteImage) {
+    runJob(time, defaultWait, immediateRunAction, waitForTurteImage) {
         if (!this.flagLoaded && waitForTurteImage) {
             // console.log('[TURTLE] waiting ...')
             return true;
         }
-        const immediateRun = defaultWait === 0;
+        const immediateRun = defaultWait <= 0;
         // 以下の２つの条件を満たしている間ループする。
         // 即時実行であるか、即時実行ではない場合は経過時間の残りがあること。
         // 未処理のJOBが残っているか、処理中のJOBがあること。
-        while ((time > 0 || immediateRun) && (this.jobs.length > 0 || this.jobStep !== 'fetchJob')) {
-            switch (this.jobStep) {
-                case 'fetchJob':
-                    // 処理中のJOBは無いので次のJOBを取得して処理に着手する
-                    this.currentJob = this.jobs.shift() || null;
-                    this.jobStep = this.currentJob !== null ? 'preExecute' : 'fetchJob';
-                    break;
-                case 'preExecute': {
-                    const job = this.currentJob;
-                    if (job === null) {
-                        this.jobStep = 'fetchJob';
-                        break;
-                    }
-                    const cmd = job.command;
-                    this.jobWait = Math.floor(defaultWait / 2);
-                    this.jobStep = 'beforeExecute';
-                    if (cmd instanceof CommandSetTurtleImage) {
-                        if (this.img) {
-                            this.flagLoaded = false;
-                            this.img.src = cmd.url;
-                        }
-                    }
-                    else {
-                        if (!immediateRun) {
-                            if (cmd instanceof CommandMove && !cmd.direct && (this.spdMove > 0 || this.spdRotate > 0)) {
-                                // カメの角度を算出
-                                const dx = cmd.p[0] - this.x;
-                                const dy = cmd.p[1] - this.y;
-                                const angleRad = Math.atan2(dy, dx);
-                                const angle = angleRad * 57.29577951308232;
-                                const targetdir = (angle + 360) % 360;
-                                let deg = (targetdir - this.dir + 360) % 360;
-                                if (deg > 180) {
-                                    deg = deg - 360;
-                                }
-                                const dir = deg < 0 ? 'l' : 'r';
-                                // カメの移動距離を算出
-                                const fdv = Math.sqrt(dx * dx + dy * dy);
-                                this.animationJobs.push(new AnimationJobMove(fdv, 'f'));
-                                this.animationJobs.push(new AnimationJobRotate(Math.abs(deg), dir));
-                                this.jobStep = 'animation';
-                                this.jobWait = 0;
-                            }
-                            else if (cmd instanceof CommandWalk && this.spdMove > 0) {
-                                let fdv = cmd.len;
-                                let dir = cmd.direction;
-                                if (fdv < 0) {
-                                    const dirSwap = { 'f': 'b', 'b': 'f', 'l': 'r', 'r': 'l' };
-                                    dir = dirSwap[dir];
-                                    fdv = -fdv;
-                                }
-                                this.animationJobs.push(new AnimationJobMove(fdv, dir));
-                                this.jobStep = 'animation';
-                                this.jobWait = 0;
-                            }
-                            else if (cmd instanceof CommandAngle && !cmd.direct && this.spdRotate > 0) {
-                                const targetdir = (((cmd.deg - 90) % 360) + 360) % 360;
-                                let deg = (targetdir - this.dir + 360) % 360;
-                                if (deg > 180) {
-                                    deg = deg - 360;
-                                }
-                                const dir = deg < 0 ? 'l' : 'r';
-                                this.animationJobs.push(new AnimationJobRotate(Math.abs(deg), dir));
-                                this.jobStep = 'animation';
-                                this.jobWait = 0;
-                            }
-                            else if (cmd instanceof CommandRotate && this.spdRotate > 0) {
-                                const deg = cmd.deg * (cmd.lr === 'l' ? -1 : 1);
-                                const dir = deg < 0 ? 'l' : 'r';
-                                this.animationJobs.push(new AnimationJobRotate(Math.abs(deg), dir));
-                                this.jobStep = 'animation';
-                                this.jobWait = 0;
-                            }
-                            else if (cmd instanceof CommandCurve && this.spdMove > 0) {
-                                let deg = cmd.deg;
-                                let fb = cmd.fb;
-                                if (deg < 0) {
-                                    deg = -deg;
-                                    fb = fb === 'f' ? 'b' : 'f';
-                                }
-                                this.animationJobs.push(new AnimationJobCurve(cmd.r, deg, fb, cmd.lr));
-                                this.jobStep = 'animation';
-                                this.jobWait = 0;
-                            }
-                        }
-                    }
-                    break;
-                }
-                case 'beforeExecute':
-                    if (time >= this.jobWait || immediateRun) {
-                        // ステップ待ち時間に到達したか、即時実行が有効となっている。
-                        // 経過時間からステップ待ち時間を減算する。
-                        time -= this.jobWait;
-                        this.jobWait = 0;
-                        this.jobStep = 'execute';
-                    }
-                    else {
-                        // ステップ待ち時間に到達していない。
-                        // 残りのステップ待ち時間から経過時間を減らして次へ。
-                        this.jobWait -= time;
-                        time = 0;
-                    }
-                    break;
-                case 'execute':
-                    if (this.currentJob !== null) {
-                        this.jobAction(this.currentJob);
-                    }
-                    this.jobWait = Math.ceil(defaultWait / 2);
-                    this.jobStep = 'afterExecute';
-                    break;
-                case 'afterExecute':
-                    if (time >= this.jobWait || immediateRun) {
-                        // ステップ待ち時間に到達したか、即時実行が有効となっている。
-                        // 経過時間からステップ待ち時間を減算する。
-                        time -= this.jobWait;
-                        this.jobWait = 0;
-                        // ステップ完了処理があるなら呼び出す。
-                        // if (tt.flagLoaded) { this.drawTurtle(tt.id) }
-                        if (this.currentJob?.resolve != null) {
-                            this.currentJob.resolve(0);
-                        }
-                        this.jobStep = 'fetchJob';
-                        this.currentJob = null;
-                    }
-                    else {
-                        // ステップ待ち時間に到達していない。
-                        // 残りのステップ待ち時間から経過時間を減らして次へ。
-                        this.jobWait -= time;
-                        time = 0;
-                    }
-                    break;
-                case 'animation': {
-                    const animJob = this.animationJobs.shift();
-                    if (animJob === undefined) {
-                        this.jobStep = 'afterAnimation';
-                        break;
-                    }
-                    const animCmd = animJob.cmd;
-                    let len;
-                    let r;
-                    let p;
-                    let lr;
-                    let dir;
-                    if (animJob instanceof AnimationJobMove) {
-                        len = animJob.len;
-                        p = [this.x, this.y];
-                        dir = animJob.dir;
-                    }
-                    else if (animJob instanceof AnimationJobRotate) {
-                        len = animJob.deg;
-                        p = [this.x, this.y];
-                    }
-                    else {
-                        len = animJob.deg;
-                        r = animJob.r;
-                        lr = animJob.lr;
-                        const direction = lr === 'l' ? -1 : 1;
-                        const dir = (this.dir + 90 * direction + 360) % 360;
-                        const rad = dir * 0.017453292519943295;
-                        const dx = this.x + Math.cos(rad) * r;
-                        const dy = this.y + Math.sin(rad) * r;
-                        p = [dx, dy];
-                    }
-                    this.animationJob = {
-                        type: animCmd,
-                        origin: p,
-                        dir: this.dir,
-                        targetLen: len,
-                        targetR: r,
-                        targetLr: lr,
-                        targetDir: dir,
-                        remain: Math.abs(len)
-                    };
-                    if (animCmd === 'rotate' && this.spdRotate <= 0) {
-                        this.jobStep = 'animationAdjust';
-                    }
-                    else if ((animCmd === 'move' || animCmd === 'curve') && this.spdMove <= 0) {
-                        this.jobStep = 'animationAdjust';
-                    }
-                    else {
-                        this.jobStep = 'animationStep';
-                    }
-                    break;
-                }
-                case 'animationStep':
-                    if (this.animationJob === null) {
-                        this.jobStep = 'animation';
-                        break;
-                    }
-                    if (this.animationJob.type === 'rotate') {
-                        const delta = time * this.spdRotate;
-                        if (delta < this.animationJob.remain) {
-                            const direction = this.animationJob.targetLen < 0 ? -1 : 1;
-                            this.animationJob.remain -= delta;
-                            this.dir = (this.dir + (delta * direction % 360) + 360) % 360;
-                            time = 0;
-                            this.f_update = true;
-                        }
-                        else {
-                            this.jobStep = 'animationAdjust';
-                        }
-                    }
-                    else if (this.animationJob.type === 'curve') {
-                        const deltaLen = time * this.spdMove;
-                        const r = this.animationJob.targetR;
-                        const delta = deltaLen / (r * 6.283185307179586) * 360;
-                        if (delta < this.animationJob.remain) {
-                            const lr = this.animationJob.targetLr;
-                            const degDirection = this.animationJob.targetLen < 0 ? -1 : 1;
-                            const dirDirection = lr === 'l' ? -1 : 1;
-                            this.animationJob.remain -= delta;
-                            this.dir = (this.dir + (delta * degDirection * dirDirection % 360) + 360) % 360;
-                            const dir = (this.dir - 90 * dirDirection + 360) % 360;
-                            const rad = dir * 0.017453292519943295;
-                            const x2 = this.animationJob.origin[0] + Math.cos(rad) * r;
-                            const y2 = this.animationJob.origin[1] + Math.sin(rad) * r;
-                            this.raiseDrawCanvas('line', [[this.x, this.y], [x2, y2]]);
-                            this.x = x2;
-                            this.y = y2;
-                            time = 0;
-                            this.f_update = true;
-                        }
-                        else {
-                            this.jobStep = 'animationAdjust';
-                        }
-                    }
-                    else if (this.animationJob.type === 'move') {
-                        const delta = time * this.spdMove;
-                        if (delta < this.animationJob.remain) {
-                            const dirDeg = { 'l': 270, 'r': 90, 'f': 0, 'b': 180 };
-                            const direction = this.animationJob.targetLen < 0 ? -1 : 1;
-                            this.animationJob.remain -= delta;
-                            const dir = this.dir + dirDeg[this.animationJob.targetDir];
-                            const rad = dir * 0.017453292519943295;
-                            const vp = delta * direction;
-                            const x2 = this.x + Math.cos(rad) * vp;
-                            const y2 = this.y + Math.sin(rad) * vp;
-                            this.raiseDrawCanvas('line', [[this.x, this.y], [x2, y2]]);
-                            this.x = x2;
-                            this.y = y2;
-                            time = 0;
-                        }
-                        else {
-                            this.jobStep = 'animationAdjust';
-                        }
-                    }
-                    break;
-                case 'animationAdjust':
-                    if (this.animationJob === null) {
-                        this.jobStep = 'animation';
-                        break;
-                    }
-                    if (this.animationJob.type === 'rotate') {
-                        if (this.spdRotate > 0) {
-                            time -= Math.floor(this.animationJob.remain / this.spdRotate);
-                        }
-                        this.animationJob.remain = 0;
-                        this.dir = (this.animationJob.dir + (this.animationJob.targetLen % 360) + 360) % 360;
-                    }
-                    else if (this.animationJob.type === 'curve') {
-                        const r = this.animationJob.targetR;
-                        if (this.spdMove > 0) {
-                            const deltaLen = this.animationJob.remain / 360 * (Math.abs(r) * 6.283185307179586);
-                            time -= Math.floor(deltaLen / this.spdRotate);
-                        }
-                        this.animationJob.remain = 0;
-                        const dirDirection = this.animationJob.targetLr === 'l' ? -1 : 1;
-                        const degDirection = this.animationJob.targetLen < 0 ? -1 : 1;
-                        const deg1 = (this.animationJob.dir - 90 * dirDirection + 180 + 360) % 360;
-                        this.dir = (this.animationJob.dir + (this.animationJob.targetLen * dirDirection) % 360 + 360) % 360;
-                        const dir = (this.dir - 90 * dirDirection + 360) % 360;
-                        const rad = dir * 0.017453292519943295;
-                        const ox = this.animationJob.origin[0];
-                        const oy = this.animationJob.origin[1];
-                        const x2 = ox + Math.cos(rad) * r;
-                        const y2 = oy + Math.sin(rad) * r;
-                        if (this.spdMove > 0) {
-                            this.raiseDrawCanvas('line', [[this.x, this.y], [x2, y2]]);
-                        }
-                        else {
-                            this.raiseDrawCanvas('arc', [[ox, oy], r, deg1, dir, degDirection * dirDirection]);
-                        }
-                        this.x = x2;
-                        this.y = y2;
-                        // console.log(`${this.x},${this.y},${this.dir} - ${this.animationJob.dir}`)
-                    }
-                    else if (this.animationJob.type === 'move') {
-                        if (this.spdMove > 0) {
-                            time -= Math.floor(this.animationJob.remain / this.spdMove);
-                        }
-                        this.animationJob.remain = 0;
-                        const dirDeg = { 'l': 270, 'r': 90, 'f': 0, 'b': 180 };
-                        const dir = this.dir + dirDeg[this.animationJob.targetDir];
-                        const rad = dir * 0.017453292519943295;
-                        const vp = this.animationJob.targetLen;
-                        const x2 = this.animationJob.origin[0] + Math.cos(rad) * vp;
-                        const y2 = this.animationJob.origin[1] + Math.sin(rad) * vp;
-                        this.raiseDrawCanvas('line', [[this.x, this.y], [x2, y2]]);
-                        this.x = x2;
-                        this.y = y2;
-                    }
-                    this.animationJob = null;
-                    this.jobStep = 'animation';
-                    break;
-                case 'afterAnimation':
-                    this.currentJob = null;
-                    this.jobStep = 'fetchJob';
-                    break;
-            }
-            // if (this.flagLoaded) { this.drawTurtle(tt.id) }
-        }
-        return (this.jobs.length > 0 || this.jobStep !== 'fetchJob');
-    }
-    typeValidation(cmd) {
-        switch (this.type) {
-            case 'カメ': {
-                if (cmd instanceof CommandWalk) {
-                    if (cmd.direction === 'r' || cmd.direction === 'l') {
-                        throw new Error(`${this.type}はその方向に進むことはできません`);
-                    }
-                }
-                break;
-            }
-            case 'カニ': {
-                if (cmd instanceof CommandWalk) {
-                    if (cmd.direction === 'f' || cmd.direction === 'b') {
-                        throw new Error(`${this.type}はその方向に進むことはできません`);
-                    }
-                }
-                if (cmd instanceof CommandCurve) {
-                    if (cmd.fb === 'f' || cmd.fb === 'b') {
-                        throw new Error(`${this.type}はその方向に進むことはできません`);
-                    }
-                }
-                break;
-            }
-            case 'エビ': {
-                if (cmd instanceof CommandWalk) {
-                    if (cmd.direction === 'f' || cmd.direction === 'r' || cmd.direction === 'l') {
-                        throw new Error(`${this.type}はその方向に進むことはできません`);
-                    }
-                }
-                if (cmd instanceof CommandCurve) {
-                    if (cmd.fb === 'f') {
-                        throw new Error(`${this.type}はその方向に進むことはできません`);
-                    }
-                }
-                break;
-            }
-            case 'サメ': {
-                if (cmd instanceof CommandWalk) {
-                    if (cmd.direction === 'b' || cmd.direction === 'r' || cmd.direction === 'l') {
-                        throw new Error(`${this.type}はその方向に進むことはできません`);
-                    }
-                }
-                if (cmd instanceof CommandRotate) {
-                    throw new Error(`${this.type}はその方法での方向転換はできません`);
-                }
-                if (cmd instanceof CommandAngle && !cmd.direct) {
-                    throw new Error(`${this.type}はその方法での方向転換はできません`);
-                }
-                if (cmd instanceof CommandMove && !cmd.direct) {
-                    throw new Error(`${this.type}はその方法での方向転換を含む移動はできません`);
-                }
-                if (cmd instanceof CommandCurve) {
-                    if (cmd.fb === 'b') {
-                        throw new Error(`${this.type}はその方向に進むことはできません`);
-                    }
-                }
-                break;
-            }
-        }
+        time = this.jobRunner.run(time, defaultWait, immediateRun, immediateRunAction);
+        return (this.jobRunner.hasJob());
     }
     raiseImageChangede() {
         const evt = new CustomEvent('imageChanged');
@@ -1015,6 +340,940 @@ class TurtleSmooth extends TypedTurtleSmoothEventTarget {
         this.dispatchEvent(evt);
     }
 }
+
+function isCmdStatic(c) {
+    return c.cmd !== undefined && c.cmdAlias !== undefined;
+}
+function isParseStatic(c) {
+    return typeof c.parse === 'function';
+}
+class CommandBase {
+    constructor() {
+        this.waitTime = 0;
+        this.actionTime = 0;
+        this.ran = false;
+        this.resolve = (result) => { };
+        this.reject = (err) => { throw err; };
+    }
+    get cmd() {
+        const c = this.constructor;
+        if (isCmdStatic(c)) {
+            return c.cmd;
+        }
+        return undefined;
+    }
+    get cmdAlias() {
+        const c = this.constructor;
+        if (isCmdStatic(c)) {
+            return c.cmdAlias;
+        }
+        return undefined;
+    }
+    getPromise() {
+        return new Promise((resolve, reject) => {
+            this.resolve = resolve;
+            this.reject = reject;
+        });
+    }
+    setup(tt, defaultWaitTime, immediateRun) {
+        this.actionTime = Math.floor(defaultWaitTime / 2);
+        this.waitTime = defaultWaitTime - this.actionTime;
+        this.ran = false;
+    }
+    tick(tt, time, immediateRun) {
+        if (this.actionTime > 0 || !this.ran) {
+            if (time < this.actionTime && !immediateRun) {
+                this.actionTime -= time;
+                time = 0;
+            }
+            else {
+                if (!immediateRun) {
+                    time -= this.actionTime;
+                }
+                this.action(tt);
+                this.ran = true;
+            }
+        }
+        else if (this.waitTime > 0) {
+            if (time < this.waitTime && !immediateRun) {
+                this.waitTime -= time;
+                time = 0;
+            }
+            else {
+                if (!immediateRun) {
+                    time -= this.waitTime;
+                }
+            }
+        }
+        return time;
+    }
+    end(tt, time) {
+        return time;
+    }
+    parse(ca) {
+        const c = this.constructor;
+        if (isParseStatic(c)) {
+            return c.parse(ca);
+        }
+        return null;
+    }
+    useAnimation(tt) {
+        return false;
+    }
+    generateAnimationJob(tt) {
+        return [];
+    }
+    action(tt) {
+        // noop
+    }
+}
+
+const LrOpposite = { 'l': 'r', 'r': 'l' };
+const DirOpposite = { 'l': 'r', 'r': 'l', 'f': 'b', 'b': 'f' };
+const LrToDeg = { 'l': -90, 'r': 90 };
+const DirToDeg = { 'l': 270, 'r': 90, 'f': 0, 'b': 180 };
+
+let Curve$1 = class Curve {
+    constructor(r, deg, dir, lr) {
+        if (deg < 0) {
+            deg = -deg;
+            dir = DirOpposite[dir];
+            lr = LrOpposite[lr];
+        }
+        this.cmd = 'curve';
+        this.r = r;
+        this.deg = deg;
+        this.dir = dir;
+        this.lr = lr;
+        this.centerPos = [0, 0];
+        this.originPos = [0, 0];
+        this.originDir = 0;
+        this.remain = 0;
+    }
+    setup(tt) {
+        const dir = (tt.dir + DirToDeg[this.dir] + LrToDeg[this.lr] + 360) % 360;
+        const rad = dir * 0.017453292519943295;
+        const cx = tt.x + Math.cos(rad) * this.r;
+        const cy = tt.y + Math.sin(rad) * this.r;
+        this.centerPos = [cx, cy];
+        this.originPos = [tt.x, tt.y];
+        this.originDir = tt.dir;
+        this.remain = this.deg;
+    }
+    tick(tt, time) {
+        const deltaLen = time * tt.spdMove;
+        const delta = deltaLen / (this.r * 6.283185307179586) * 360;
+        if (delta < this.remain) {
+            this.remain -= delta;
+            const clockWard = (this.lr === 'r') ? 1 : -1;
+            const deg1 = (tt.dir + DirToDeg[this.dir] - LrToDeg[this.lr] + 360) % 360;
+            tt.dir = (((tt.dir + delta * clockWard) % 360) + 360) % 360;
+            const dir = (tt.dir + DirToDeg[this.dir] - LrToDeg[this.lr] + 360) % 360;
+            const rad = dir * 0.017453292519943295;
+            const x2 = this.centerPos[0] + Math.cos(rad) * this.r;
+            const y2 = this.centerPos[1] + Math.sin(rad) * this.r;
+            // tt.raiseDrawCanvas('line', [[tt.x, tt.y], [x2, y2]])
+            tt.raiseDrawCanvas('arc', [this.centerPos, this.r, deg1, dir, clockWard]);
+            tt.x = x2;
+            tt.y = y2;
+            time = 0;
+            tt.f_update = true;
+        }
+        return time;
+    }
+    end(tt, time) {
+        if (tt.spdMove > 0) {
+            const deltaLen = this.remain / 360 * (this.r * 6.283185307179586);
+            time -= Math.floor(deltaLen / tt.spdMove);
+        }
+        this.remain = 0;
+        const clockWard = (this.lr === 'r') ? 1 : -1;
+        const deg1 = (tt.dir + DirToDeg[this.dir] - LrToDeg[this.lr] + 360) % 360;
+        tt.dir = (((this.originDir + this.deg * clockWard + 360) % 360) + 360) % 360;
+        const dir = (tt.dir + DirToDeg[this.dir] - LrToDeg[this.lr] + 360) % 360;
+        const rad = dir * 0.017453292519943295;
+        const ox = this.centerPos[0];
+        const oy = this.centerPos[1];
+        const x2 = ox + Math.cos(rad) * this.r;
+        const y2 = oy + Math.sin(rad) * this.r;
+        tt.raiseDrawCanvas('arc', [this.centerPos, this.r, deg1, dir, clockWard]);
+        tt.x = x2;
+        tt.y = y2;
+        // console.log(`${this.x},${this.y},${this.dir} - ${this.animationJob.dir}`)
+        return time;
+    }
+};
+
+let Move$1 = class Move {
+    constructor(len, dir) {
+        if (len < 0) {
+            len = -len;
+            dir = DirOpposite[dir];
+        }
+        this.cmd = 'move';
+        this.len = len;
+        this.dir = dir;
+        this.originPos = [0, 0];
+        this.remain = 0;
+    }
+    setup(tt) {
+        this.originPos = [tt.x, tt.y];
+        this.remain = Math.abs(this.len);
+    }
+    tick(tt, time) {
+        const delta = time * tt.spdMove;
+        if (delta < this.remain) {
+            const direction = this.len < 0 ? -1 : 1;
+            this.remain -= delta;
+            const dir = tt.dir + DirToDeg[this.dir];
+            const rad = dir * 0.017453292519943295;
+            const vp = delta * direction;
+            const x2 = tt.x + Math.cos(rad) * vp;
+            const y2 = tt.y + Math.sin(rad) * vp;
+            tt.raiseDrawCanvas('line', [[tt.x, tt.y], [x2, y2]]);
+            tt.x = x2;
+            tt.y = y2;
+            time = 0;
+        }
+        return time;
+    }
+    end(tt, time) {
+        if (tt.spdMove > 0) {
+            time -= Math.floor(this.remain / tt.spdMove);
+        }
+        this.remain = 0;
+        const dir = tt.dir + DirToDeg[this.dir];
+        const rad = dir * 0.017453292519943295;
+        const vp = this.len;
+        const x2 = this.originPos[0] + Math.cos(rad) * vp;
+        const y2 = this.originPos[1] + Math.sin(rad) * vp;
+        tt.raiseDrawCanvas('line', [[tt.x, tt.y], [x2, y2]]);
+        tt.x = x2;
+        tt.y = y2;
+        return time;
+    }
+};
+
+let Rotate$1 = class Rotate {
+    constructor(deg, lr) {
+        if (deg < 0) {
+            deg = -deg;
+            lr = LrOpposite[lr];
+        }
+        this.cmd = 'rotate';
+        this.deg = deg;
+        this.lr = lr;
+        this.originPos = [0, 0];
+        this.originDir = 0;
+        this.remain = 0;
+    }
+    setup(tt) {
+        this.originPos = [tt.x, tt.y];
+        this.originDir = tt.dir;
+        this.remain = this.deg;
+    }
+    tick(tt, time) {
+        const delta = time * tt.spdRotate;
+        if (delta < this.remain) {
+            const direction = this.lr === 'r' ? 1 : -1;
+            this.remain -= delta;
+            tt.dir = (tt.dir + (delta * direction % 360) + 360) % 360;
+            time = 0;
+            tt.f_update = true;
+        }
+        return time;
+    }
+    end(tt, time) {
+        if (tt.spdRotate > 0) {
+            time -= Math.floor(this.remain / tt.spdRotate);
+        }
+        this.remain = 0;
+        const direction = this.lr === 'r' ? 1 : -1;
+        tt.dir = (this.originDir + (this.deg * direction % 360) + 360) % 360;
+        return time;
+    }
+};
+
+class RotateToDir extends Rotate$1 {
+    constructor(angle) {
+        angle = ((angle % 360) + 360) % 360;
+        super(angle, 'r');
+        this.angle = angle;
+    }
+    setup(tt) {
+        let deg = (this.angle - tt.dir + 360) % 360;
+        if (deg > 180) {
+            deg = deg - 360;
+        }
+        const dir = deg < 0 ? 'l' : 'r';
+        this.deg = Math.abs(deg);
+        this.lr = dir;
+        this.originPos = [tt.x, tt.y];
+        this.originDir = tt.dir;
+        this.remain = Math.abs(this.deg);
+    }
+    tick(tt, time) {
+        const delta = time * tt.spdRotate;
+        if (delta < this.remain) {
+            const direction = this.lr === 'r' ? 1 : -1;
+            this.remain -= delta;
+            tt.dir = (tt.dir + (delta * direction % 360) + 360) % 360;
+            time = 0;
+            tt.f_update = true;
+        }
+        return time;
+    }
+    end(tt, time) {
+        if (tt.spdRotate > 0) {
+            time -= Math.floor(this.remain / tt.spdRotate);
+        }
+        this.remain = 0;
+        tt.dir = this.angle;
+        return time;
+    }
+}
+
+class Move extends CommandBase {
+    constructor(p, direct) {
+        super();
+        this.p = p;
+        this.direct = !!direct;
+    }
+    useAnimation(tt) {
+        return !this.direct && (tt.spdMove > 0 || tt.spdRotate > 0);
+    }
+    generateAnimationJob(tt) {
+        const dx = this.p[0] - tt.x;
+        const dy = this.p[1] - tt.y;
+        const angleRad = Math.atan2(dy, dx);
+        const angle = angleRad * 57.29577951308232;
+        const targetdir = (angle + 360) % 360;
+        let deg = (targetdir - tt.dir + 360) % 360;
+        if (deg > 180) {
+            deg = deg - 360;
+        }
+        const fd = tt.soul.getMoveDirection();
+        let lr;
+        let dir;
+        if (fd === 'lr') {
+            dir = deg < 0 ? 'l' : 'r';
+            deg = Math.abs(deg);
+            if (deg < 90) {
+                lr = dir === 'l' ? 'r' : 'l';
+                deg = 90 - deg;
+            }
+            else {
+                lr = dir;
+                deg = deg - 90;
+            }
+        }
+        else if (fd === 'b') {
+            lr = deg < 0 ? 'r' : 'l';
+            deg = 180 - Math.abs(deg);
+            dir = 'b';
+        }
+        else {
+            lr = deg < 0 ? 'l' : 'r';
+            deg = Math.abs(deg);
+            dir = 'f';
+        }
+        // カメの移動距離を算出
+        const fdv = Math.sqrt(dx * dx + dy * dy);
+        return [
+            new Rotate$1(deg, lr),
+            new Move$1(fdv, dir)
+        ];
+    }
+    static parse(ca) {
+        return new Move([parseFloat(ca[1]), parseFloat(ca[2])], false);
+    }
+    action(tt) {
+        // 線を引く
+        tt.raiseDrawCanvas('line', [[tt.x, tt.y], this.p]);
+        // カメの角度を変更
+        const mvRad = Math.atan2(this.p[1] - tt.y, this.p[0] - tt.x);
+        tt.dir = mvRad * 57.29577951308232;
+        tt.f_update = true;
+        // 実際に位置を移動
+        tt.x = this.p[0];
+        tt.y = this.p[1];
+    }
+}
+Move.cmd = 'mv';
+Move.cmdAlias = [];
+
+class Jump extends CommandBase {
+    constructor(p) {
+        super();
+        this.p = p;
+    }
+    static parse(ca) {
+        return new Jump([parseFloat(ca[1]), parseFloat(ca[2])]);
+    }
+    action(tt) {
+        // 起点を移動する
+        tt.x = this.p[0];
+        tt.y = this.p[1];
+    }
+}
+Jump.cmd = 'xy';
+Jump.cmdAlias = ['warp', 'jump'];
+
+class Angle extends CommandBase {
+    constructor(deg, direct) {
+        super();
+        this.deg = deg;
+        this.direct = !!direct;
+    }
+    useAnimation(tt) {
+        return !this.direct && tt.spdRotate > 0;
+    }
+    generateAnimationJob(tt) {
+        const targetdir = (((this.deg - 90) % 360) + 360) % 360;
+        // let deg = (targetdir - tt.dir + 360) % 360
+        // if (deg > 180) {
+        //     deg = deg - 360
+        // }
+        // const dir = deg < 0 ? 'l' : 'r'
+        return [new RotateToDir(targetdir)];
+    }
+    static parse(ca) {
+        return new Angle(parseFloat(ca[1]), false);
+    }
+    action(tt) {
+        tt.dir = ((this.deg - 90 % 360) + 360) % 360;
+        tt.f_update = true;
+    }
+}
+Angle.cmd = 'angle';
+Angle.cmdAlias = [];
+
+class Walk extends CommandBase {
+    constructor(len, direction) {
+        super();
+        this.len = len;
+        this.direction = direction;
+    }
+    useAnimation(tt) {
+        return tt.spdMove > 0;
+    }
+    generateAnimationJob(tt) {
+        let fdv = this.len;
+        let dir = this.direction;
+        if (fdv < 0) {
+            dir = DirOpposite[dir];
+            fdv = -fdv;
+        }
+        return [new Move$1(fdv, dir)];
+    }
+    static parse(ca) {
+        if (ca[0] === 'fd') {
+            const cmd = ca[2];
+            const value = parseFloat(ca[1]);
+            switch (cmd) {
+                case 'f':
+                case '1':
+                    return new Walk(value, 'f');
+                case 'b':
+                case '-1':
+                    return new Walk(value, 'b');
+                case 'l':
+                    return new Walk(value, 'l');
+                case 'r':
+                    return new Walk(value, 'r');
+            }
+        }
+        else {
+            const cmd = ca[0];
+            const value = parseFloat(ca[1]);
+            if (cmd === 'forward') {
+                return new Walk(value, 'f');
+            }
+            else if (cmd === 'backward' || cmd === 'back') {
+                return new Walk(value, 'b');
+            }
+            else if (cmd === 'left') {
+                return new Walk(value, 'l');
+            }
+            else if (cmd === 'right') {
+                return new Walk(value, 'r');
+            }
+        }
+        return null;
+    }
+    action(tt) {
+        const fdv = this.len;
+        const dir = this.direction;
+        const deg = (tt.dir + DirToDeg[dir]) % 360;
+        const rad = deg * 0.017453292519943295;
+        const x2 = tt.x + Math.cos(rad) * fdv;
+        const y2 = tt.y + Math.sin(rad) * fdv;
+        tt.raiseDrawCanvas('line', [[tt.x, tt.y], [x2, y2]]);
+        tt.x = x2;
+        tt.y = y2;
+    }
+}
+Walk.cmd = 'fd';
+Walk.cmdAlias = ['forward', 'back', 'backward', 'left', 'right'];
+
+class Rotate extends CommandBase {
+    constructor(deg, lr) {
+        super();
+        this.deg = deg;
+        this.lr = lr;
+    }
+    useAnimation(tt) {
+        return tt.spdRotate > 0;
+    }
+    generateAnimationJob(tt) {
+        const deg = this.deg * (this.lr === 'l' ? -1 : 1);
+        const dir = deg < 0 ? 'l' : 'r';
+        return [new Rotate$1(Math.abs(deg), dir)];
+    }
+    static parse(ca) {
+        if (ca[0] === 'rot' || ca[0] === 'rotate') {
+            const cmd = ca[2];
+            const value = parseFloat(ca[1]);
+            switch (cmd) {
+                case 'r':
+                case '1':
+                    return new Rotate(value, 'r');
+                case 'l':
+                case '-1':
+                    return new Rotate(value, 'l');
+            }
+        }
+        else {
+            const cmd = ca[0];
+            const value = parseFloat(ca[1]);
+            if (cmd === 'rotR' || cmd === 'rotateR') {
+                return new Rotate(value, 'r');
+            }
+            else if (cmd === 'rotL' || cmd === 'roteteL') {
+                return new Rotate(value, 'l');
+            }
+        }
+        return null;
+    }
+    action(tt) {
+        const deg = this.deg * (this.lr === 'l' ? -1 : 1);
+        tt.dir = (tt.dir + (deg % 360) + 360) % 360;
+        tt.f_update = true;
+    }
+}
+Rotate.cmd = 'rot';
+Rotate.cmdAlias = ['rotR', 'rotL', 'rotate', 'rotateR', 'rotateL'];
+
+class Curve extends CommandBase {
+    constructor(r, deg, dir, lr) {
+        super();
+        this.r = r;
+        this.deg = deg;
+        this.dir = dir;
+        this.lr = lr;
+    }
+    useAnimation(tt) {
+        return tt.spdMove > 0;
+    }
+    generateAnimationJob(tt) {
+        let deg = this.deg;
+        let dir = this.dir;
+        if (deg < 0) {
+            deg = -deg;
+            dir = dir === 'f' ? 'b' : 'f';
+        }
+        return [new Curve$1(this.r, deg, dir, this.lr)];
+    }
+    static parse(ca) {
+        let r = null;
+        let deg = null;
+        let dir = null;
+        let lr = null;
+        for (const p of ca) {
+            if (p === 'curve') ;
+            else if (p === 'tl' || p === 'toleft') {
+                lr = 'l';
+            }
+            else if (p === 'tr' || p === 'toright') {
+                lr = 'r';
+            }
+            else if (p === 'l' || p === 'left') {
+                dir = 'l';
+            }
+            else if (p === 'r' || p === 'right') {
+                dir = 'r';
+            }
+            else if (p === 'f' || p === 'forward') {
+                dir = 'f';
+            }
+            else if (p === 'b' || p === 'backward' || p === 'back') {
+                dir = 'b';
+            }
+            else {
+                if (r === null) {
+                    r = parseFloat(p);
+                }
+                else if (deg === null) {
+                    deg = parseFloat(p);
+                }
+            }
+        }
+        if (dir === null) {
+            dir = 'f';
+        }
+        if (r === null || deg === null || lr === null) {
+            return null;
+        }
+        return new Curve(r, deg, dir, lr);
+    }
+    action(tt) {
+        const r = this.r;
+        const deg = this.deg * (this.dir === 'b' ? -1 : 1);
+        const dirDirection = this.lr === 'l' ? -1 : 1;
+        const degDirection = deg < 0 ? -1 : 1;
+        const dir = (tt.dir + 90 * dirDirection + 360) % 360;
+        const rad = dir * 0.017453292519943295;
+        const ox = tt.x + Math.cos(rad) * r;
+        const oy = tt.y + Math.sin(rad) * r;
+        const deg1 = (dir + 180) % 360;
+        const deg2 = (deg1 + (deg * dirDirection) % 360 + 360) % 360;
+        const rad2 = deg2 * 0.017453292519943295;
+        tt.raiseDrawCanvas('arc', [[ox, oy], r, deg1, deg2, degDirection * dirDirection]);
+        tt.dir = (tt.dir + (deg * dirDirection) % 360 + 360) % 360;
+        tt.x = ox + Math.cos(rad2) * r;
+        tt.y = oy + Math.sin(rad2) * r;
+        tt.f_update = true;
+    }
+}
+Curve.cmd = 'curve';
+Curve.cmdAlias = [];
+
+class Path extends CommandBase {
+    constructor(pathCmd) {
+        super();
+        this.pathCmd = pathCmd;
+    }
+    static parse(ca) {
+        const cmdIndex = ca[0] === 'path' ? 1 : 0;
+        const cmd = ca[cmdIndex];
+        if (cmd === 'begin' || cmd === 'close') {
+            return new Path(cmd);
+        }
+        return null;
+    }
+    action(tt) {
+        if (this.pathCmd === 'begin') {
+            tt.raiseDrawCanvas('beginPath', [tt.x, tt.y]);
+        }
+        else {
+            tt.raiseDrawCanvas('closePath', []);
+        }
+    }
+}
+Path.cmd = 'path';
+Path.cmdAlias = ['begin', 'close'];
+
+class Raw extends CommandBase {
+    constructor(rawCmd) {
+        super();
+        this.rawCmd = rawCmd;
+    }
+    static parse(ca) {
+        const cmdIndex = ca[0] === 'raw' ? 1 : 0;
+        const cmd = ca[cmdIndex];
+        if (cmd === 'stroke' || cmd === 'fill') {
+            return new Raw(cmd);
+        }
+        return null;
+    }
+    action(tt) {
+        tt.raiseDrawCanvas(this.rawCmd, []);
+    }
+}
+Raw.cmd = 'raw';
+Raw.cmdAlias = ['stroke', 'fill'];
+
+class DrawText extends CommandBase {
+    constructor(text) {
+        super();
+        this.text = text;
+    }
+    static parse(ca) {
+        return new DrawText(ca[1]);
+    }
+    action(tt) {
+        tt.raiseDrawCanvas('fillText', [[tt.x, tt.y], this.text]);
+    }
+}
+DrawText.cmd = 'text';
+DrawText.cmdAlias = [];
+
+class SetMoveSpeed extends CommandBase {
+    constructor(spd) {
+        super();
+        this.spd = spd;
+    }
+    static parse(ca) {
+        return new SetMoveSpeed(parseFloat(ca[1]));
+    }
+    action(tt) {
+        tt.spdMove = this.spd;
+    }
+}
+SetMoveSpeed.cmd = 'spdM';
+SetMoveSpeed.cmdAlias = [];
+
+class SetRotateSpeed extends CommandBase {
+    constructor(spd) {
+        super();
+        this.spd = spd;
+    }
+    static parse(ca) {
+        return new SetRotateSpeed(parseFloat(ca[1]));
+    }
+    action(tt) {
+        tt.spdRotate = this.spd;
+    }
+}
+SetRotateSpeed.cmd = 'spdR';
+SetRotateSpeed.cmdAlias = [];
+
+class SetVisible extends CommandBase {
+    constructor(v) {
+        super();
+        this.visible = !!v;
+    }
+    static parse(ca) {
+        return new SetVisible(ca[1]);
+    }
+    action(tt) {
+        tt.f_visible = this.visible;
+        tt.f_update = true;
+    }
+}
+SetVisible.cmd = 'visible';
+SetVisible.cmdAlias = [];
+
+class SetImage extends CommandBase {
+    constructor(url) {
+        super();
+        this.url = url;
+    }
+    static parse(ca) {
+        return new SetImage(ca[1]);
+    }
+    setup(tt) {
+        if (tt.img) {
+            tt.flagLoaded = false;
+            tt.img.src = this.url;
+        }
+    }
+    action(tt) {
+        // none
+    }
+}
+SetImage.cmd = 'changemodel';
+SetImage.cmdAlias = [];
+
+class SetStyle extends CommandBase {
+    constructor(name, value) {
+        super();
+        this.name = name;
+        this.value = value;
+    }
+    static parse(ca) {
+        const cmdIndex = ca[0] === 'style' ? 1 : 0;
+        const cmd = ca[cmdIndex];
+        const value = ca[cmdIndex + 1];
+        if (cmd === 'fillStyle') {
+            return new SetStyle('fillStyle', value);
+        }
+        else if (cmd === 'strokeStyle') {
+            return new SetStyle('strokeStyle', value);
+        }
+        else if (cmd === 'lineWidth' || cmd === 'size') {
+            return new SetStyle('lineWidth', value);
+        }
+        else if (cmd === 'font' || cmd === 'textset') {
+            return new SetStyle('font', value);
+        }
+        else if (cmd === 'penDown' || cmd === 'penOn') {
+            return new SetStyle('font', value);
+        }
+        return null;
+    }
+    action(tt) {
+        tt.raiseDrawCanvas(this.name, [this.value]);
+    }
+}
+SetStyle.cmd = 'style';
+SetStyle.cmdAlias = ['fillStyle', 'strokeStyle', 'lineWidth', 'font', 'penDown', 'size', 'textset', 'penOn'];
+
+class CommandFactory {
+    constructor() {
+        this.commands = [];
+        this.cmds = new Map();
+    }
+    regist(command) {
+        this.commands.push(command);
+        const cmd = command;
+        if (isCmdStatic(cmd)) {
+            this.cmds.set(cmd.cmd, command);
+            for (const alias of cmd.cmdAlias) {
+                this.cmds.set(alias, command);
+            }
+        }
+    }
+    initRegist() {
+        const commandList = [
+            Move,
+            Walk,
+            Rotate,
+            Jump,
+            Angle,
+            Curve,
+            Path,
+            Raw,
+            DrawText,
+            SetStyle,
+            SetVisible,
+            SetImage,
+            SetMoveSpeed,
+            SetRotateSpeed
+        ];
+        for (const command of commandList) {
+            this.regist(command);
+        }
+    }
+    parse(s) {
+        let c = s;
+        c = c.replace(/^([a-zA-Z_]+)\s*(\d+)/, '$1,$2');
+        c = c.replace(/^([a-zA-Z_]+)\s*=/, '$1,');
+        const ca = c.split(/\s*,\s*/);
+        const cmdCon = this.cmds.get(ca[0]);
+        let command = null;
+        if (isParseStatic(cmdCon)) {
+            command = cmdCon.parse(ca);
+        }
+        return command;
+    }
+}
+
+class Turtle {
+    constructor() {
+        this.type = 'カメ';
+    }
+    walkValidation(cmd) {
+        if (cmd instanceof Walk) {
+            if (cmd.direction === 'r' || cmd.direction === 'l') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+        if (cmd instanceof Curve) {
+            if (cmd.dir === 'l' || cmd.dir === 'r') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+    }
+    getMoveDirection() {
+        return 'f';
+    }
+}
+
+class Cancer {
+    constructor() {
+        this.type = 'カニ';
+    }
+    walkValidation(cmd) {
+        if (cmd instanceof Walk) {
+            if (cmd.direction === 'f' || cmd.direction === 'b') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+        if (cmd instanceof Curve) {
+            if (cmd.dir === 'f' || cmd.dir === 'b') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+    }
+    getMoveDirection() {
+        return 'lr';
+    }
+}
+
+class Srawn {
+    constructor() {
+        this.type = 'エビ';
+    }
+    walkValidation(cmd) {
+        if (cmd instanceof Walk) {
+            if (cmd.direction === 'f' || cmd.direction === 'r' || cmd.direction === 'l') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+        if (cmd instanceof Curve) {
+            if (cmd.dir === 'f' || cmd.dir === 'l' || cmd.dir === 'r') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+    }
+    getMoveDirection() {
+        return 'b';
+    }
+}
+
+class Shark {
+    constructor() {
+        this.type = 'サメ';
+    }
+    walkValidation(cmd) {
+        if (cmd instanceof Walk) {
+            if (cmd.direction === 'b' || cmd.direction === 'r' || cmd.direction === 'l') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+        if (cmd instanceof Rotate) {
+            throw new Error(`${this.type}はその方法での方向転換はできません`);
+        }
+        if (cmd instanceof Angle && !cmd.direct) {
+            throw new Error(`${this.type}はその方法での方向転換はできません`);
+        }
+        if (cmd instanceof Move && !cmd.direct) {
+            throw new Error(`${this.type}はその方法での方向転換を含む移動はできません`);
+        }
+        if (cmd instanceof Curve) {
+            if (cmd.dir === 'b' || cmd.dir === 'l' || cmd.dir === 'r') {
+                throw new Error(`${this.type}はその方向に進むことはできません`);
+            }
+        }
+    }
+    getMoveDirection() {
+        return 'f';
+    }
+}
+
+class SoulFactory {
+    constructor() {
+        this.souls = new Map();
+    }
+    regist(soul) {
+        this.souls.set(soul.type, soul);
+    }
+    initRegist() {
+        this.regist(new Turtle());
+        this.regist(new Cancer());
+        this.regist(new Srawn());
+        this.regist(new Shark());
+    }
+    getSoul(type) {
+        const soul = this.souls.get(type);
+        if (!soul) {
+            throw new Error(`不明な歩行種別${type}の生成が指定されてました`);
+        }
+        return soul;
+    }
+}
+
 class TurtleSmoothSystem {
     static getInstance(sys) {
         if (TurtleSmoothSystem.instance === undefined) {
@@ -1027,6 +1286,7 @@ class TurtleSmoothSystem {
     constructor(sys) {
         this.sys = sys;
         this.factory = new CommandFactory();
+        this.soulFactory = new SoulFactory();
         this.ctx = null;
         this.canvas = null;
         this.flagSetTimer = false;
@@ -1038,6 +1298,7 @@ class TurtleSmoothSystem {
         this.turtlePenStyles = [];
         this.usePathId = null; // パス描画中のカメのID
         this.factory.initRegist();
+        this.soulFactory.initRegist();
     }
     clearAll() {
         // console.log('カメ全消去 turtles=', this.turtles)
@@ -1081,9 +1342,6 @@ class TurtleSmoothSystem {
         }
         this.flagSetTimer = true;
         this.play(0);
-    }
-    line(id, p1, p2) {
-        /* istanbul ignore else */
     }
     draw(id, cmd, params) {
         const penStyle = this.turtlePenStyles[id];
@@ -1258,17 +1516,14 @@ class TurtleSmoothSystem {
     }
     addJob(command) {
         const tt = this.getCur();
-        tt.typeValidation(command);
-        return new Promise((resolve, reject) => {
-            const job = new Job(command, resolve, reject);
-            tt.jobs.push(job);
-            this.setTimer();
-        });
+        const promise = tt.addCommand(command);
+        this.setTimer();
+        return promise;
     }
-    runJobAllTurtles(time, defaultWait, waitForTurteImage) {
+    runJobAllTurtles(time, defaultWait, immediateRunAction, waitForTurteImage) {
         let hasNext = false;
         for (const tt of this.turtles) {
-            hasNext = tt.runJob(time, defaultWait, waitForTurteImage) || hasNext;
+            hasNext = tt.runJob(time, defaultWait, immediateRunAction, waitForTurteImage) || hasNext;
             if (tt.flagLoaded) {
                 this.drawTurtle(tt.id);
             }
@@ -1287,17 +1542,18 @@ class TurtleSmoothSystem {
         }
         this.lastStart = timestamp;
         const wait = this.sys.__getSysVar('カメ速度');
-        if (wait <= 0) {
+        const smooth = !!this.sys.__getSysVar('カメスムース移動');
+        if (wait <= 0 && !smooth) {
             // 待ち時間なしで全部実行
             let hasNext = true;
             while (hasNext) {
-                hasNext = this.runJobAllTurtles(0, 0, false);
+                hasNext = this.runJobAllTurtles(0, 0, !smooth, false);
             }
         }
         else {
             // 一つずつ実行
             const waitForTurtleImage = wait > 0;
-            const hasNext = this.runJobAllTurtles(time, wait, waitForTurtleImage);
+            const hasNext = this.runJobAllTurtles(time, wait, !smooth, waitForTurtleImage);
             if (hasNext) {
                 this.fid = requestAnimationFrame((timestamp) => this.play(timestamp));
                 return;
@@ -1357,7 +1613,7 @@ class TurtleSmoothSystem {
         this.setupCanvas();
         // カメの情報をリストに追加
         const id = this.turtles.length;
-        const tt = new TurtleSmooth(id);
+        const tt = new TurtleSmooth(id, this.soulFactory.getSoul(type));
         this.turtles.push(tt);
         this.turtlePenStyles[id] = {
             lineWidth: 4,
@@ -1366,11 +1622,6 @@ class TurtleSmoothSystem {
             font: '10px sans-serif',
             down: true
         };
-        if (type !== undefined) {
-            tt.type = type;
-        } else {
-            tt.type = 'カメ';
-        }
         this.target = id;
         tt.addEventListener('drawCanvas', (e) => {
             this.draw(e.detail.id, e.detail.cmd, e.detail.params);
@@ -1397,6 +1648,7 @@ class TurtleSmoothSystem {
         return sys.tags.turtlesmooth;
     }
 }
+
 const PluginTurtleSmooth = {
     'meta': {
         type: 'const',
@@ -1428,67 +1680,67 @@ const PluginTurtleSmooth = {
         }
     },
     // @タートルグラフィックス・カメ描画
-    'カメ作成': {
+    'カメ作成': { // @タートルグラフィックスを開始してカメのIDを返す // @かめさくせい
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
             const imageUrl = sys.__getSysVar('カメ画像URL');
-            return turtlesmooth.createTurtle(imageUrl);
+            return turtlesmooth.createTurtle(imageUrl, 'カメ');
         }
     },
-    'ゾウ作成': {
+    'ゾウ作成': { // @ゾウの画像でタートルグラフィックスを開始してIDを返す // @ぞうさくせい
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            const imageUrl = elephantImageURL;
-            return turtlesmooth.createTurtle(imageUrl);
+            const imageUrl = sys.__getSysVar('ゾウ画像URL');
+            return turtlesmooth.createTurtle(imageUrl, 'カメ');
         }
     },
-    'パンダ作成': {
+    'パンダ作成': { // @パンダの画像でタートルグラフィックスを開始してIDを返す // @ぱんださくせい
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            const imageUrl = pandaImageURL;
-            return turtlesmooth.createTurtle(imageUrl);
+            const imageUrl = sys.__getSysVar('パンダ画像URL');
+            return turtlesmooth.createTurtle(imageUrl, 'カメ');
         }
     },
-    'カニ作成': {
+    'カニ作成': { // @カニの画像でタートルグラフィックスを開始してIDを返す // @かにさくせい
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            const imageUrl = cancerImageURL;
+            const imageUrl = sys.__getSysVar('カニ画像URL');
             return turtlesmooth.createTurtle(imageUrl, 'カニ');
         }
     },
-    'エビ作成': {
+    'エビ作成': { // @エビの画像でタートルグラフィックスを開始してIDを返す // @えびさくせい
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            const imageUrl = ebiImageURL;
+            const imageUrl = sys.__getSysVar('カメ画像URL');
             return turtlesmooth.createTurtle(imageUrl, 'エビ');
         }
     },
-    'サメ作成': {
+    'サメ作成': { // @サメの画像でタートルグラフィックスを開始してIDを返す // @さめさくせい
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            const imageUrl = sharkImageURL;
+            const imageUrl = sys.__getSysVar('サメ画像URL');
             return turtlesmooth.createTurtle(imageUrl, 'サメ');
         }
     },
-    'カメ操作対象設定': {
+    'カメ操作対象設定': { // @IDを指定して操作対象となるカメを変更する // @かめそうさたいしょうせってい
         type: 'func',
         josi: [['に', 'へ', 'の']],
         pure: true,
@@ -1499,17 +1751,22 @@ const PluginTurtleSmooth = {
     },
     'カメ描画先': { type: 'var', value: '#turtle_cv' }, // @かめびょうがさき
     'カメ画像URL': { type: 'var', value: turtleImageURL }, // @かめがぞうURL
-    'カメ画像変更': {
+    'ゾウ画像URL': { type: 'var', value: elephantImageURL }, // @ぞうがぞうURL
+    'パンダ画像URL': { type: 'var', value: pandaImageURL }, // @ぱんだがぞうURL
+    'カニ画像URL': { type: 'var', value: cancerImageURL }, // @かにがぞうURL
+    'エビ画像URL': { type: 'var', value: ebiImageURL }, // @えびがぞうURL
+    'サメ画像URL': { type: 'var', value: sharkImageURL }, // @さめがぞうURL
+    'カメ画像変更': { // @カメの画像をURLに変更する // @かめがぞうへんこう
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (url, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetTurtleImage(url));
+            return turtlesmooth.addJob(new SetImage(url));
         }
     },
     'カメ速度': { type: 'const', value: 100 }, // @かめそくど
-    'カメ速度設定': {
+    'カメ速度設定': { // @カメの動作速度vに設定(大きいほど遅い) // @かめそくどせってい
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
@@ -1518,25 +1775,25 @@ const PluginTurtleSmooth = {
         },
         return_none: true
     },
-    'カメ移動': {
+    'カメ移動': { // @カメの位置を[x,y]へ移動する // @かめいどう
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (xy, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandMove([xy[0], xy[1]], false));
+            return turtlesmooth.addJob(new Move([xy[0], xy[1]], false));
         }
     },
-    'カメ起点移動': {
+    'カメ起点移動': { // @カメの描画起点位置を[x,y]へ移動する // @かめきてんいどう
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (xy, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandJump([xy[0], xy[1]]));
+            return turtlesmooth.addJob(new Jump([xy[0], xy[1]]));
         }
     },
-    'カメ進': {
+    'カメ進': { // @カメの位置をVだけ進める // @かめすすむ
         type: 'func',
         josi: [['だけ']],
         pure: true,
@@ -1549,10 +1806,10 @@ const PluginTurtleSmooth = {
             if (v < 0) {
                 dir = 'b';
             }
-            return turtlesmooth.addJob(new CommandWalk(Math.abs(v), dir));
+            return turtlesmooth.addJob(new Walk(Math.abs(v), dir));
         }
     },
-    'カメ右進': {
+    'カメ右進': { // @カメの位置をVだけ右に横に進める // @かめみぎすすむ
         type: 'func',
         josi: [['だけ']],
         pure: true,
@@ -1565,10 +1822,10 @@ const PluginTurtleSmooth = {
             if (v < 0) {
                 dir = 'l';
             }
-            return turtlesmooth.addJob(new CommandWalk(Math.abs(v), dir));
+            return turtlesmooth.addJob(new Walk(Math.abs(v), dir));
         }
     },
-    'カメ左進': {
+    'カメ左進': { // @カメの位置をVだけ左に横に進める // @かめひだりすすむ
         type: 'func',
         josi: [['だけ']],
         pure: true,
@@ -1581,10 +1838,10 @@ const PluginTurtleSmooth = {
             if (v < 0) {
                 dir = 'r';
             }
-            return turtlesmooth.addJob(new CommandWalk(Math.abs(v), dir));
+            return turtlesmooth.addJob(new Walk(Math.abs(v), dir));
         }
     },
-    'カメ戻': {
+    'カメ戻': { // @カメの位置をVだけ戻す // @かめもどる
         type: 'func',
         josi: [['だけ']],
         pure: true,
@@ -1597,10 +1854,10 @@ const PluginTurtleSmooth = {
             if (v < 0) {
                 dir = 'f';
             }
-            return turtlesmooth.addJob(new CommandWalk(Math.abs(v), dir));
+            return turtlesmooth.addJob(new Walk(Math.abs(v), dir));
         }
     },
-    'カメ角度設定': {
+    'カメ角度設定': { // @カメの向きをDEGに設定する // @かめかくどせってい
         type: 'func',
         josi: [['に', 'へ', 'の']],
         pure: true,
@@ -1609,10 +1866,10 @@ const PluginTurtleSmooth = {
             if (typeof deg === 'string') {
                 deg = parseFloat(deg);
             }
-            return turtlesmooth.addJob(new CommandAngle(deg, false));
+            return turtlesmooth.addJob(new Angle(deg, false));
         }
     },
-    'カメ右回転': {
+    'カメ右回転': { // @カメの向きをDEGだけ右に向ける // @かめみぎかいてん
         type: 'func',
         josi: [['だけ']],
         pure: true,
@@ -1625,10 +1882,10 @@ const PluginTurtleSmooth = {
             if (deg < 0) {
                 lr = 'l';
             }
-            return turtlesmooth.addJob(new CommandRotate(Math.abs(deg), lr));
+            return turtlesmooth.addJob(new Rotate(Math.abs(deg), lr));
         }
     },
-    'カメ左回転': {
+    'カメ左回転': { // @カメの向きをDEGだけ左に向ける // @かめひだりかいてん
         type: 'func',
         josi: [['だけ']],
         pure: true,
@@ -1641,82 +1898,82 @@ const PluginTurtleSmooth = {
             if (deg < 0) {
                 lr = 'r';
             }
-            return turtlesmooth.addJob(new CommandRotate(Math.abs(deg), lr));
+            return turtlesmooth.addJob(new Rotate(Math.abs(deg), lr));
         }
     },
-    'カメペン色設定': {
+    'カメペン色設定': { // @カメのペン描画色をCに設定する // @かめぺんいろせってい
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (c, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetStyle('strokeStyle', c));
+            return turtlesmooth.addJob(new SetStyle('strokeStyle', c));
         }
     },
-    'カメペンサイズ設定': {
+    'カメペンサイズ設定': { // @カメペンのサイズをWに設定する // @かめぺんさいずせってい
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (w, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetStyle('lineWidth', w));
+            return turtlesmooth.addJob(new SetStyle('lineWidth', w));
         }
     },
-    'カメペン設定': {
+    'カメペン設定': { // @カメペンを使うかどうかをV(オン/オフ)に設定する // @かめぺんせってい
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (v, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetStyle('penDown', v));
+            return turtlesmooth.addJob(new SetStyle('penDown', v));
         }
     },
-    'カメパス開始': {
+    'カメパス開始': { // @カメで明示的にパスの描画を開始する // @かめぱすかいし
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandPath('begin'));
+            return turtlesmooth.addJob(new Path('begin'));
         }
     },
-    'カメパス閉': {
+    'カメパス閉': { // @カメでパスを明示的に閉じる(省略可能) // @かめぱすとじる
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandPath('close'));
+            return turtlesmooth.addJob(new Path('close'));
         }
     },
-    'カメパス線引': {
+    'カメパス線引': { // @カメでパスを閉じて、カメペン色設定で指定した色で枠線を引く // @かめぱすせんひく
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandRaw('stroke'));
+            return turtlesmooth.addJob(new Raw('stroke'));
         }
     },
-    'カメパス塗': {
+    'カメパス塗': { // @カメでパスを閉じて、カメ塗り色設定で指定した色で塗りつぶす // @かめぱすぬる
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandRaw('fill'));
+            return turtlesmooth.addJob(new Raw('fill'));
         }
     },
-    'カメ文字描画': {
+    'カメ文字描画': { // @カメの位置に文字Sを描画 // @かめもじびょうが
         type: 'func',
         josi: [['を', 'と', 'の']],
         pure: true,
         fn: function (s, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandDrawText(s));
+            return turtlesmooth.addJob(new DrawText(s));
         }
     },
-    'カメ文字設定': {
+    'カメ文字設定': { // @カメ文字描画で描画するテキストサイズやフォント(48px serif)などを設定 // @かめもじせってい
         type: 'func',
         josi: [['に', 'へ', 'で']],
         pure: true,
@@ -1729,19 +1986,19 @@ const PluginTurtleSmooth = {
             else if (s.match(/^\d+(px|em)$/)) {
                 s = s + ' serif';
             }
-            return turtlesmooth.addJob(new CommandSetStyle('font', s));
+            return turtlesmooth.addJob(new SetStyle('font', s));
         }
     },
-    'カメ塗色設定': {
+    'カメ塗色設定': { // @カメパスの塗り色をCに設定する // @かめぬりいろせってい
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (c, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetStyle('fillStyle', c));
+            return turtlesmooth.addJob(new SetStyle('fillStyle', c));
         }
     },
-    'カメ全消去': {
+    'カメ全消去': { // @表示しているカメと描画内容を全部消去する // @かめぜんしょうきょ
         type: 'func',
         josi: [],
         pure: true,
@@ -1751,7 +2008,7 @@ const PluginTurtleSmooth = {
         },
         return_none: true
     },
-    'カメコマンド実行': {
+    'カメコマンド実行': { // @カメにコマンドSを実行する。コマンドは改行か「;」で区切る。コマンドと引数は「=」で区切り引数はかカンマで区切る // @かめこまんどじっこう
         type: 'func',
         josi: [['の', 'を']],
         pure: true,
@@ -1779,25 +2036,25 @@ const PluginTurtleSmooth = {
             return promise;
         }
     },
-    'カメ非表示': {
+    'カメ非表示': { // @カメの画像を非表示にする。描画に影響しない。 // @かめひひょうじ
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetVisible(false));
+            return turtlesmooth.addJob(new SetVisible(false));
         }
     },
-    'カメ表示': {
+    'カメ表示': { // @非表示にしたカメを表示する。 // @かめひょうじ
         type: 'func',
         josi: [],
         pure: true,
         fn: function (sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetVisible(true));
+            return turtlesmooth.addJob(new SetVisible(true));
         }
     },
-    'カメクリック時': {
+    'カメクリック時': { // @ 操作対象のカメをクリックした時のイベントを設定する // @かめくりっくしたとき
         type: 'func',
         josi: [['を']],
         pure: false,
@@ -1818,7 +2075,7 @@ const PluginTurtleSmooth = {
         return_none: true
     },
     // @タートルグラフィックス・カメ描画(スムースカメ拡張命令)
-    'カメ複製': {
+    'カメ複製': { // @指定したカメと同じ位置と向きを持つカメを作成してIDを返す // @かめふくせい
         type: 'func',
         josi: [['の', 'から']],
         pure: true,
@@ -1836,14 +2093,14 @@ const PluginTurtleSmooth = {
                 tt = turtlesmooth.getCur();
             }
             const imageUrl = sys.__getSysVar('カメ画像URL');
-            const tid = turtlesmooth.createTurtle(imageUrl);
+            const tid = turtlesmooth.createTurtle(imageUrl, tt.soul.type);
             turtlesmooth.turtles[tid].x = tt.x;
             turtlesmooth.turtles[tid].y = tt.y;
             turtlesmooth.turtles[tid].dir = tt.dir;
             return tid;
         }
     },
-    'カメ数取得': {
+    'カメ数取得': { // @カメの数を取得する // @かめすうしゅとく
         type: 'func',
         josi: [],
         pure: true,
@@ -1852,7 +2109,7 @@ const PluginTurtleSmooth = {
             return turtlesmooth.turtles.length;
         }
     },
-    'カメ右曲': {
+    'カメ右曲': { // @カメを旋回半径Rで旋回円の角度DEGだけ前に進みながら右に旋回する // @かめみぎまがる
         type: 'func',
         josi: [['に', 'で'], ['だけ']],
         pure: true,
@@ -1864,14 +2121,17 @@ const PluginTurtleSmooth = {
             if (r < 0) {
                 throw new Error('半径に負の値を指定することはできません');
             }
-            let fb = 'f';
+            let dir = 'f';
+            let lr = 'r';
             if (deg < 0) {
-                fb = 'b';
+                deg = -deg;
+                dir = 'b';
+                lr = 'l';
             }
-            return turtlesmooth.addJob(new CommandCurve(r, Math.abs(deg), fb, 'r'));
+            return turtlesmooth.addJob(new Curve(r, deg, dir, lr));
         }
     },
-    'カメ左曲': {
+    'カメ左曲': { // @カメを旋回半径Rで旋回円の角度DEGだけ前に進みながら左に旋回する // @かめひだりまがる
         type: 'func',
         josi: [['に', 'で'], ['だけ']],
         pure: true,
@@ -1883,14 +2143,17 @@ const PluginTurtleSmooth = {
             if (r < 0) {
                 throw new Error('半径に負の値を指定することはできません');
             }
-            let fb = 'f';
+            let dir = 'f';
+            let lr = 'l';
             if (deg < 0) {
-                fb = 'b';
+                deg = -deg;
+                dir = 'b';
+                lr = 'r';
             }
-            return turtlesmooth.addJob(new CommandCurve(r, Math.abs(deg), fb, 'l'));
+            return turtlesmooth.addJob(new Curve(r, deg, dir, lr));
         }
     },
-    'カメ右曲戻': {
+    'カメ右曲戻': { // @カメを旋回半径Rで旋回円の角度DEGだけ後ろに戻りながら右に旋回する // @かめみぎまがりもどる
         type: 'func',
         josi: [['に', 'で'], ['だけ']],
         pure: true,
@@ -1902,14 +2165,17 @@ const PluginTurtleSmooth = {
             if (r < 0) {
                 throw new Error('半径に負の値を指定することはできません');
             }
-            let fb = 'b';
+            let dir = 'b';
+            let lr = 'l';
             if (deg < 0) {
-                fb = 'f';
+                deg = -deg;
+                dir = 'f';
+                lr = 'r';
             }
-            return turtlesmooth.addJob(new CommandCurve(r, Math.abs(deg), fb, 'r'));
+            return turtlesmooth.addJob(new Curve(r, Math.abs(deg), dir, lr));
         }
     },
-    'カメ左曲戻': {
+    'カメ左曲戻': { // @カメを旋回半径Rで旋回円の角度DEGだけ後ろに戻りながら左に旋回する // @かめひだりまがりもどる
         type: 'func',
         josi: [['に', 'で'], ['だけ']],
         pure: true,
@@ -1921,23 +2187,114 @@ const PluginTurtleSmooth = {
             if (r < 0) {
                 throw new Error('半径に負の値を指定することはできません');
             }
-            let fb = 'b';
+            let dir = 'b';
+            let lr = 'r';
             if (deg < 0) {
-                fb = 'f';
+                deg = -deg;
+                dir = 'f';
+                lr = 'l';
             }
-            return turtlesmooth.addJob(new CommandCurve(r, Math.abs(deg), fb, 'l'));
+            return turtlesmooth.addJob(new Curve(r, Math.abs(deg), dir, lr));
         }
     },
-    'カメ直接移動': {
+    'カメ右前曲': { // @カメを旋回半径Rで旋回円の角度DEGだけ右に進みながら前方に旋回する // @かめみぎまえまがる
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            if (r < 0) {
+                throw new Error('半径に負の値を指定することはできません');
+            }
+            let dir = 'r';
+            let lr = 'l';
+            if (deg < 0) {
+                deg = -deg;
+                dir = 'l';
+                lr = 'r';
+            }
+            return turtlesmooth.addJob(new Curve(r, deg, dir, lr));
+        }
+    },
+    'カメ左前曲': { // @カメを旋回半径Rで旋回円の角度DEGだけ左に進みながら前方に旋回する // @かめひだりまえまがる
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            if (r < 0) {
+                throw new Error('半径に負の値を指定することはできません');
+            }
+            let dir = 'l';
+            let lr = 'r';
+            if (deg < 0) {
+                deg = -deg;
+                dir = 'r';
+                lr = 'l';
+            }
+            return turtlesmooth.addJob(new Curve(r, deg, dir, lr));
+        }
+    },
+    'カメ右後曲': { // @カメを旋回半径Rで旋回円の角度DEGだけ右に進みながら後方に旋回する // @かめみぎうしろまがる
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            if (r < 0) {
+                throw new Error('半径に負の値を指定することはできません');
+            }
+            let dir = 'r';
+            let lr = 'r';
+            if (deg < 0) {
+                deg = -deg;
+                dir = 'l';
+                lr = 'l';
+            }
+            return turtlesmooth.addJob(new Curve(r, deg, dir, lr));
+        }
+    },
+    'カメ左後曲': { // @カメを旋回半径Rで旋回円の角度DEGだけ左に進みながら後方に旋回する // @かめひだりうしろまがる
+        type: 'func',
+        josi: [['に', 'で'], ['だけ']],
+        pure: true,
+        fn: function (r, deg, sys) {
+            const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
+            if (typeof deg === 'string') {
+                deg = parseFloat(deg);
+            }
+            if (r < 0) {
+                throw new Error('半径に負の値を指定することはできません');
+            }
+            let dir = 'l';
+            let lr = 'l';
+            if (deg < 0) {
+                deg = -deg;
+                dir = 'r';
+                lr = 'r';
+            }
+            return turtlesmooth.addJob(new Curve(r, deg, dir, lr));
+        }
+    },
+    'カメ直接移動': { // @カメの位置を[x,y]へ移動する // @かめちょくせついどう
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (xy, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandMove([xy[0], xy[1]], true));
+            return turtlesmooth.addJob(new Move([xy[0], xy[1]], true));
         }
     },
-    'カメ直接角度設定': {
+    'カメ直接角度設定': { // @カメの向きをDEGに設定する // @かめちょくせつかくどせってい
         type: 'func',
         josi: [['に', 'へ', 'の']],
         pure: true,
@@ -1946,10 +2303,10 @@ const PluginTurtleSmooth = {
             if (typeof deg === 'string') {
                 deg = parseFloat(deg);
             }
-            return turtlesmooth.addJob(new CommandAngle(deg, true));
+            return turtlesmooth.addJob(new Angle(deg, true));
         }
     },
-    'カメ位置取得': {
+    'カメ位置取得': { // @カメの位置([X,Y])を取得する // @かめいちしゅとく
         type: 'func',
         josi: [['の', 'から']],
         pure: true,
@@ -1969,7 +2326,7 @@ const PluginTurtleSmooth = {
             return [tt.x, tt.y];
         }
     },
-    'カメ角度取得': {
+    'カメ角度取得': { // @カメの向き(度)を取得する // @かめかくどしゅとく
         type: 'func',
         josi: [['の', 'から']],
         pure: true,
@@ -1986,26 +2343,47 @@ const PluginTurtleSmooth = {
             else {
                 tt = turtlesmooth.getCur();
             }
-            return tt.dir;
+            return (tt.dir + 270) % 360;
         }
     },
-    'カメ移動速度設定': {
+    'カメ移動速度設定': { // @カメが移動する際の速さをSPD(px/ミリ秒)に設定する // @かめいどうそくどせってい
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (spd, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetMoveSpeed(spd));
+            return turtlesmooth.addJob(new SetMoveSpeed(spd));
         }
     },
-    'カメ回転速度設定': {
+    'カメ回転速度設定': { // @カメが回転する際の速さをSPD(度/ミリ秒)に設定する // @かめかいてんそくどせってい
         type: 'func',
         josi: [['に', 'へ']],
         pure: true,
         fn: function (spd, sys) {
             const turtlesmooth = TurtleSmoothSystem.getTurtleSmooth(sys);
-            return turtlesmooth.addJob(new CommandSetRotateSpeed(spd));
+            return turtlesmooth.addJob(new SetRotateSpeed(spd));
         }
+    },
+    'カメスムース移動': { type: 'var', value: true }, // @かめすむーすいどう
+    'カメスムース移動オン': { // @カメが回転・移動する際に途中経過も描画する // @かめすむーすいどうおん
+        type: 'func',
+        josi: [],
+        pure: true,
+        fn: function (sys) {
+            TurtleSmoothSystem.getTurtleSmooth(sys);
+            sys.__setSysVar('カメスムース移動', true);
+        },
+        return_none: true
+    },
+    'カメスムース移動オフ': { // @カメが回転・移動する際の途中経過を描画しない // @かめすむーすいどうおふ
+        type: 'func',
+        josi: [],
+        pure: true,
+        fn: function (sys) {
+            TurtleSmoothSystem.getTurtleSmooth(sys);
+            sys.__setSysVar('カメスムース移動', false);
+        },
+        return_none: true
     }
 };
 // scriptタグで取り込んだ時、自動で登録する

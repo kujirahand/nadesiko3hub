@@ -1,0 +1,33 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3045
+### タイトル=貯蔵庫でPythonを実行する実験
+### 作者=クジラ飛行机(user_id=0)
+### ライセンス=CC0
+### 説明=貯蔵庫でPythonを実行する実験
+### 対象バージョン=3.7.7
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2025-08-23 15:11:30
+###
+
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<body>
+  <div id="info">現在、Pythonを読み込み中...</div>
+</body>
+
+<!-- PyScriptをロード -->
+<script type="module" src="https://pyscript.net/releases/2025.8.1/core.js"></script>
+<script type="py">
+    import js  # jsモジュール
+    import random  # 乱数モジュール
+    # ロード画面を消す
+    js.document.getElementById("info").innerHTML = ""
+    # HTMLと一緒にサイコロの結果を表示
+    js.document.write("八面体のサイコロ:")
+    js.document.write("<span style='font-size:8em'>")
+    js.document.write(random.randint(1, 8))
+    js.document.write("</span>")
+</script>

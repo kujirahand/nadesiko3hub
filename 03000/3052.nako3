@@ -1,0 +1,32 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3052
+### タイトル=Pythonでサイコロ
+### 作者=クジラ飛行机(Python)(user_id=464)
+### ライセンス=MIT
+### 説明=Pythonでサイコロを表示
+### 対象バージョン=3.7.8
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2025-08-26 22:57:52
+###
+
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<script type="module" src="https://pyscript.net/releases/2025.8.1/core.js"></script>
+<!-- サイコロを表示するCanvasと画像imgを用意 --- (※1) -->
+<canvas id="c" width="205" height="205" style="border: 2px solid gray"></canvas>
+<img id="i" src="https://n3s.nadesi.com/image.php?f=572.png" style="display:none">
+<script type="py">
+    import js
+    import random
+    # 要素やオブジェクトを取得 --- (※2)
+    canvas = js.document.getElementById("c")
+    ctx = canvas.getContext("2d")
+    image = js.document.getElementById("i")
+    w = image.width // 6 # サイコロの幅を計算
+    # サイコロを振る --- (※3)
+    r = random.randint(1, 6) - 1
+    # 画像の一部を切り取って表示 --- (※4)
+    ctx.drawImage(image, r * w, 0, w, w, 0, 0, w, w)
+</script>

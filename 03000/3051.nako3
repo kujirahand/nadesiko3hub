@@ -1,0 +1,90 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3051
+### タイトル=ReGATE VERS用プラグイン
+### 作者=かの＠nittc(user_id=463)
+### ライセンス=N3S_ONLY
+### 説明=ReGATE VERS用プラグイン
+### 対象バージョン=3.7.7
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2025-08-26 16:29:32
+###
+
+const PluginP1 = {
+  // プラグイン名
+  name: 'regatepro用プラグイン',
+
+  // 初期化処理
+  init: function (nako) {
+    nako.addFunc('排他的理論和', [['数値配列A', 'array'], ['数値配列B', 'array']], function (sys, arrA, arrB) {
+        const setA = new Set(arrA);
+        const setB = new Set(arrB);
+        const exclusiveA = arrA.filter(x => !setB.has(x));
+        const exclusiveB = arrB.filter(x => !setA.has(x));
+        return exclusiveA.concat(exclusiveB);
+    });
+    nako.addFunc('合計計算', [['数値配列', 'array']], function (sys, arr) {
+      return arr.reduce((a, b) => a + b, 0);
+    });
+    nako.addFunc('平均計算', [['数値配列', 'array']], function (sys, arr) {
+      const total = arr.reduce((a, b) => a + b, 0);
+      return total / arr.length;
+    });
+    nako.addFunc('最大値', [['数値配列', 'array']], function (sys, arr) {
+      return Math.max(...arr);
+    });
+    nako.addFunc('最小値', [['数値配列', 'array']], function (sys, arr) {
+      return Math.min(...arr);
+    });
+    nako.addFunc('中央値', [['数値配列', 'array']], function (sys, arr) {
+        const sorted = [...arr].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    });
+    nako.addFunc('標準偏差', [['数値配列', 'array']], function (sys, arr) {
+        const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+        const squaredDiffs = arr.map(x => Math.pow(x - mean, 2));
+        const variance = squaredDiffs.reduce((a, b) => a + b, 0) / arr.length;
+        return Math.sqrt(variance);
+    });
+    nako.addFunc('分散', [['数値配列', 'array']], function (sys, arr) {
+        const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+        const squaredDiffs = arr.map(x => Math.pow(x - mean, 2));
+        return squaredDiffs.reduce((a, b) => a + b, 0) / arr.length;
+    });
+    nako.addFunc('合計計算', [['数値配列', 'array']], function (sys, arr) {
+        return arr.reduce((a, b) => a + b, 0);
+    });
+    nako.addFunc('文字列を大文字に', [['文字列', 'str']], function (sys, str) {
+        return str.toUpperCase();
+    });
+    nako.addFunc('文字列を小文字に', [['文字列', 'str']], function (sys, str) {
+        return str.toLowerCase();
+    });
+    nako.addFunc('文字列の長さ', [['文字列', 'str']], function (sys, str) {
+        return str.length;
+    });
+    nako.addFunc('文字列を反転', [['文字列', 'str']], function (sys, str) {
+        return str.split('').reverse().join('');
+    });
+    nako.addFunc('配列をソート', [['数値配列', 'array']], function (sys, arr) {
+        return [...arr].sort((a, b) => a - b);
+    });
+    nako.addFunc('配列を逆順に', [['数値配列', 'array']], function (sys, arr) {
+        return [...arr].reverse();
+    });
+    nako.addFunc('重複を削除', [['数値配列', 'array']], function (sys, arr) {
+        return [...new Set(arr)];
+    });
+    nako.addFunc('配列の結合', [['数値配列A', 'array'], ['数値配列B', 'array']], function (sys, arrA, arrB) {
+        return arrA.concat(arrB);
+    });
+    nako.addFunc('配列の要素数', [['配列', 'array']], function (sys, arr) {
+        return arr.length;
+    });
+}
+};
+if (typeof exports === 'object') {
+  module.exports = PluginP1;
+}

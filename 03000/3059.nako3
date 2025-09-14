@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=w_noname
-### 更新日時=2025-09-15 00:32:35
+### 更新日時=2025-09-15 01:32:01
 ###
 
 // nadesiko3-music.js
@@ -20,7 +20,7 @@ const LIBFLUIDSYNTH_VER = '2.4.6' // libfluidsynthのバージョン
 const LIBFLUIDSYNTH_URL = `https://nadesi.com/v3/common/music/libfluidsynth-${LIBFLUIDSYNTH_VER}-with-libsndfile.js`
 const JS_SYNTH_VER = '1.11.0' // js-synthesizerのバージョン
 const JS_SYNTH_URL = `https://nadesi.com/v3/common/music/js-synthesizer@${JS_SYNTH_VER}.min.js`
-const DEFAULT_SOUNDFONT_URL = 'https://sakuramml.com/picosakura/synth/fonts/TimGM6mb.sf2'
+const DEFAULT_SOUNDFONT_URL = 'https://nadesi.com/v3/common/music/TimGM6mb.sf2'
 
 const PluginMusic = {
     'meta': {
@@ -28,7 +28,7 @@ const PluginMusic = {
         value: {
             pluginName: 'plugin_music', // プラグインの名前
             description: '音楽を再生するためのプラグイン', // 説明
-            pluginVersion: '3.6.3', // プラグインのバージョン
+            pluginVersion: '3.7.1', // プラグインのバージョン
             nakoRuntime: ['wnako'], // 対象ランタイム
             nakoVersion: '3.6.6' // 要求なでしこバージョン
         }
@@ -127,24 +127,8 @@ const PluginMusic = {
         type: 'func',
         josi: [['を', 'の']],
         asyncFn: true,
-        fn: function (mml, sys) {
-            return new Promise((resolve, _reject) => {
-                if (typeof(sys.__sakuramml) === 'undefined') {
-                    // コンパイラの読み込み
-                    import(SARKUAMML_URL)
-                    .then(module => {
-                        sys.__sakuramml = module;
-                        module.default().then(() => {
-                            console.log('loaded sakuramml.js')
-                            console.log('sakuramml ver.', module.get_version());
-                            resolve(compileMML(mml, sys))
-                        })
-                    });
-                } else {
-                    // すでに読み込まれている
-                    resolve(compileMML(mml, sys))
-                }
-            })
+        fn: async function (mml, sys) {
+            return await compileMMLAsync(mml, sys)
         }
     },
     // @サウンドフォント
@@ -168,15 +152,15 @@ const PluginMusic = {
                 const sfData = new Uint8Array(buffer)
                 sys.__soundfont = sfData
                 console.log('loaded SoundFont file, size=', sfData.length)
+                return sfData
             } catch (error) {
                 console.error('サウンドフォントの読み込みでURLのエラー : ', error)
                 sys.__soundfont = undefined
                 throw error
             }
-            return sfData
         }
     },
-    'サウンドフォントMIDI演奏': { // @MIDIデータ(バイナリ)を指定して読み込む // @サウンドフォントえんそう
+    'サウンドフォントMIDI演奏': { // @MIDIデータ(バイナリ)を指定して演奏する // @サウンドフォントMIDIえんそう
         type: 'func',
         josi: [['を', 'の']],
         asyncFn: true,
@@ -206,14 +190,25 @@ const PluginMusic = {
                 console.error('AudioContext close error:', e)
             }
         }
-    }
+    },
+    'サウンドフォントMML演奏': { // @MMLをサウンドフォントで演奏する // @サウンドフォントMMLえんそう
+        type: 'func',
+        josi: [['を', 'の']],
+        asyncFn: true,
+        fn: async function (mml, sys) {
+            if (typeof(sys.__soundfont) === 'undefined') {
+                throw new Error('サウンドフォントが読み込まれていません。先に「サウンドフォント読む」で読み込んでください。')
+            }
+            // MIDIをバイナリに変換
+            bin = await compileMMLAsync(mml, sys)
+            // SoundFontを使ってMIDIを演奏する
+            await playMIDIWithSoundFont(bin , sys.__soundfont, sys)
+        }
+    },
 }
 
 /// SoundFontを使ってMIDIを演奏する
 async function playMIDIWithSoundFont(binMidi, soundfont, sys) {
-    if (typeof (FluidSynth) === 'undefined' || typeof (JSSynthesizer) === 'undefined') {
-        throw new Error('FluidSynthかJSSynthesizerが読み込まれていません。')
-    }
     // ライブラリの読み込み
     await loadScriptAsync(LIBFLUIDSYNTH_URL)
     await loadScriptAsync(JS_SYNTH_URL)
@@ -232,6 +227,27 @@ async function playMIDIWithSoundFont(binMidi, soundfont, sys) {
 
     sys.__audio_context = context
     return sys.__jssynth = synth
+}
+
+/// MMLをコンパイルしてMIDIバイナリを返す(非同期版)
+function compileMMLAsync(mml, sys) {
+    return new Promise((resolve, _reject) => {
+        if (typeof(sys.__sakuramml) === 'undefined') {
+            // コンパイラの読み込み
+            import(SARKUAMML_URL)
+            .then(module => {
+                sys.__sakuramml = module;
+                module.default().then(() => {
+                    console.log('loaded sakuramml.js')
+                    console.log('sakuramml ver.', module.get_version());
+                    resolve(compileMML(mml, sys))
+                })
+            });
+        } else {
+            // すでに読み込まれている
+            resolve(compileMML(mml, sys))
+        }
+    })
 }
 
 /// MMLをコンパイルしてMIDIバイナリを返す

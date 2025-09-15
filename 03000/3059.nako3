@@ -8,7 +8,7 @@
 ### URL=
 ### 種類=wnako
 ### タグ=w_noname
-### 更新日時=2025-09-15 01:32:01
+### 更新日時=2025-09-15 11:32:19
 ###
 
 // nadesiko3-music.js
@@ -28,7 +28,7 @@ const PluginMusic = {
         value: {
             pluginName: 'plugin_music', // プラグインの名前
             description: '音楽を再生するためのプラグイン', // 説明
-            pluginVersion: '3.7.1', // プラグインのバージョン
+            pluginVersion: '3.7.3', // プラグインのバージョン
             nakoRuntime: ['wnako'], // 対象ランタイム
             nakoVersion: '3.6.6' // 要求なでしこバージョン
         }
@@ -40,16 +40,22 @@ const PluginMusic = {
             sys.__picoaudio = undefined
             sys.__sakuramml = undefined
             sys.__soundfont = undefined
+            sys.__jssynth = undefined
+            sys.__audio_context = undefined
+            sys.__picoaudio_loop = false
+            sys.__soundfont_wait_time = 300 // サウンドフォント読み込み後の待機時間(ミリ秒)
         }
     },
     '!クリア': {
         type: 'func',
         josi: [],
-        fn: function (sys) {
+        fn: async function (sys) {
             // 演奏中であれば停める
             if (typeof (sys.__picoaudio) !== 'undefined') {
                 sys.__picoaudio.initStatus()
             }
+            // サウンドフォントの演奏を停止
+            await stopSoundFontMIDIAsync(sys)
         }
     },
     // @音楽
@@ -132,72 +138,41 @@ const PluginMusic = {
         }
     },
     // @サウンドフォント
-    'サウンドフォント読': { // @サウンドフォントのURLを指定して読み込む。URLに「デフォルト」を指定可能 // @サウンドフォントよむ
+    'サウンドフォント読': { // @サウンドフォントのURLを指定して読み込む。URLに「デフォルト」を指定可能 // @さうんどふぉんとよむ
         type: 'func',
         josi: [['から', 'の']],
         asyncFn: true,
         fn: async function (url, sys) {
-            // サウンドフォントのバイナリデータを読み込む
-            if (url === 'デフォルト') {
-                url = DEFAULT_SOUNDFONT_URL
-            }
-            console.log('load SoundFont file=', url)
-            try {
-                const response = await fetch(url)
-                if (!response.ok) {
-                    console.error('サウンドフォントの読み込みでURLのエラー : fetch error', response)
-                    return
-                }
-                const buffer = await response.arrayBuffer()
-                const sfData = new Uint8Array(buffer)
-                sys.__soundfont = sfData
-                console.log('loaded SoundFont file, size=', sfData.length)
-                return sfData
-            } catch (error) {
-                console.error('サウンドフォントの読み込みでURLのエラー : ', error)
-                sys.__soundfont = undefined
-                throw error
-            }
+            return await loadSoundFontAsync(url, sys)
         }
     },
-    'サウンドフォントMIDI演奏': { // @MIDIデータ(バイナリ)を指定して演奏する // @サウンドフォントMIDIえんそう
+    'サウンドフォントMIDI演奏': { // @MIDIデータ(バイナリ)を指定して演奏する // @さうんどふぉんとMIDIえんそう
         type: 'func',
         josi: [['を', 'の']],
         asyncFn: true,
         fn: async function (bin, sys) {
             if (typeof(sys.__soundfont) === 'undefined') {
-                throw new Error('サウンドフォントが読み込まれていません。先に「サウンドフォント読む」で読み込んでください。')
+                await loadSoundFontAsync(DEFAULT_SOUNDFONT_URL, sys)
             }
             // SoundFontを使ってMIDIを演奏する
             await playMIDIWithSoundFont(bin , sys.__soundfont, sys)
         }
     },
-    'サウンドフォントMIDI演奏停止': { // @再生中のMIDI演奏を停止する // @サウンドフォントえんそうていし
+    'サウンドフォントMIDI演奏停止': { // @再生中のMIDI演奏を停止する // @さうんどふぉんとえんそうていし
         type: 'func',
         josi: [],
         asyncFn: true,
         fn: async function (sys) {
-            if (typeof (sys.__jssynth) === 'undefined') {
-                return
-            }
-            await sys.__jssynth.stopPlayer()
-            try {
-                if (typeof(sys.__audio_context) !== 'undefined') {
-                    await sys.__audio_context.close()
-                    sys.__audio_context = undefined
-                }
-            } catch (e) {
-                console.error('AudioContext close error:', e)
-            }
+            await stopSoundFontMIDIAsync(sys)
         }
     },
-    'サウンドフォントMML演奏': { // @MMLをサウンドフォントで演奏する // @サウンドフォントMMLえんそう
+    'サウンドフォントMML演奏': { // @MMLをサウンドフォントで演奏する // @さうんどふぉんとMMLえんそう
         type: 'func',
         josi: [['を', 'の']],
         asyncFn: true,
         fn: async function (mml, sys) {
             if (typeof(sys.__soundfont) === 'undefined') {
-                throw new Error('サウンドフォントが読み込まれていません。先に「サウンドフォント読む」で読み込んでください。')
+                await loadSoundFontAsync(DEFAULT_SOUNDFONT_URL, sys)                
             }
             // MIDIをバイナリに変換
             bin = await compileMMLAsync(mml, sys)
@@ -205,6 +180,64 @@ const PluginMusic = {
             await playMIDIWithSoundFont(bin , sys.__soundfont, sys)
         }
     },
+    'サウンドフォント待時間設定': { // @再生前の待機時間をミリ秒で指定(エラーが出るときに指定) // @さうんどふぉんとまちじかんせってい
+        type: 'func',
+        josi: ["に", "へ"],
+        asyncFn: true,
+        fn: async function (v, sys) {
+            sys.__soundfont_wait_time = v
+        }
+    },
+}
+
+/// サウンドフォントの演奏を停止する
+async function stopSoundFontMIDIAsync(sys) {
+    // 演奏中でなければ何もしない
+    if (typeof (sys.__jssynth) === 'undefined') {
+        return
+    }
+    try {
+        try {
+            // 停止
+            await sys.__jssynth.stopPlayer()
+        } catch (e) {
+            console.error('JSSynth stopPlayer error:', e)
+        }
+        // AudioContextを閉じる
+        if (typeof(sys.__audio_context) !== 'undefined') {
+            await sys.__audio_context.close()
+            sys.__audio_context = undefined
+        }
+        // Synthesizerを破棄
+        sys.__jssynth = undefined
+        sys.__soundfont = undefined
+    } catch (e) {
+        console.error('AudioContext close error:', e)
+    }
+}
+
+/// サウンドフォントのバイナリデータを読み込む
+async function loadSoundFontAsync(url, sys) {   
+    if (url === 'デフォルト') {
+        url = DEFAULT_SOUNDFONT_URL
+    }
+    console.log('load SoundFont file=', url)
+    try {
+        const response = await fetch(url)
+        if (!response.ok) {
+            console.error('サウンドフォントの読み込みでURLのエラー : fetch error', response)
+            return
+        }
+        const buffer = await response.arrayBuffer()
+        const sfData = new Uint8Array(buffer)
+        sys.__soundfont = sfData
+        console.log('loaded SoundFont file, size=', sfData.length)
+        return sfData
+    } catch (error) {
+        console.error('サウンドフォントの読み込みでURLのエラー : ', error)
+        sys.__soundfont = undefined
+        throw error
+    }
 }
 
 /// SoundFontを使ってMIDIを演奏する
@@ -212,21 +245,43 @@ async function playMIDIWithSoundFont(binMidi, soundfont, sys) {
     // ライブラリの読み込み
     await loadScriptAsync(LIBFLUIDSYNTH_URL)
     await loadScriptAsync(JS_SYNTH_URL)
+    await sleep(sys.__soundfont_wait_time)
+
     // オーディオコンテキストの初期化
-    var context = new AudioContext();
-    var synth = new JSSynth.Synthesizer();
-    synth.init(context.sampleRate);
+    const context = new AudioContext()
+    const synth = new JSSynth.Synthesizer()
+    synth.init(context.sampleRate)
 
     // Create AudioNode (ScriptProcessorNode) to output audio data
-    var node = synth.createAudioNode(context, 8192); // 8192 is the frame count of buffer
-    node.connect(context.destination);
+    const node = synth.createAudioNode(context, 8192) // 8192 is the frame count of buffer
+    node.connect(context.destination)
 
     await synth.loadSFont(soundfont)
     await synth.addSMFDataToPlayer(binMidi)
+
+    // ループ再生設定
+    if (sys.__picoaudio_loop) {
+        try {
+            synth.setPlayerLoop(-1)
+            console.log('SoundFont MIDI loop enabled')
+        } catch (e) {
+            console.error('SoundFont MIDI loop error:', e)
+        }
+    } else {
+        // synth.setPlayerLoop(1)
+    }
+
+    // 演奏開始
     await synth.playPlayer()
+
 
     sys.__audio_context = context
     return sys.__jssynth = synth
+}
+
+/// スリープ
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /// MMLをコンパイルしてMIDIバイナリを返す(非同期版)

@@ -1,0 +1,145 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3079
+### タイトル=神経衰弱(PyScript/スマホ対応)
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=MIT
+### 説明=PyScriptで作った神経衰弱のプログラム
+### 対象バージョン=3.7.8
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2025-10-11 18:53:34
+###
+
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>神経衰弱</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head><body style="text-align:center; margin: 0px; padding: 0px;">
+    <!-- ゲーム画面の定義 --- (*1) -->
+    <div id="title" style="background-color:blue; color:white;">神経衰弱</div>
+    <div id="info">-</div>
+    <canvas id="canvas" width="380" height="665" mpy-click="card_click"></canvas>
+    <img id="cards" src="https://n3s.nadesi.com/image.php?f=578.png" style="display:none;">
+</body>
+<script type="module" src="https://pyscript.net/releases/2025.8.1/core.js"></script>
+<script type="mpy">
+import js
+import random
+# 定数の定義 --- (*2)
+CARD_IMAGE_URL = "./cards.png"
+CARD_W, CARD_H = 239, 335  # 素材画像のカード1枚のサイズ
+COL, ROW = 4, 5  # 描画先の列数と行数
+# 描画先のカード1枚のサイズを計算
+DES_W = 380 // COL  # 描画先のカード1枚の幅
+DES_H = int(DES_W / CARD_W * CARD_H)  # 描画先のカード1枚の高さ
+# 特殊カードのIDを定義
+CARD_BACK_ID = 53  # 裏向きカードのID
+CARD_NONE_ID = 56  # 既に取られたカードのID
+
+# グローバル変数 --- (*3)
+cards = []
+game = {"first": None, "second": None, "score": 0}
+
+# 簡単にHTML要素を取得する関数などを定義 --- (*4)
+q = lambda selector: js.document.querySelector(selector)
+def q_text(selector, text): q(selector).innerText = text # テキストを設定する関数
+set_timeout = lambda f, ms: js.setTimeout(f, ms) # タイマーを設定する関数
+
+# キャンバスとコンテキストの取得 --- (*5)
+canvas = q("#canvas")
+context = canvas.getContext("2d")
+
+def game_start():
+    """ゲームを開始する"""  # --- (*6)
+    global cards, game
+    # クローバーとダイヤのAから10のカードを用意
+    cards = list(range(0, 10)) + list(range(13*1, 13*1+10))
+    shuffle_list(cards)
+    # 初期化
+    game = game = {"first": None, "second": None, "score": 0}
+    q_text("#title", "神経衰弱")
+    q_text("#info", "カードを2枚選んでペアを見つけてください！")
+    draw_cards()
+
+def draw_cards():
+    """カードを描画する"""  # --- (*7)
+    # スコアを表示
+    q_text("#title", f"神経衰弱 ({game['score']}点)")
+    # カードを描画
+    for i, card in enumerate(cards):
+        # 描画位置を計算 --- (*8)
+        x = (i % COL) * DES_W
+        y = (i // COL) * DES_H
+        if card == CARD_NONE_ID:  # 既に取られたカード
+            context.clearRect(x, y, DES_W, DES_H)
+            continue
+        # どのカードを描画するか? --- (*9)
+        if i not in (game["first"], game["second"]):
+            card = CARD_BACK_ID  # 裏向きカードをセット
+        # カード素材の位置を確認 --- (*10)
+        sx = (card % 13) * CARD_W
+        sy = (card // 13) * CARD_H
+        context.drawImage(
+            q("img#cards"), sx, sy, CARD_W, CARD_H,
+            x, y, DES_W, DES_H)
+
+def card_click(event):
+    """カードがクリックされた時の処理"""  # --- (*11)
+    # クリックされた位置を取得 --- (*12)
+    rect = canvas.getBoundingClientRect()
+    x = int(event.clientX - rect.left)
+    y = int(event.clientY - rect.top)
+    # クリックされたカードを特定 --- (*13)
+    click_col = x // DES_W
+    click_row = y // DES_H
+    index = click_row * COL + click_col
+    if index >= len(cards):
+        return  # 範囲外
+    check_card(index)
+    draw_cards()
+
+def check_card(index):
+    """カードが選ばれた"""  # --- (*14)
+    if cards[index] == CARD_NONE_ID:
+        return  # 既に取られたカード
+    if game["first"] is None:  # 最初のカードを選択 --- (*15)
+        game["first"] = index
+        q_text("#info", "2枚目のカードを選んでください")
+    elif game["second"] is None:  # 2枚目のカードを選択 --- (*16)
+        if game["first"] == index:
+            return  # 同じカードは選べない
+        game["second"] = index
+        # ペアが見つかったか? --- (*17)
+        cno1 = cards[game["first"]] % 13
+        cno2 = cards[game["second"]] % 13
+        if cno1 == cno2:
+            q_text("#info", "ペアが見つかりました!")
+            game["score"] += 1
+            def clear_selection():
+                """ペアのカードを削除"""  # --- (*17)
+                cards[game["first"]] = CARD_NONE_ID
+                cards[game["second"]] = CARD_NONE_ID
+                game["first"] = None
+                game["second"] = None
+                if all(c == CARD_NONE_ID for c in cards):
+                    q_text("#info", "全部揃いました！ゲームクリア！")
+                    set_timeout(game_start, 2000)
+                draw_cards()
+            set_timeout(clear_selection, 2000)
+        else:  # --- (*18)
+            q_text("#info", "ペアが違います。もう一度選んでください")
+            def reset_selection():
+                game["first"] = None
+                game["second"] = None
+                q_text("#info", "1枚目のカードを選んでください")
+                draw_cards()
+            set_timeout(reset_selection, 2000)
+
+def shuffle_list(a_list):
+    """Fisher-Yatesでリストをシャッフルする関数"""  # --- (*19)
+    for i in range(len(a_list) - 1, 0, -1):
+        j = random.randint(0, i)
+        a_list[i], a_list[j] = a_list[j], a_list[i]
+
+set_timeout(game_start, 500)  # 初回は、自動的にゲームを開始 --- (*20)
+</script></html>

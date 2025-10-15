@@ -1,0 +1,22 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3080
+### タイトル=PyScriptでHello World
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=CC0
+### 説明=PyScriptでHello World
+### 対象バージョン=3.7.8
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2025-10-15 11:04:04
+###
+
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<!-- PyScriptを読み込む -->
+<script type="module" src="https://pyscript.net/releases/2025.8.1/core.js"></script>
+<!-- Pythonのプログラム -->
+<script type="mpy">
+    from pyscript import display
+    display("こんにちは！")
+</script>

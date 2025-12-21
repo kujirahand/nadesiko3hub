@@ -1,0 +1,65 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3137
+### タイトル=2×2リバーシ
+### 作者=みけCAT(user_id=398)
+### ライセンス=CC0
+### 説明=2マス×2マスのリバーシです。(笑)
+### 対象バージョン=3.7.11
+### URL=https://note.com/mi_ke_cat/n/nfac72329b7d1
+### 種類=wnako
+### タグ=
+### 更新日時=2025-12-22 00:00:36
+###
+
+DOM親要素の「text-align」に「center」をDOMスタイル設定。
+
+タイトル画面は「DIV」のDOM部品作成。
+ゲーム画面は「DIV」のDOM部品作成。
+それの「display」に「none」をDOMスタイル設定。
+
+タイトル画面にDOM親要素設定。
+「2×2リバーシ」のラベル作成。
+それの「font-size」に「300%」をDOMスタイル設定。
+2回、改行作成。
+開始ボタンは「スタート」のボタン作成。
+それに{
+  "font-size": "200%",
+  "padding": "1ex",
+}をDOMスタイル一括設定。
+
+ゲーム画面にDOM親要素設定。
+「data:image/svg+xml,<svg viewBox="0 0 101 101" xmlns="http://www.w3.org/2000/svg">
+<g stroke="black">
+  <rect x="1" y="1" width="100" height="100" fill="green" />
+  <line x1="50" y1="1" x2="50" y2="101" />
+  <line x1="1" y1="50" x2="101" y2="50" />
+</g>
+<g fill="white">
+  <circle cx="26" cy="26" r="20" />
+  <circle cx="76" cy="76" r="20" />
+</g>
+<g fill="black">
+  <circle cx="76" cy="26" r="20" />
+  <circle cx="26" cy="76" r="20" />
+</g>
+</svg>」の画像作成。
+それに{
+  "width": "15ex",
+  "height": "15ex",
+}をDOMスタイル一括設定。
+2回、改行作成。
+「引き分け！」のラベル作成。
+それの「font-size」に「200%」をDOMスタイル設定。
+2回、改行作成。
+復帰ボタンは「戻る」のボタン作成。
+それの「padding」に「0.5ex」をDOMスタイル設定。
+
+開始ボタンをクリックした時には
+  タイトル画面の「display」に「none」をDOMスタイル設定。
+  ゲーム画面の「display」に「block」をDOMスタイル設定。
+ここまで。
+
+復帰ボタンをクリックした時には
+  タイトル画面の「display」に「block」をDOMスタイル設定。
+  ゲーム画面の「display」に「none」をDOMスタイル設定。
+ここまで。

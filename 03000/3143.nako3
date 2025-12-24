@@ -1,0 +1,106 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3143
+### タイトル=回転タイルパズル - 数字版
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=MIT
+### 説明=回転タイルパズル - 数字版
+### 対象バージョン=3.7.11
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2025-12-24 18:36:09
+###
+
+<!DOCTYPE html><!-- 画面HTML --- (※1) -->
+<html><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>回転タイルパズル - 数字版</title>
+</head><body style="text-align: center;">
+    <h1 id="title">回転タイルパズル - 数字版</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+</body>
+<script>
+// 定数の定義 --- (※2)
+const RANDOM_COUNT = 4; // シャッフル回数
+const GRID_SIZE = 3; // グリッドのサイズ（3x3）
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const TILE_SIZE = canvas.width / GRID_SIZE;
+const dragInfo = {xy: [0, 0], f: false, tile: [0, 0]};
+// タイルを初期化 --- (※3)
+const tiles = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+// 行全体をスライド（循環シフト） --- (※4a)
+function shiftRow(row, toRight = true) {
+    if (row < 0 || row >= GRID_SIZE) return;
+    const r = tiles[row];
+    if (toRight) { r.unshift(r.pop()); } else { r.push(r.shift()); }
+}
+// 列全体をスライド（循環シフト）--- (※4b)
+function shiftColumn(col, toDown = true) {
+    if (col < 0 || col >= GRID_SIZE) return;
+    const c = tiles.map(row => row[col]);
+    if (toDown) { c.unshift(c.pop()); } else { c.push(c.shift()); }
+    for (let y = 0; y < GRID_SIZE; y++) { tiles[y][col] = c[y]; }
+}
+// スワイプ検出してタイルの移動処理 --- (※5)
+function handleSwipe(cx, cy) {
+    const p = [cx - dragInfo.xy[0], cy - dragInfo.xy[1]];
+    const distance = Math.sqrt(p[0] * p[0] + p[1] * p[1]);
+    if (distance > 40) {
+        if (Math.abs(p[0]) > Math.abs(p[1])) {
+            shiftRow(dragInfo.tile[1], p[0] > 0);
+        } else {
+            shiftColumn(dragInfo.tile[0], p[1] > 0);
+        }
+        dragInfo.f = false;
+        draw();
+    }
+}
+// タイルをシャッフルする - ランダムに行または列をシフト --- (※6)
+function shuffleTiles() {
+    for (let i = 0; i < RANDOM_COUNT; i++) {
+        const idx = Math.floor(Math.random() * GRID_SIZE);
+        const dir = (Math.random() > 0.5);
+        if (Math.random() > 0.5) { shiftRow(idx, dir) } else { shiftColumn(idx, dir) }
+    }
+}
+// ゲーム画面の描画 --- (※7)
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let y = 0; y < GRID_SIZE; y++) { // タイルを一つずつ描画
+        for (let x = 0; x < GRID_SIZE; x++) {
+            // 背景を描画
+            ctx.fillStyle = 'purple';
+            ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE - 2, TILE_SIZE - 2);
+            // タイル番号を描画
+            ctx.fillStyle = 'white'; ctx.font = '50px Arial';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(tiles[y][x], x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2);
+        }
+    }
+}
+// マウスのイベントを設定
+canvas.addEventListener('mousedown', (e) => { // マウスボタンを押した時 --- (※8)
+    dragInfo.f = true;
+    dragInfo.xy = [e.clientX, e.clientY]; // 押した位置を保存
+    // マウス座標からタイル位置を取得
+    const r = canvas.getBoundingClientRect();
+    dragInfo.tile = [ // タイルの位置を保存
+        Math.floor((e.clientX - r.left) / TILE_SIZE),
+        Math.floor((e.clientY - r.top) / TILE_SIZE)
+    ];
+});
+canvas.addEventListener('mousemove', (e) => { // カーソルを移動したとき --- (※9)
+    if (dragInfo.f) {
+        handleSwipe(e.clientX, e.clientY);
+        const isClear = tiles.flat().every((v, i) => v === i + 1); // クリア判定
+        if (isClear) {
+            document.getElementById('title').innerText = 'クリアしました！';
+        }
+    }
+});
+canvas.addEventListener('mouseup', () => {dragInfo.f = false;});
+// 初回の処理 --- (※10)
+shuffleTiles(); draw();
+</script>
+</html>

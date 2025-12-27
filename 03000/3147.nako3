@@ -1,0 +1,253 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3147
+### タイトル=DOM和属性革命プラグイン
+### 作者=TKI(user_id=273)
+### ライセンス=CC0
+### 説明=すべてのDOMはDOM和属性、DOM和スタイルの辞書キーを得る
+### 対象バージョン=3.7.11
+### URL=
+### 種類=wnako
+### タグ=プラグイン
+### 更新日時=2025-12-27 21:49:19
+###
+
+/*
+ Object.definePropertyを初めて知ったのでウキウキしながら命令にしました
+ js部分はcopilot作
+ 注意：取り込んだ時に革命が起きます（●DOM和属性革命が実行されます）
+ 
+ 効能：すべてのDOMはDOM和属性、DOM和スタイルの辞書キーを得る
+ 
+ 
+ DOM和属性＠hogeをユーザー側で追加する場合は、追加後に「DOM和属性革命」命令を実行することで有効になります。
+ 
+ 
+ //ゲッター・セッター命令
+ ※ 注意：用法を誤ると無限ループが発生します
+ ●値セットした時(funcでobjのkeyを|keyに)
+ ●値ゲットした時(funcでobjのkeyを|keyから)
+ 
+ //新DOM和属性命令　domに辞書キーを追加する
+ ※ 注意：HTMLElement.prototypeに追加します
+ ●DOM和属性追加（jpKeyをoriginalKeyに|originalKeyへ）
+ ●DOM和スタイル追加（jpKeyをoriginalKeyに|originalKeyへ）
+ 
+ ●DOM和属性革命()　　//すべてのDOMはDOM和属性、DOM和スタイルの辞書キーを得る
+ 
+*/
+
+//-----------------------
+//objのkeyに値を出し入れするとoriginalKeyから出し入れする（変数エイリアス作成）
+●defineProperty(obj,jpkey,originalKey)：
+　『(function (obj, jpKey, originalKey) {
+  Object.defineProperty(obj, jpKey, {
+    get() {return this[originalKey]},
+    set(v) {this[originalKey] = v;},
+    enumerable: false,
+    configurable: true
+  });
+})』を[obj, jpkey, originalKey]でJS関数実行
+　objを戻す
+/*
+日本語名が決まらなかった
+●呼称する(objのoriginalKeyをjpkeyと)：
+　defineProperty(obj,jpkey,originalKey)
+●代行する(objのjpkeyがoriginalKeyを)：
+　defineProperty(obj,jpkey,originalKey)
+●任命する(objのjpkeyをoriginalKeyに)：
+　defineProperty(obj,jpkey,originalKey)
+●業務委託(objのjpkeyにoriginalKeyを)：
+　defineProperty(obj,jpkey,originalKey)
+*/
+
+//-----------------------
+ //ゲッター・セッター命令
+ ※ 注意：用法を誤ると無限ループが発生します
+//-----------------------
+//辞書型objのkeyに値を入れた時、funcを実行します
+●値セットした時(funcでobjのkeyを|keyに|keyへ)：
+　『(
+function 値セット時(func, obj, key) {
+  const desc = Object.getOwnPropertyDescriptor(obj, key) || {};
+  Object.defineProperty(obj, key, {
+    get: desc.get || function () {},
+    set: function (value) {
+      sys.__setSysVar('対象', this);
+      func(value);
+    },
+    enumerable: true,
+    configurable: true
+  });
+})』を[func, obj, key]でJS関数実行
+　objを戻す
+
+//辞書型objのkeyの値を取得した時、funcを実行します
+●値ゲットした時(funcでobjのkeyを|keyに|keyへ|keyから)：
+　『(
+function 値ゲット時(func, obj, key) {
+  const desc = Object.getOwnPropertyDescriptor(obj, key) || {};
+  Object.defineProperty(obj, key, {
+    get: function () {
+      sys.__setSysVar('対象', this);
+      return func();
+    },
+    set: desc.set || function (value) { obj[key] = value },
+    enumerable: true,
+    configurable: true
+  });
+})』を[func, obj, key]でJS関数実行
+　objを戻す
+
+
+
+//-----------------------
+ //新DOM和属性命令
+ ※ 注意：HTMLElement.prototypeに追加します
+//-----------------------
+//日本語名と英語名(domの属性名)を指定してDOMのプロパティに紐づけします
+●DOM和属性追加（jpKeyをoriginalKeyに|originalKeyへ|originalKeyとして）：
+　DOM和属性[jpKey] = originalKey //追加
+　『(
+function DOM和属性追加(jpKey, originalKey) {
+  Object.defineProperty(HTMLElement.prototype, jpKey, {
+    // domのプロパティを確認して存在すればその値を設定する #1392
+    get() {
+      if (originalKey in this) {
+        return this[originalKey];
+      } else {
+        return this.getAttribute(originalKey);
+      }
+    },
+    set(v) {
+      if (originalKey in this) {
+        this[originalKey] = v;
+      } else {
+        this.setAttribute(originalKey, v === true ? "" : String(v));
+      }
+    },
+    enumerable: false,
+    configurable: true
+  });
+})』を[jpKey, originalKey]でJS関数実行
+
+
+//日本語名と英語名(domのcssプロパティ名)を指定してDOMのスタイルに紐づけします
+●DOM和スタイル追加（jpKeyをoriginalKeyに|originalKeyへ|originalKeyとして）：
+　DOM和スタイル[jpKey] = originalKey //追加
+  『(function DOMスタイル追加(jpKey, originalKey) {
+
+  // kebab-case → camelCase 変換
+  function toCamelCase(cssName) {
+    return cssName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  }
+
+  const camelKey = toCamelCase(originalKey);
+
+  Object.defineProperty(HTMLElement.prototype, jpKey, {
+    get() {
+      return this.style[camelKey];
+    },
+    set(v) {
+      this.style[camelKey] = v;
+    },
+    enumerable: false,
+    configurable: true
+  });
+})』を[jpKey, originalKey]でJS関数実行
+
+
+
+
+//注意：取り込んだ時にDOM和属性革命が実行されます
+//すべてのDOMはDOM和属性、DOM和スタイルの辞書キーを得る（クリアで消えません　あしからず）
+●DOM和属性革命
+　DOM和属性を反復：
+　　　対象キーを対象へDOM和属性追加
+　DOM和スタイルを反復：
+　　　対象キーを対象へDOM和スタイル追加
+　「ソース」を「src」へDOM和属性追加 //img、audio、video
+　
+　
+　//DOMプロパティ情報がhookであるものは関数へ
+　変数　HTMLElementprototype　= 『HTMLElement.prototype』をJS実行
+　HTMLElementprototypeの"有効"を値セットした時には (v) DOM有効設定(対象,v)。。。
+　HTMLElementprototypeの"有効"を値ゲットした時には  DOM有効取得(対象)。。。
+　HTMLElementprototypeの"可視"を値セットした時には (v) DOM可視設定(対象,v)。。。
+　HTMLElementprototypeの"可視"を値ゲットした時には  DOM可視取得(対象)。。。
+　HTMLElementprototypeの"ポケット"を値セットした時には (v) DOMポケット設定(対象,v)。。。
+　HTMLElementprototypeの"ポケット"を値ゲットした時には  DOMポケット取得(対象)。。。
+　HTMLElementprototypeの"ヒント"を値セットした時には (v) DOMヒント設定(対象,v)。。。
+　HTMLElementprototypeの"ヒント"を値ゲットした時には  DOMヒント取得(対象)。。。
+　HTMLElementprototypeの"テキスト"を値セットした時には (v) DOMテキスト設定(対象,v)。。。
+　HTMLElementprototypeの"テキスト"を値ゲットした時には  DOMテキスト取得(対象)。。。
+　/*
+//↑のスクリプト作成用
+結果=「」
+DOMプロパティ情報を反復：
+　もし対象が「hook」ならば：
+　　結果=結果に「HTMLElementprototypeの"{対象キー}"を値セットした時には (v) DOM{対象キー}設定(対象,v)。。。」を一行追加
+　　結果=結果に「HTMLElementprototypeの"{対象キー}"を値ゲットした時には  DOM{対象キー}取得(対象)。。。」を一行追加
+結果のテキストエリア作成
+*/
+　
+　//セレクトボックス専用　
+　変数　HTMLSelectElement = 『HTMLSelectElement.prototype』をJS実行
+　{
+　　"値":"selectedIndex",
+　　"行":"size"
+　}を反復：
+　　　defineProperty(HTMLSelectElement,対象キー,対象)
+　
+　HTMLSelectElementの「アイテム」を値セットした時には (v)：
+　　　vを対象へセレクトボックスアイテム設定
+　HTMLSelectElementの「アイテム」を値ゲットした時には：
+　　　配列マップ(関数(v)　それはv["label"]。。。,対象["options"])
+　HTMLSelectElementの「テキスト」を値ゲットした時には　対象["value"]を戻す。。。
+　
+　//オーディオ、ビデオタグ共通
+　変数　HTMLMediaElement = 『HTMLMediaElement.prototype』をJS実行
+　{
+　　"再生位置":"currentTime"
+　　"シーク中","seeking"
+　　"長さ","duration"
+　　"完了","ended"
+　　"ミュート","muted"
+　　"ループ","loop"
+　　"準備完了","readyState"
+　　"自動再生","autoplay"
+　}を反復：
+　　　defineProperty(HTMLMediaElement,対象キー,対象)
+　
+　//ビデオタグ　上記も参照
+　変数　HTMLVideoElement = 『HTMLVideoElement.prototype』をJS実行
+　{
+　　"ビデオ高","videoHeight"
+　　"ビデオ幅","videoWidth"
+　　"画像","poster"
+　}を反復：
+　　　defineProperty(HTMLVideoElement,対象キー,対象)
+　
+ここまで
+
+/*
+　//ちからつきました
+　//キャンバス　　キャンバス＠「文字色」など
+　//変数　HTMLCanvasElement = 『HTMLCanvasElement.prototype』をJS実行
+　//{
+　//　"文字色":""
+　//　"文字サイズ":"font-size"
+　//}を反復
+　//　　canvas.getContext('2d').
+*/
+
+//-----------------------
+
+
+もしプラグイン名が「メイン」ならば：
+　　「使用方法は[https://n3s.nadesi.com/id.php?3148](https://n3s.nadesi.com/id.php?3148)を参照」をマークダウンHTML変換
+　　それのラベル作成
+違えば：
+　　//取り込んだ時に革命が起きます
+　　//現在・過去・未来のすべてのDOMはDOM和属性、DOM和スタイルの辞書キーを得る（クリアで消えません　あしからず）
+　　DOM和属性革命
+　　

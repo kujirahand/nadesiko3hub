@@ -1,0 +1,272 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3191
+### タイトル=絵文字をアイコンファイルにするツール
+### 作者=TKI(user_id=273)
+### ライセンス=CC0
+### 説明=絵文字をアイコンファイルにするツール(AI一部利用)
+### 対象バージョン=3.7.15
+### URL=
+### 種類=wnako
+### タグ=ツール,アイコン,AI一部利用
+### 更新日時=2026-02-10 01:11:10
+###
+
+//絵文字をアイコンファイルにするツール
+！「https://n3s.nadesi.com/plain/panel.nako3」を取り込む
+！インデント構文
+
+//　[＜]　[__0__]　[＞] の数値変更部品
+●直前部品inc
+　変数　dom = 対象の直前部品
+　domからテキスト取得
+　dom＠「テキスト」はINT(それ) +1
+
+●直後部品dec
+　変数　dom = 対象の直後部品
+　domからテキスト取得
+　dom＠「テキスト」はINT(それ) -1
+
+
+//説明
+『### ■ 絵文字をアイコンファイルにするツール ■
+
+---
+1. 機能  
+絵文字をキャンバスにでかでかと表示します  
+アイコンファイル(.ico)としてダウンロードできます  
+ファイルアイコンとして使用できます  
+（内部に16, 24, 32, 48, 64, 128, 256のサイズの画像を内包しています）
+
+2. 使い方  
+「字」の入力欄に字を入れます（絵文字や漢字など）  
+X,Y,サイズをいい感じに微調整します  
+ダウンロードボタンでアイコンファイルとしてダウンロード  
+
+3. 注意  
+ブラウザやOSによって絵文字の画風が変わります  
+好みの画風がでる環境で実行してください
+
+---
+』をマークダウンHTML変換
+それのラベル作成
+改行作成
+
+1回　//キャンバス
+　絵文字キャンバス = [256,256]のキャンバス作成
+　それ＠「ボーダー」は「1px solid」
+　描画中コンテキスト["textAlign"] = "center"
+　描画中コンテキスト["textBaseline"] = "middle"
+　「アイコンとしてダウンロード」のボタン作成
+　それのクリック時には
+　　　再描画
+　　　アイコンダウンロード
+　改行作成
+　
+
+//-------------------
+//copilot作　
+inputスタイル={
+    "text-align": "center";   /* 入力文字を中央寄せ */
+    "width": 100px;         /* 幅を指定（任意） */
+    "padding": 1px;         /* 内側余白 */
+    "font-size": 16px;      /* 文字サイズ */
+}
+//それにinputスタイルをDOMスタイル一括設定　//で使う
+
+//-------------------
+「div」のDOM部品作成
+それに部品作成先変更
+それの変更時には
+　　もし対象["tagName"]が「INPUT」ならば
+　　　　再描画
+
+
+1回　//UI
+　「字：」のラベル作成
+　絵文字エディタ=「🌸」のエディタ作成
+　それにinputスタイルをDOMスタイル一括設定
+　それ＠「文字サイズ」は2em
+　それの変更時には
+　　　再描画
+　改行作成
+
+1回
+　「Ｘ：」のラベル作成
+　それ＠「幅」はラベル幅
+　「＜」のボタン作成
+　それのクリック時には
+　　　直後部品decして再描画
+　Xエディタ = 「0」のエディタ作成
+　それにinputスタイルをDOMスタイル一括設定
+　それ＠「幅」は3em
+　「＞」のボタン作成
+　それのクリック時には
+　　　直前部品incして再描画
+　改行作成
+
+1回
+　「Ｙ：」のラベル作成
+　「＜」のボタン作成
+　それのクリック時には
+　　　直後部品decして再描画
+　Yエディタ = 「20」のエディタ作成
+　それにinputスタイルをDOMスタイル一括設定
+　それ＠「幅」は3em
+　「＞」のボタン作成
+　それのクリック時には
+　　　直前部品incして再描画
+　改行作成
+
+1回
+　「サイズ：」のラベル作成
+　「＜」のボタン作成
+　それのクリック時には
+　　　直後部品decして再描画
+　サイズエディタ = 「205」のエディタ作成
+　それにinputスタイルをDOMスタイル一括設定
+　それ＠「幅」は3em
+　「＞」のボタン作成
+　それのクリック時には
+　　　直前部品incして再描画
+　改行作成
+
+1回
+　「文字色：」のラベル作成
+　文字色エディタは色選択ボックス作成
+　「(絵文字でない字のときに使用します)」のラベル作成
+
+
+//------------------
+//copilot作
+//　blobを結合してicoファイルにする。blobを返す
+//　icoファイルには複数サイズの画像を内包する
+createICO = 『(
+async function createICO(images) {
+  // images: [{width, height, blob}, ...]
+  
+  const pngBuffers = await Promise.all(images.map(img => img.blob.arrayBuffer()));
+  const entrySize = 16;
+  const headerSize = 6 + entrySize * images.length;
+
+  let offset = headerSize;
+  const totalSize = headerSize + pngBuffers.reduce((a, b) => a + b.byteLength, 0);
+
+  const buffer = new ArrayBuffer(totalSize);
+  const view = new DataView(buffer);
+
+  // ICONDIR
+  view.setUint16(0, 0, true); // reserved
+  view.setUint16(2, 1, true); // type = icon
+  view.setUint16(4, images.length, true);
+
+  let pos = 6;
+
+  images.forEach((img, i) => {
+    const png = pngBuffers[i];
+
+    view.setUint8(pos + 0, img.width === 256 ? 0 : img.width);
+    view.setUint8(pos + 1, img.height === 256 ? 0 : img.height);
+    view.setUint8(pos + 2, 0); // colors
+    view.setUint8(pos + 3, 0); // reserved
+    view.setUint16(pos + 4, 1, true); // planes
+    view.setUint16(pos + 6, 32, true); // bit count
+    view.setUint32(pos + 8, png.byteLength, true); // size
+    view.setUint32(pos + 12, offset, true); // offset
+
+    new Uint8Array(buffer, offset, png.byteLength).set(new Uint8Array(png));
+    offset += png.byteLength;
+    pos += entrySize;
+  });
+
+  return new Blob([buffer], { type: "image/x-icon" });
+}
+)』をJS実行
+
+//キャンバスを各サイズに
+●blob作成作業
+　変数　sw = 絵文字キャンバス＠「幅属性」
+　変数　sh = 絵文字キャンバス＠「高属性」
+　変数　images = []
+　変数　内包サイズ = [16, 24, 32, 48, 64, 128, 256] //アイコンの大きさリスト
+　
+　内包サイズを反復
+　　　変数　size = 対象
+　　　変数　canvas = [size,size]のキャンバス作成
+　　　canvas＠「非表示」はオン
+　　　絵文字キャンバスの[0,0,sw,sh]を[0,0,size,size]へ画像部分描画 //IMGのSXYをDXYへ
+　　　変数　blob = 描画データBLOB変換
+　　　
+　　　imagesへ{ "width": size, "height": size, "blob":blob}を配列追加
+　　　
+　　　canvasのDOM部品削除
+　　　
+　
+　blob = createICOを[images]でAWAIT実行 //上記js
+　blobを戻す
+
+●アイコンダウンロード
+　変数　blob = blob作成作業
+　変数　url = 「URL.createObjectURL」を[blob]でJS関数実行
+　
+　//絵文字とかの文字コードをファイル名とする
+　絵文字エディタからテキスト取得
+　変数　asc = ASC(それ)
+　変数　filename = 「icon{asc}.ico」
+　//??[asc, filename]
+　『(
+function(url,filename) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+}
+)』を[url,filename]でJS関数実行
+
+//------------------
+改行作成
+改行作成
+「絵文字コピー用（適当）」のラベル作成
+「再抽選」のボタン作成
+それのクリック時には
+　　ランダム候補選出
+改行作成
+ランダム候補=「」のラベル作成
+●ランダム候補選出
+　それ = [127924,128512,129293,127740,127740+200,9800,127232,127502,39729]を配列シャッフル
+　変数　d = それ[0]
+　変数　txt = 「{d}：{改行}」
+　200回
+　　txt = txtに「&#{d};」を追加
+　　d=d+1
+　　もし回数%50=0ならば
+　　　　txt = txtに「<br>」を追加
+　ランダム候補にtxtをテキスト設定
+//------------------
+//無駄かも
+//フォントセレクタUI=["Noto Color Emoji","Twemoji","Segoe UI Emoji","Apple Color Emoji"]のセレクトボックス作成
+
+●再描画
+　絵文字キャンバスへ描画開始
+　全描画クリア
+　変数　sw = 絵文字キャンバス＠「幅属性」
+　変数　sh = 絵文字キャンバス＠「高属性」
+　
+　変数　size = サイズエディタからテキスト取得
+　//フォントわからんです
+　変数　font = ["Noto Color Emoji","Twemoji","Segoe UI Emoji","Apple Color Emoji"][2]
+　"{size}px '{font}'"に描画フォント設定
+　
+　変数　emoji = 絵文字エディタからテキスト取得
+　変数　ix = Xエディタからテキスト取得
+　変数　iy = Yエディタからテキスト取得
+　x = sw/2 + ix
+　y = sh/2 + iy
+　文字色エディタからテキスト取得
+　それに塗色設定
+　[x,y]へemojiを文字描画
+　//??[x,y,emoji]
+
+//------------------
+
+ランダム候補選出
+再描画

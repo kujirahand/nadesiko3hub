@@ -1,0 +1,95 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3396
+### タイトル=Tavia browser
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=GoogleとBingとDuckDuckGoとYahoo!Japanとそのほかの4つの検索エンジンから選んで検索できます。　空白を選択したらどこかに飛びます。　URLは難読化してます。
+### 対象バージョン=3.1.19
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-03 10:32:52
+###
+
+// ver 1.0 β版
+// ver 2.3 安定版
+// ver 4.5 開くタブを現在開いているタブから、別のタブを開くように再構築
+// ver 4.6 複数のbrowserに対応
+// ver 5.2 browserをセレクトボックスにより選択できるように変更
+// ver 6.3 他の作品を参考に、UIを見やすくしました。
+// ver 6.4 ラベルのフォントを変更
+# 1. 画面デザインの作成
+DOM親要素に『<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playpen+Sans+Deva&display=swap" rel="stylesheet">
+<div id="表示">   Tavia browser</div>』をHTML設定します。
+「#表示」に{「font-family」：「Playpen Sans Deva」、文字サイズ： 「55px」、余白：「45px」}をDOMスタイル一括設定します。
+改行作成。
+検索欄＝空のエディタ作成。
+それの「幅」に「500px」をDOMスタイル設定。
+それの「高さ」に「30px」をDOMスタイル設定。
+それの「placeholder」に「ここに検索したい言葉を入力...」をDOM属性設定。
+それの「文字サイズ」に「21px」をDOMスタイル設定。
+改行作成。改行作成。
+
+
+# セレクトボックス（プルダウン）を作成
+["  ","Yahoo! JAPAN","Bing","DuckDuckGo","Google"]のセレクトボックス作成し、ブラウザ選択に代入。
+それの「幅」に「250px」をDOMスタイル設定。
+検索ボタン＝「検索」のボタン作成。
+それの「幅」に「100px」をDOMスタイル設定。
+
+# 2. 検索実行の関数
+●検索処理とは
+    キーワード＝検索欄のテキスト取得。
+    もし、キーワード≠「」ならば
+        選択名＝ブラウザ選択のテキスト取得。
+        
+        E_Y＝「aHR0cHM6Ly9zZWFyY2gueWFob28uY28uanAvc2VhcmNoP3A9」
+        E_B＝「aHR0cHM6Ly93d3cuYmluZy5jb20vc2VhcmNoP3E9」
+        E_D＝「aHR0cHM6Ly9kdWNrZHVja2dvLmNvbS8/cT0=」
+        E_G＝「aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS9zZWFyY2g/cT0=」
+        O0＝「aHR0cHM6Ly93d3cuYmFpZHUuY29tL3M/d2Q9」
+        O1＝「aHR0cHM6Ly9zZWFyY2gubmF2ZXIuY29tL3NlYXJjaC5uYXZlcj9xdWVyeT0=」
+        O2＝「aHR0cHM6Ly95YW5kZXguY29tL3NlYXJjaC8/dGV4dD0=」
+        O3＝「aHR0cHM6Ly93d3cuc29nb3UuY29tL3dlYj9xdWVyeT0=」
+        O4＝「aHR0cHM6Ly93d3cuZWNvc2lhLm9yZy9zZWFyY2g/cT0=」
+        
+        R＝(5の乱数)
+        T＝O0
+        もし、R＝1ならば
+            T＝O1
+        ここまで。
+        もし、R＝2ならば
+            T＝O2
+        ここまで。
+        もし、R＝3ならば
+            T＝O3
+        ここまで。
+        もし、R＝4ならば
+            T＝O4
+        ここまで。
+        
+        # 明示的に選択されている場合はそれぞれのURLをセット
+        もし、選択名＝「Yahoo! JAPAN」ならば
+            T＝E_Y
+    　　ここまで。
+        もし、選択名＝「Bing」ならば
+            T＝E_B
+    　　ここまで。
+    　　もし、選択名＝「DuckDuckGo」ならば
+            T＝E_D
+    　　ここまで。
+        もし、選択名＝「Google」ならば
+            T＝E_G
+    　　ここまで。
+        
+        # JSで復号を実行
+        検索URL＝「decodeURIComponent(escape(window.atob('」 ＆ T ＆ 「')));」をJS実行。
+        
+        URL＝検索URL ＆ (キーワードをURLエンコード)
+        「window.open('」＆URL＆「', '_blank');」をJS実行。
+    ここまで
+ここまで
+
+# 3. ボタンと関数をひも付ける
+検索ボタンの「onclick」に「検索処理」をDOMイベント設定。

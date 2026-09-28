@@ -1,0 +1,40 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3377
+### タイトル=Go in duck hoo!
+### 作者=粉ぁぁぁ雪ぃぃぃ(user_id=0)
+### ライセンス=MIT
+### 説明=GoogleとBingとDuckDuckGoとYahoo!Japanの4つの検索エンジンから選んで検索できます。
+### 対象バージョン=3.7.20
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-07-16 11:16:58
+###
+
+「Go in duck hoo!」のラベル作成
+それの「文字サイズ」に「30px」をDOMスタイル設定
+改行作成
+空のエディタ作成して、input_searchに代入
+それの「幅」に「450px」をDOMスタイル設定。
+それの「placeholder」に「ここに検索したい言葉を入力...」をDOM属性設定
+改行作成
+「Googleで検索」のボタン作成して、google_search_buttonに代入
+それをクリックした時には
+    input_searchのテキスト取得して、search_wordに代入。
+    「window.open('https://www.google.com/search?q={search_word}', '_blank');」をJS実行。
+ここまで
+「Bingで検索」のボタン作成して、bing_search_buttonに代入。
+それをクリックした時には
+    input_searchのテキスト取得して、search_wordに代入。
+    「window.open('https://www.bing.com/search?q={search_word}', '_blank');」をJS実行。
+ここまで
+「DuckDuckGoで検索」のボタン作成して、duckduckgo_search_buttonに代入
+それをクリックした時には
+    input_searchのテキスト取得して、search_wordに代入
+    「window.open('https://duckduckgo.com/?q={search_word}', '_blank');」をJS実行。
+ここまで
+「Yahoo!Japanで検索」のボタン作成して、yahoojapan_search_buttonに代入
+それをクリックした時には
+    input_searchのテキスト取得して、search_wordに代入
+    「window.open('https://search.yahoo.co.jp/search?p={search_word}', '_blank')」をJS実行。
+ここまで

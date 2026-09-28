@@ -1,0 +1,174 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3431
+### タイトル=現在のUNIXタイムスタンプ
+### 作者=Aris(user_id=565)
+### ライセンス=BSD
+### 説明=現在の日時をUNIXタイムスタンプで表示します。
+### 対象バージョン=3.7.22
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-26 10:28:15
+###
+
+// =========================================================
+// ラベルを作成する
+// =========================================================
+●（テキストで）ラベル作成
+    L ＝「span」をDOM要素作成。
+    Lにテキストをテキスト設定。
+    Lの「style」に「font-weight: bold; color: #64748b; margin-right: 6px; font-size: 14px;」をDOM属性設定。
+    Lで戻る。
+ここまで。
+
+
+// =========================================================
+// グローバル変数（リアルタイムで書き換える要素の参照を保持）
+// =========================================================
+保持_ミリ秒表示 ＝ 未定義
+保持_日本語表記 ＝ 未定義
+保持_英語表記 ＝ 未定義
+保持_ISOローカル ＝ 未定義
+保持_ISO_UTC ＝ 未定義
+保持_RFC2822 ＝ 未定義
+
+
+// =========================================================
+// 1度だけカードの枠組みを作成し、各要素を変数に保存する
+// =========================================================
+●時刻カード枠組み作成
+    # 外枠カードの作成
+    CARD ＝「div」をDOM要素作成。
+    カードスタイル ＝「display: block; max-width: 750px; margin: 16px 0; padding: 20px; background-color: #ffffff; border: 2px solid #3b82f6; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); font-family: sans-serif; line-height: 1.6; color: #0f172a;」
+    CARDの「style」にカードスタイルをDOM属性設定。
+
+    # タイトル部分
+    TITLE ＝「div」をDOM要素作成。
+    TITLEに「現在のUNIXタイムスタンプ」をテキスト設定。
+    TITLEの「style」に「font-size: 18px; font-weight: bold; color: #2563eb; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;」をDOM属性設定。
+    CARDへTITLEをDOM子要素追加。
+
+    # 情報表示エリア
+    INFO_BOX ＝「div」をDOM要素作成。
+    INFO_BOXの「style」に「font-size: 14px; color: #0f172a;」をDOM属性設定。
+
+    # 1. UNIX時間（ミリ秒）
+    LINE1 ＝「div」をDOM要素作成。
+    LINE1の「style」に「margin-bottom: 14px; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;」をDOM属性設定。
+    L1 ＝「UNIX時間（ミリ秒）:」でラベル作成。
+    LINE1へL1をDOM子要素追加。
+    T1 ＝「span」をDOM要素作成。
+    T1の「style」に「font-family: monospace; font-size: 16px; font-weight: bold; color: #2563eb;」をDOM属性設定。
+    LINE1へT1をDOM子要素追加。
+    INFO_BOXへLINE1をDOM子要素追加。
+    保持_ミリ秒表示 ＝ T1
+
+    # 2. 日時フォーマットの見出し
+    SUBTITLE ＝「div」をDOM要素作成。
+    SUBTITLEに「日時フォーマット (Asia/Tokyo)」をテキスト設定。
+    SUBTITLEの「style」に「font-weight: bold; color: #1e293b; margin-bottom: 8px; margin-top: 16px;」をDOM属性設定。
+    INFO_BOXへSUBTITLEをDOM子要素追加。
+
+    // 日本語表記
+    ROW1 ＝「div」をDOM要素作成。
+    ROW1の「style」に「display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;」をDOM属性設定。
+    RL1 ＝「日本語表記」でラベル作成。
+    ROW1へRL1をDOM子要素追加。
+    RT1 ＝「span」をDOM要素作成。
+    RT1の「style」に「font-weight: 500;」をDOM属性設定。
+    ROW1へRT1をDOM子要素追加。
+    INFO_BOXへROW1をDOM子要素追加。
+    保持_日本語表記 ＝ RT1
+
+    // 英語表記
+    ROW2 ＝「div」をDOM要素作成。
+    ROW2の「style」に「display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;」をDOM属性設定。
+    RL2 ＝「英語表記」でラベル作成。
+    ROW2へRL2をDOM子要素追加。
+    RT2 ＝「span」をDOM要素作成。
+    RT2の「style」に「font-weight: 500;」をDOM属性設定。
+    ROW2へRT2をDOM子要素追加。
+    INFO_BOXへROW2をDOM子要素追加。
+    保持_英語表記 ＝ RT2
+
+    // ISO 8601 (ローカル)
+    ROW3 ＝「div」をDOM要素作成。
+    ROW3の「style」に「display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;」をDOM属性設定。
+    RL3 ＝「ISO 8601 形式（地域時間）」でラベル作成。
+    ROW3へRL3をDOM子要素追加。
+    RT3 ＝「span」をDOM要素作成。
+    RT3の「style」に「font-family: monospace; color: #64748b;」をDOM属性設定。
+    ROW3へRT3をDOM子要素追加。
+    INFO_BOXへROW3をDOM子要素追加。
+    保持_ISOローカル ＝ RT3
+
+    // ISO 8601 (UTC)
+    ROW4 ＝「div」をDOM要素作成。
+    ROW4の「style」に「display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;」をDOM属性設定。
+    RL4 ＝「ISO 8601 形式（協定世界時）」でラベル作成。
+    ROW4へRL4をDOM子要素追加。
+    RT4 ＝「span」をDOM要素作成。
+    RT4の「style」に「font-family: monospace; color: #64748b;」をDOM属性設定。
+    ROW4へRT4をDOM子要素追加。
+    INFO_BOXへROW4をDOM子要素追加。
+    保持_ISO_UTC ＝ RT4
+
+    // RFC 2822
+    ROW5 ＝「div」をDOM要素作成。
+    ROW5の「style」に「display: flex; justify-content: space-between; padding: 8px 0;」をDOM属性設定。
+    RL5 ＝「RFC 2822 形式（標準日時）」でラベル作成。
+    ROW5へRL5をDOM子要素追加。
+    RT5 ＝「span」をDOM要素作成。
+    RT5の「style」に「font-family: monospace; color: #64748b;」をDOM属性設定。
+    ROW5へRT5をDOM子要素追加。
+    INFO_BOXへROW5をDOM子要素追加。
+    保持_RFC2822 ＝ RT5
+
+    CARDへINFO_BOXをDOM子要素追加。
+    DOM親要素へCARDをDOM子要素追加。
+ここまで。
+
+
+// =========================================================
+// データを取得して既存の要素のテキストだけを書き換える
+// =========================================================
+●時刻データ更新処理
+    現在ミリ秒＝システム時間ミリ秒
+
+    // JS実行部分（{ } 誤認を防ぐため CHR(123), CHR(125) を使用）
+    JS文字列_日本語＝「new Intl.DateTimeFormat('ja-JP', 」＆CHR(123)＆「 dateStyle: 'full', timeStyle: 'medium', timeZone: 'Asia/Tokyo' 」＆CHR(125)＆「).format(new Date())」
+    JS文字列_英語＝「new Intl.DateTimeFormat('en-US', 」＆CHR(123)＆「 dateStyle: 'full', timeStyle: 'medium', timeZone: 'Asia/Tokyo' 」＆CHR(125)＆「).format(new Date())」
+    JS文字列_ローカル＝「new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000).toISOString().slice(0, -1) + '+09:00'」
+    JS文字列_UTC＝「new Date().toISOString()」
+    JS文字列_RFC＝「new Date().toUTCString()」
+
+    日本語表記＝JS文字列_日本語をJS実行
+    英語表記＝JS文字列_英語をJS実行
+    ISO_ローカル＝JS文字列_ローカルをJS実行
+    ISO_UTC＝JS文字列_UTCをJS実行
+    RFC2822＝JS文字列_RFCをJS実行
+
+    # 再描画せず、保持している各DOM要素のテキストだけを直接書き換える
+    保持_ミリ秒表示に現在ミリ秒をテキスト設定
+    保持_日本語表記に日本語表記をテキスト設定
+    保持_英語表記に英語表記をテキスト設定
+    保持_ISOローカルにISO_ローカルをテキスト設定
+    保持_ISO_UTCにISO_UTCをテキスト設定
+    保持_RFC2822にRFC2822をテキスト設定
+ここまで。
+
+
+// =========================================================
+// メイン処理
+// =========================================================
+
+# 1. 初回のみカードの枠組みを生成する
+時刻カード枠組み作成
+
+# 2. 初回データを反映
+時刻データ更新処理
+
+# 3. 1秒ごとに数値やテキストの書き換えだけを繰り返す
+1秒毎には
+    時刻データ更新処理
+ここまで。

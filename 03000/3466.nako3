@@ -1,0 +1,171 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3466
+### タイトル=UnicodeからPunycode（ACE）変換　変換が間違っているかも
+### 作者=Aris(user_id=565)
+### ライセンス=BSD
+### 説明=UnicodeからPunycode（ACE）に変換
+### 対象バージョン=3.8.1
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-09-11 12:32:38
+###
+
+# --- 補助関数1：アダプト関数 ---
+●アダプト(delta, npoints, first)
+    もし first ならば
+        delta = FLOOR(delta / 700)
+    違えば
+        delta = FLOOR(delta / 2)
+    💧
+    delta = delta + FLOOR(delta / npoints)
+    k = 0
+    (delta > 455) の間
+        delta = FLOOR(delta / 35)
+        k = k + 36
+    💧
+    (k + FLOOR((36 * delta) / (delta + 38)))を戻す
+💧
+
+# --- 補助関数2：数値をPunycodeの基本文字（a-z, 0-9）に変換 ---
+●数字化文字(d)
+    もし d < 26 ならば
+        CHR(97 + d)を戻す
+    違えば
+        CHR(48 + (d - 26))を戻す
+    💧
+💧
+
+# --- Punycode (Bootstring) 変換主関数 ---
+●Punycode変換(S)
+    base = 36
+    tmin = 1
+    tmax = 26
+    skew = 38
+    damp = 700
+    initial_bias = 72
+    initial_n = 128
+
+    # 基本文字（ASCII）と非基本文字の分離
+    Basic = 🌿🌿
+    文字配列 = 文字列分解(S)
+    文字配列を反復
+        C = 対象
+        code = ASC(C)
+        もし code < 128 ならば
+            Basic = Basic ＆ C
+        💧
+    💧
+
+    # Punycodeのプレフィックスと基本文字の処理
+    output = 🌿xn--🌿 ＆ Basic
+    h = Basicの文字数
+    b = h
+    もし b > 0 ならば
+        output = output ＆ 🌿-🌿
+    💧
+
+    n = initial_n
+    delta = 0
+    bias = initial_bias
+
+    # 非基本文字のエンコードループ
+    AllCodes = []
+    文字配列を反復
+        AllCodesにASC(対象)を追加
+    💧
+
+    InputLen = AllCodesの要素数
+    (h < InputLen) の間
+        m = 1114111
+        AllCodesを反復
+            c = 対象
+            もし (c >= n) かつ (c < m) ならば
+                m = c
+            💧
+        💧
+
+        delta = delta + ((m - n) * (h + 1))
+        n = m
+
+        AllCodesを反復
+            c = 対象
+            もし c < n ならば
+                delta = delta + 1
+            違えば もし c == n ならば
+                q = delta
+                k = base
+                無限回
+                    もし k <= bias ならば
+                        t = tmin
+                    違えば もし k >= bias + tmax ならば
+                        t = tmax
+                    違えば
+                        t = k - bias
+                    💧
+
+                    もし q < t ならば
+                        抜ける
+                    💧
+
+                    digitVal = t + ((q - t) % (base - t))
+                    output = output ＆ 数字化文字(digitVal)
+                    
+                    q = FLOOR((q - t) / (base - t))
+                    k = k + base
+                💧
+                output = output ＆ 数字化文字(q)
+                bias = アダプト(delta, h + 1, h == b)
+                delta = 0
+                h = h + 1
+            💧
+        💧
+        delta = delta + 1
+        n = n + 1
+    💧
+
+    outputを戻す
+💧
+
+
+# --- GUIの作成 ---
+🌿Punycode 変換ツール🌿のラベル作成
+  それの🌿文字サイズ🌿に🌿25px🌿をDOMスタイル設定。
+改行作成。
+
+# エディタの作成
+文字エディタはテキストエリア作成
+  🌿🌿を文字エディタにテキスト設定。
+
+# エディタのスタイル設定（縦方向のみリサイズ可能＆最小高さを指定）
+  文字エディタの🌿height🌿に🌿240px🌿をDOMスタイル設定。
+  文字エディタの🌿min-height🌿に🌿240px🌿をDOMスタイル設定。
+  文字エディタの🌿width🌿に🌿490px🌿をDOMスタイル設定。
+  文字エディタの🌿placeholder🌿に🌿Unicodeテキストまたはドメインを入力🌿をDOM属性設定。
+  文字エディタの🌿font-size🌿に🌿17px🌿をDOMスタイル設定。
+  文字エディタの🌿overflow-y🌿に🌿auto🌿をDOMスタイル設定。
+  文字エディタの🌿box-sizing🌿に🌿border-box🌿をDOMスタイル設定。
+  文字エディタの🌿resize🌿に🌿vertical🌿をDOMスタイル設定。
+
+改行作成。
+
+# ボタンの作成
+変換ボタンは🌿変換🌿のボタン作成。
+  それの🌿高さ🌿に🌿40px🌿をDOMスタイル設定。
+  それの🌿幅🌿に🌿60px🌿をDOMスタイル設定。
+  それの🌿文字サイズ🌿に🌿17px🌿をDOMスタイル設定。
+  改行作成。
+  改行作成。
+  
+# ボタンの処理
+変換ボタンをクリックした時には
+    文字エディタのテキスト取得
+    本文 ＝ それ
+    
+    # Punycode変換を実行
+    Punycode変換(本文)
+    変換後 ＝ それ
+    
+    # 変換結果を表示
+    🌴変換結果：{変換後}🌴を表示。
+💧

@@ -1,0 +1,241 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3368
+### タイトル=バッテリー残量チェッカー
+### 作者=tsumu(user_id=0)
+### ライセンス=N3S_ONLY
+### 説明=バッテリーの不正入力を防ぐプログラム。
+### 対象バージョン=3.7.20
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-07-09 21:33:57
+###
+
+バッテリー残量＝-1
+
+●取得(N)
+    バッテリー残量＝Nを四捨五入
+ここまで
+
+
+画面＝「」のラベル作成。
+
+画面に『
+<style>
+body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(135deg,#d8efff,#ffffff);
+    font-family:"ＭＳ Ｐ明朝";
+}
+
+.card{
+    width:350px;
+    margin:40px auto;
+    padding:30px;
+    background:rgba(255,255,255,0.85);
+    border-radius:25px;
+    box-shadow:
+    0 15px 35px rgba(0,0,0,0.15);
+    text-align:center;
+}
+
+.title{
+    font-size:26px;
+    color:#2589d0;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.info{
+    color:#555;
+    line-height:1.8;
+}
+
+.circle{
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    margin:25px auto;
+    background:
+    conic-gradient(#2589d0 0%,#eeeeee 0%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:1s;
+}
+
+.circle-inner{
+    width:135px;
+    height:135px;
+    border-radius:50%;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:38px;
+    color:#2589d0;
+}
+
+button{
+    margin-top:20px;
+    padding:15px 35px;
+    border:none;
+    border-radius:30px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+
+    color:#5c4308;
+
+    background:
+    linear-gradient(
+    135deg,
+    #fff6af,
+    #ffd700,
+    #b38f00
+    );
+
+    box-shadow:
+    0 5px 0 #8a6d00,
+    0 10px 20px rgba(0,0,0,.25);
+}
+
+button:active{
+    transform:translateY(5px);
+    box-shadow:
+    0 0 0 #8a6d00;
+}
+
+.loading{
+    display:none;
+    margin-top:15px;
+}
+
+.spinner{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:5px solid #ddd;
+    border-top-color:#2589d0;
+    animation:spin 1s linear infinite;
+    margin:auto;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+</style>
+
+<div class="card">
+
+<div class="title">
+🔋 タブレット充電チェッカー
+</div>
+
+<div class="info">
+アンケート送信前に<br>
+バッテリー残量を確認します。
+</div>
+
+
+<div id="circle" class="circle">
+<div id="percent" class="circle-inner">
+--
+</div>
+</div>
+
+
+<div id="status">
+計測ボタンを押してください
+</div>
+
+
+<button id="batteryBtn">
+バッテリー残量を計測
+</button>
+
+
+<div id="loading" class="loading">
+<div class="spinner"></div>
+</div>
+
+
+</div>
+』をDOM_HTML設定。
+『
+document.getElementById("batteryBtn").onclick=function(){
+
+    document.getElementById("batteryBtn").style.display="none";
+
+    document.getElementById("loading").style.display="block";
+
+    document.getElementById("status").innerHTML=
+    "バッテリー計測中...";
+
+
+    navigator.getBattery().then(function(battery){
+
+        let level=Math.round(battery.level*100);
+
+        sys.__exec("取得",[level]);
+
+
+        document.getElementById("percent").innerHTML=
+        level+"%";
+
+
+        let color="#2589d0";
+
+        if(level>=80){
+            color="#36c96b";
+        }
+        else if(level>=30){
+            color="#2589d0";
+        }
+        else if(level>=10){
+            color="#ff9800";
+        }
+        else{
+            color="#f44336";
+        }
+
+
+        document.getElementById("circle").style.background=
+        "conic-gradient("+color+" "+level+"%,#eeeeee "+level+"%)";
+
+
+        document.getElementById("loading").style.display="none";
+
+        document.getElementById("status").innerHTML=
+        "✓ 計測完了";
+
+
+        setTimeout(function(){
+
+
+            if(level==100){
+
+                location.href=
+                "https://docs.google.com/forms/d/e/1FAIpQLSc7U0Ycvu6uvGx3_I1WYxPpuetWQZJ-sOYcxwgF6ls0iTyVOQ/viewform?usp=publish-editor";
+
+            }
+            else{
+
+                location.href=
+                "https://docs.google.com/forms/d/e/1FAIpQLSdNSEHXcUR7MoYpk_6O6dcRZQ0_xSiQnHVnXLKQwKvtSnzhuQ/viewform?usp=pp_url&entry.632004814="
+                +level;
+
+            }
+
+
+        },1000);
+
+
+    });
+
+};
+』をJS実行。

@@ -1,0 +1,339 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3433
+### タイトル=モールス信号変換
+### 作者=Aris(user_id=565)
+### ライセンス=BSD
+### 説明=漢字以外の日本語,英語,数字をモールス信号に相互変換できます。
+### 対象バージョン=3.7.22
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-26 12:34:40
+###
+
+// =========================================================
+// ラベルを作成する共通関数
+// =========================================================
+●（テキストで）ラベル作成
+    L ＝「span」をDOM要素作成。
+    Lにテキストをテキスト設定。
+    Lの「style」に「font-weight: bold; color: #64748b; margin-right: 6px; font-size: 14px;」をDOM属性設定。
+    Lで戻る。
+ここまで。
+
+
+// =========================================================
+// 画面構築関数（なでしこ表示レイアウト）
+// =========================================================
+●画面構築
+    # 外枠カードの作成
+    CARD ＝「div」をDOM要素作成。
+    カードスタイル ＝「display: block; max-width: 650px; margin: 16px 0; padding: 20px; background-color: #ffffff; border: 2px solid #3b82f6; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); font-family: sans-serif; line-height: 1.6; color: #0f172a;」
+    CARDの「style」にカードスタイルをDOM属性設定。
+
+    # タイトル部分
+    TITLE ＝「div」をDOM要素作成。
+    TITLEに「モールス信号 相互変換ツール」をテキスト設定。
+    TITLEの「style」に「font-size: 18px; font-weight: bold; color: #2563eb; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;」をDOM属性設定。
+    CARDへTITLEをDOM子要素追加。
+
+    # -----------------------------------------------------
+    # 1. 相互入力エリア
+    # -----------------------------------------------------
+    INFO_BOX ＝「div」をDOM要素作成。
+    
+    // テキスト入力
+    LINE1 ＝「div」をDOM要素作成。
+    LINE1の「style」に「margin-bottom: 12px; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start;」をDOM属性設定。
+    L1 ＝「テキスト (日本語/英数):」でラベル作成。
+    LINE1へL1をDOM子要素追加。
+    
+    T1 ＝「textarea」をDOM要素作成。
+    T1の「id」に「text_input」をDOM属性設定。
+    T1の「placeholder」に「文字を入力 (例: SOS)」をDOM属性設定。
+    T1の「style」に「width: 320px; min-height: 60px; padding: 8px 10px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; resize: none; overflow: hidden; line-height: 1.5;」をDOM属性設定。
+    LINE1へT1をDOM子要素追加。
+    INFO_BOXへLINE1をDOM子要素追加。
+
+    // モールス信号入力
+    LINE2 ＝「div」をDOM要素作成。
+    LINE2の「style」に「margin-bottom: 16px; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start;」をDOM属性設定。
+    L2 ＝「モールス信号 (・とー):」でラベル作成。
+    LINE2へL2をDOM子要素追加。
+    
+    T2 ＝「textarea」をDOM要素作成。
+    T2の「id」に「morse_input」をDOM属性設定。
+    T2の「placeholder」に「符号を入力 (例: ・・・ ーーー ・・・)」をDOM属性設定。
+    T2の「style」に「width: 320px; min-height: 60px; padding: 8px 10px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; resize: none; overflow: hidden; line-height: 1.5;」をDOM属性設定。
+    LINE2へT2をDOM子要素追加。
+    INFO_BOXへLINE2をDOM子要素追加。
+
+    CARDへINFO_BOXをDOM子要素追加。
+
+    # -----------------------------------------------------
+    # 2. よく使われる単語（プリセットボタン）
+    # -----------------------------------------------------
+    PRESET_TITLE ＝「div」をDOM要素作成。
+    PRESET_TITLEに「よく使われる文字列」をテキスト設定。
+    PRESET_TITLEの「style」に「font-weight: bold; color: #1e293b; margin-bottom: 8px; font-size: 15px;」をDOM属性設定。
+    CARDへPRESET_TITLEをDOM子要素追加。
+
+    PRESET_BOX ＝「div」をDOM要素作成。
+    PRESET_BOXの「style」に「display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;」をDOM属性設定。
+
+    P1 ＝ 「SOS|遭難信号|SOS」
+    P2 ＝ 「What Hath God Wrought|最初の電報|What Hath God Wrought」
+    P3 ＝ 「オハヨウ|挨拶|オハヨウ」
+    P4 ＝ 「コンニチハ|挨拶|コンニチハ」
+
+    プリセットリスト ＝ [P1, P2, P3, P4]
+
+    プリセットリストを反復
+        要素データ ＝ 対象を「|」で区切る
+        P_NAME ＝ 要素データ[0]
+        P_SUB ＝ 要素データ[1]
+        P_VAL ＝ 要素データ[2]
+
+        BTN ＝「button」をDOM要素作成。
+        BTNの「className」に「preset-btn」をDOM属性設定。
+        BTNの「data-val」にP_VALをDOM属性設定。
+        BTNの「style」に「flex: 1 1 calc(25% - 8px); min-width: 120px; padding: 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; text-align: left; cursor: pointer;」をDOM属性設定。
+        
+        BTN_MAIN ＝「div」をDOM要素作成。
+        BTN_MAINにP_NAMEをテキスト設定。
+        BTN_MAINの「style」に「font-weight: bold; font-size: 13px; color: #0f172a;」をDOM属性設定。
+        BTNへBTN_MAINをDOM子要素追加。
+
+        BTN_SUB ＝「div」をDOM要素作成。
+        BTN_SUBにP_SUBをテキスト設定。
+        BTN_SUBの「style」に「font-size: 11px; color: #64748b;」をDOM属性設定。
+        BTNへBTN_SUBをDOM子要素追加。
+
+        PRESET_BOXへBTNをDOM子要素追加。
+    ここまで
+
+    CARDへPRESET_BOXをDOM子要素追加。
+
+    # -----------------------------------------------------
+    # 3. モールス信号 早見表（和文）
+    # -----------------------------------------------------
+    TABLE_TITLE ＝「div」をDOM要素作成。
+    TABLE_TITLEに「モールス信号 早見表（日本語・和文）」をテキスト設定。
+    TABLE_TITLEの「style」に「font-weight: bold; color: #1e293b; margin-bottom: 8px; font-size: 15px;」をDOM属性設定。
+    CARDへTABLE_TITLEをDOM子要素追加。
+
+    TABLE_CONTAINER ＝「div」をDOM要素作成。
+    TABLE_CONTAINERの「style」に「max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;」をDOM属性設定。
+
+    TABLE_ELEM ＝「table」をDOM要素作成。
+    TABLE_ELEMの「style」に「width: 100%; border-collapse: collapse; font-size: 14px;」をDOM属性設定。
+
+    THEAD ＝「thead」をDOM要素作成。
+    THEADの「style」に「position: sticky; top: 0; background: #f1f5f9; color: #334155; font-weight: bold; border-bottom: 2px solid #cbd5e1;」をDOM属性設定。
+    
+    TH_TR ＝「tr」をDOM要素作成。
+    TH1 ＝「th」をDOM要素作成。
+    TH1に「文字」をテキスト設定。
+    TH1の「style」に「padding: 8px 12px; text-align: left;」をDOM属性設定。
+    TH_TRへTH1をDOM子要素追加。
+
+    TH2 ＝「th」をDOM要素作成。
+    TH2に「モールス信号 (・とー)」をテキスト設定。
+    TH2の「style」に「padding: 8px 12px; text-align: left;」をDOM属性設定。
+    TH_TRへTH2をDOM子要素追加。
+
+    THEADへTH_TRをDOM子要素追加。
+    TABLE_ELEMへTHEADをDOM子要素追加。
+
+    TBODY ＝「tbody」をDOM要素作成。
+    
+    チャリスト ＝ ["イ:・ー", "ロ:・ー・ー", "ハ:ー・・・", "ニ:・ー・ー", "ホ:ー・・", "ヘ:・", "ト:・・ー・・", "チ:・・ー・", "リ:ーー・", "ヌ:・・・・", "ル:ー・ーー・", "ヲ:・ーーー", "ワ:ー・ー", "カ:・ー・", "ヨ:ーー", "タ:ー・", "レ:ーーー", "ソ:ーーー・", "ツ:・ーー・", "ネ:ーー・ー", "ナ:・ー・・", "ラ:・・・", "ム:ー", "ウ:・・ー", "ヰ:・ー・・ー", "ノ:・・ーー", "オ:・ー・・・", "ク:・・ー・", "ヤ:・ーー", "マ:ー・・ー", "ケ:ー・ーー", "フ:ーー・・", "コ:ーーーー", "エ:ー・ーーー", "テ:・ー・ーー", "ア:ーー・ーー", "サ:ー・ー・ー", "キ:ー・ーー・", "ユ:・ーー・・", "メ:ー・・・ー", "ミ:・・ー・ー", "シ:ーー・ー・", "ヱ:・・ーー・", "ヒ:ーー・・ー", "モ:ー・・ー・", "セ:・ーーー・", "ス:ーーー・ー", "ン:・ー・ー・", "デ:・ー・ーー ・・"]
+
+    チャリストを反復
+        ペア ＝ 対象を「:」で区切る
+        TR_ELEM ＝「tr」をDOM要素作成。
+        TR_ELEMの「style」に「border-bottom: 1px solid #f1f5f9;」をDOM属性設定。
+
+        TD1 ＝「td」をDOM要素作成。
+        TD1にペア[0]をテキスト設定。
+        TD1の「style」に「padding: 6px 12px; text-align: left; font-weight: bold;」をDOM属性設定。
+        TR_ELEMへTD1をDOM子要素追加。
+
+        TD2 ＝「td」をDOM要素作成。
+        TD2にペア[1]をテキスト設定。
+        TD2の「style」に「padding: 6px 12px; text-align: left; font-family: monospace; font-weight: bold; color: #2563eb;」をDOM属性設定。
+        TR_ELEMへTD2をDOM子要素追加。
+
+        TBODYへTR_ELEMをDOM子要素追加。
+    ここまで
+
+    TABLE_ELEMへTBODYをDOM子要素追加。
+    TABLE_CONTAINERへTABLE_ELEMをDOM子要素追加。
+    CARDへTABLE_CONTAINERをDOM子要素追加。
+
+    DOM親要素へCARDをDOM子要素追加。
+ここまで。
+
+
+// =========================================================
+// メイン処理 & 変換ロジック（JavaScript実装）
+// =========================================================
+画面構築
+
+『
+const textInput = document.getElementById("text_input");
+const morseInput = document.getElementById("morse_input");
+
+let isUpdating = false;
+
+// 和文・欧文モールス信号マップ（濁音・半濁音を含む）
+const morseMap = {
+    'ア': 'ーー・ーー', 'イ': '・ー', 'ウ': '・・ー', 'エ': 'ー・ーーー', 'オ': '・ー・・・',
+    'カ': '・ー・', 'キ': 'ー・ーー・', 'ク': '・・ー・', 'ケ': 'ー・ーー', 'コ': 'ーーーー',
+    'サ': 'ー・ー・ー', 'シ': 'ーー・ー・', 'ス': 'ーーー・ー', 'セ': '・ーーー・', 'ソ': 'ーーー・',
+    'タ': 'ー・', 'チ': '・・ー・', 'ツ': '・ーー・', 'テ': '・ー・ーー', 'ト': '・・ー・・',
+    'ナ': '・ー・・', 'ニ': 'ー・ー・', 'ヌ': '・・・・', 'ネ': 'ーー・ー', 'ノ': '・・ーー',
+    'ハ': 'ー・・・', 'ヒ': 'ーー・・ー', 'フ': 'ーー・・', 'ヘ': '・', 'ホ': 'ー・・',
+    'マ': 'ー・・ー', 'ミ': '・・ー・ー', 'ム': 'ー', 'メ': 'ー・・・ー', 'モ': 'ー・・ー・',
+    'ヤ': '・ーー', 'ユ': '・ーー・・', 'ヨ': 'ーー',
+    'ラ': '・・・', 'リ': 'ーー・', 'ル': 'ー・ーー・', 'レ': 'ーーー', 'ロ': '・ー・ー',
+    'ワ': 'ー・ー', 'ヰ': '・ー・・ー', 'ヱ': '・・ーー・', 'ヲ': '・ーーー', 'ン': '・ー・ー・',
+    // 濁音・半濁音
+    'ガ': '・ー・ ・・', 'ギ': 'ー・ーー・ ・・', 'グ': '・・ー・ ・・', 'ゲ': 'ー・ーー ・・', 'ゴ': 'ーーーー ・・',
+    'ザ': 'ー・ー・ー ・・', 'ジ': 'ーー・ー・ ・・', 'ズ': 'ーーー・ー ・・', 'ゼ': '・ーーー・ ・・', 'ゾ': 'ーーー・ ・・',
+    'ダ': 'ー・ ・・', 'ヂ': '・・ー・ ・・', 'ヅ': '・ーー・ ・・', 'デ': '・ー・ーー ・・', 'ド': '・・ー・・ ・・',
+    'バ': 'ー・・・ ・・', 'ビ': 'ーー・・ー ・・', 'ブ': 'ーー・・ ・・', 'ベ': '・ ・・', 'ボ': 'ー・・ ・・',
+    'パ': 'ー・・・ ・・・・', 'ピ': 'ーー・・ー ・・・・', 'プ': 'ーー・・ ・・・・', 'ペ': '・ ・・・・', 'ポ': 'ー・・ ・・・・',
+    // 小文字
+    'ァ': 'ーー・ーー', 'ィ': '・ー', 'ゥ': '・・ー', 'ェ': 'ー・ーーー', 'ォ': '・ー・・・',
+    'ッ': '・ーー・', 'ャ': '・ーー', 'ュ': '・ーー・・', 'ョ': 'ーー',
+    // 欧文・数字
+    'A': '・ー', 'B': 'ー・・・', 'C': 'ー・ー・', 'D': 'ー・・', 'E': '・', 'F': '・・ー・',
+    'G': 'ーー・', 'H': '・・・・', 'I': '・・', 'J': '・ーーー', 'K': 'ー・ー', 'L': '・ー・・',
+    'M': 'ーー', 'N': 'ー・', 'O': 'ーーー', 'P': '・ーー・', 'Q': 'ーー・ー', 'R': '・ー・',
+    'S': '・・・・', 'T': 'ー', 'U': '・・ー', 'V': '・・・ー', 'W': '・ーー', 'X': 'ー・・ー',
+    'Y': 'ー・ーー', 'Z': 'ーー・・',
+    '0': 'ーーーーー', '1': '・ーーー・', '2': '・・ーーー', '3': '・・・ーー', '4': '・・・・ー',
+    '5': '・・···', '6': 'ー・・・・', '7': 'ーー・・・', '8': 'ーーー・・', '9': 'ーーー・',
+    '\n': '\n', ' ': '/'
+};
+
+// 入力欄の高さをテキスト量に応じて自動で下へ伸ばす関数
+function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight) + 'px';
+}
+
+// ひらがなをカタカナに変換するヘルパー
+function hiraganaToKatakana(src) {
+    return src.replace(/[\u3041-\u3096]/g, function(match) {
+        var chr = match.charCodeAt(0) + 0x60;
+        return String.fromCharCode(chr);
+    });
+}
+
+const reverseMorseMap = {};
+for (let key in morseMap) {
+    if(key !== '\n') {
+        reverseMorseMap[morseMap[key]] = key;
+    }
+}
+
+// テキスト -> モールス信号（・とー）
+textInput.addEventListener("input", function() {
+    autoResize(this);
+    if (isUpdating) return;
+    isUpdating = true;
+    let val = textInput.value;
+    val = hiraganaToKatakana(val).toUpperCase();
+    
+    if (val === "") {
+        morseInput.value = "";
+        autoResize(morseInput);
+    } else {
+        let result = [];
+        for (let i = 0; i < val.length; i++) {
+            const char = val[i];
+            if (char === '\n') {
+                result.push('\n');
+            } else if (morseMap[char]) {
+                result.push(morseMap[char]);
+            } else {
+                result.push(char);
+            }
+        }
+        morseInput.value = result.join(" ");
+        autoResize(morseInput);
+    }
+    isUpdating = false;
+});
+
+// モールス信号 -> テキスト
+morseInput.addEventListener("input", function() {
+    autoResize(this);
+    if (isUpdating) return;
+    isUpdating = true;
+    let rawVal = morseInput.value;
+    rawVal = rawVal.replace(/\./g, '・').replace(/[-‐―−―]/g, 'ー');
+    
+    if (rawVal.trim() === "") {
+        textInput.value = "";
+        autoResize(textInput);
+    } else {
+        const lines = rawVal.split("\n");
+        let resultLines = [];
+        for (let l = 0; l < lines.length; l++) {
+            const line = lines[l].trim();
+            if (line === "") {
+                resultLines.push("");
+                continue;
+            }
+            
+            const tokens = line.split(" ");
+            let result = [];
+            let i = 0;
+            while (i < tokens.length) {
+                let code = tokens[i];
+                if (code === "") {
+                    i++;
+                    continue;
+                }
+                if (code === "/") {
+                    result.push(" ");
+                    i++;
+                    continue;
+                }
+                
+                if (i + 1 < tokens.length && (tokens[i+1] === "・・" || tokens[i+1] === "・・・・")) {
+                    let combined = code + " " + tokens[i+1];
+                    if (reverseMorseMap[combined]) {
+                        result.push(reverseMorseMap[combined]);
+                        i += 2;
+                        continue;
+                    }
+                }
+                
+                if (reverseMorseMap[code]) {
+                    result.push(reverseMorseMap[code]);
+                } else {
+                    result.push("?");
+                }
+                i++;
+            }
+            resultLines.push(result.join(""));
+        }
+        textInput.value = resultLines.join("\n");
+        autoResize(textInput);
+    }
+    isUpdating = false;
+});
+
+// プリセット用イベント登録
+document.querySelectorAll(".preset-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+        const val = this.getAttribute("data-val");
+        textInput.value = val;
+        textInput.dispatchEvent(new Event("input"));
+    });
+});
+』をJS実行

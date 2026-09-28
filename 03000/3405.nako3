@@ -1,0 +1,175 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3405
+### タイトル=お絵描きプログラム
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=イラストを描くことができるプログラムです。　簡単なことだけできます。　難しいことはできません　chatGPT codex web版を使用
+### 対象バージョン=3.7.20
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2026-07-29 13:54:06
+###
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Simple Paint Lite</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;font-family:sans-serif}
+#app{display:flex;height:100vh}
+#tools{width:70px;padding:5px;border-right:1px solid #999}
+#brush{width:150px;padding:8px;border-right:1px solid #999}
+button{margin:2px}
+input{width:120px}
+.selected{background:#888;color:white}
+#main{flex:1}
+#menu{height:40px;padding:5px}
+#frame{height:calc(100vh - 40px);background:#888;overflow:hidden;position:relative}
+#canvasArea{position:absolute;left:0;top:0;transform-origin:0 0}
+.layer{position:absolute;left:0;top:0}
+#layers{width:130px;padding:8px;border-left:1px solid #999}
+.layerButton{width:100px;display:block;margin:3px}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="tools">
+<button id="penTool" onclick="setTool('pen')">ペン</button><br>
+<button id="eraserTool" onclick="setTool('eraser')">消しゴム</button>
+</div>
+<div id="brush">
+色<br>
+<input id="color" type="color" value="#000000"><br><br>
+サイズ<br>
+<input id="size" type="range" min="1" max="80" value="5"><br><br>
+種類<br>
+<button id="gPen" onclick="setPen('g')">Gペン</button><br>
+<button id="mPen" onclick="setPen('m')">ミリペン</button>
+</div>
+<div id="main">
+<div id="menu">
+<button onclick="newCanvas()">新規</button>
+<button onclick="savePNG()">PNG保存</button>
+</div>
+<div id="frame">
+<div id="canvasArea"></div>
+</div>
+</div>
+<div id="layers">
+<b>レイヤー</b>
+<div id="list"></div>
+<button onclick="addLayer()">追加</button>
+<button onclick="removeLayer()">削除</button>
+</div>
+</div>
+<script>
+let w=1000,h=700,layers=[],current=0,tool="pen",pen="g",draw=false,zoom=1;
+const area=document.getElementById("canvasArea");
+
+function createLayer(n){
+let c=document.createElement("canvas"),ctx=c.getContext("2d");
+c.width=w;c.height=h;c.className="layer";
+ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);
+area.appendChild(c);
+layers.push({name:n,canvas:c,ctx:ctx});
+updateList()
+}
+
+createLayer("Layer 1");
+setTool("pen");
+setPen("g");
+
+function setTool(t){
+tool=t;
+penTool.classList.remove("selected");
+eraserTool.classList.remove("selected");
+(t=="pen"?penTool:eraserTool).classList.add("selected")
+}
+
+function setPen(p){
+pen=p;
+gPen.classList.remove("selected");
+mPen.classList.remove("selected");
+(p=="g"?gPen:mPen).classList.add("selected")
+}
+
+function updateList(){
+list.innerHTML="";
+layers.forEach((l,i)=>{
+let b=document.createElement("button");
+b.textContent=l.name;
+b.className="layerButton";
+if(i==current)b.classList.add("selected");
+b.onclick=()=>{current=i;updateList()};
+list.appendChild(b)
+})
+}
+
+function addLayer(){
+if(layers.length>=10)return;
+createLayer("Layer "+(layers.length+1));
+current=layers.length-1;
+updateList()
+}
+
+function removeLayer(){
+if(layers.length<=1)return;
+area.removeChild(layers[current].canvas);
+layers.splice(current,1);
+current=0;
+updateList()
+}
+
+area.onpointerdown=e=>{
+draw=true;
+let l=layers[current],r=l.canvas.getBoundingClientRect();
+l.ctx.beginPath();
+l.ctx.moveTo((e.clientX-r.left)/zoom,(e.clientY-r.top)/zoom)
+};
+
+area.onpointermove=e=>{
+if(!draw)return;
+let l=layers[current],ctx=l.ctx,r=l.canvas.getBoundingClientRect();
+let x=(e.clientX-r.left)/zoom,y=(e.clientY-r.top)/zoom;
+let s=size.value;
+ctx.lineCap="round";
+ctx.strokeStyle=tool=="eraser"?"#fff":color.value;
+ctx.lineWidth=pen=="g"?s:Math.max(1,s/3);
+ctx.lineTo(x,y);
+ctx.stroke()
+};
+
+onpointerup=()=>draw=false;
+
+frame.onwheel=e=>{
+e.preventDefault();
+zoom+=e.deltaY<0?.1:-.1;
+if(zoom<.2)zoom=.2;
+if(zoom>5)zoom=5;
+canvasArea.style.transform="scale("+zoom+")"
+};
+
+function newCanvas(){
+let nw=prompt("幅",1000),nh=prompt("高さ",700);
+if(!nw||!nh)return;
+w=+nw;h=+nh;
+layers.forEach(l=>area.removeChild(l.canvas));
+layers=[];current=0;
+createLayer("Layer 1")
+}
+
+function savePNG(){
+let c=document.createElement("canvas"),x=c.getContext("2d");
+c.width=w;c.height=h;
+layers.forEach(l=>x.drawImage(l.canvas,0,0));
+let a=document.createElement("a");
+a.download="paint.png";
+a.href=c.toDataURL("image/png");
+a.click()
+}
+</script>
+</body>
+</html>

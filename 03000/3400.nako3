@@ -1,0 +1,152 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3400
+### タイトル=津波予報の表示
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=津波予報が表示できるかのテスト
+### 対象バージョン=3.7.20
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-04 10:25:07
+###
+
+# =========================================================
+# 関数の定義
+# =========================================================
+
+# ラベル（「発表日付:」等）を作る関数
+●（テキストで）ラベル作成
+    L ＝「span」をDOM要素作成。
+    Lにテキストをテキスト設定。
+    Lの「style」に「font-weight: bold; color: #0056b3; background-color: #e9ecef; padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-size: 14px;」をDOM属性設定。
+    Lで戻る。
+ここまで。
+
+# カードを作成する関数
+●（日付, 時間, 解除, データで）カード作成
+    # 外枠カードの作成（borderを全方向 2px の青線 #0056b3 に変更）
+    CARD ＝「div」をDOM要素作成。
+    カードスタイル ＝「display: block; max-width: 440px; margin: 12px 0; padding: 16px; background-color: #fde1fb; border: 2.3px solid #51edf1; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); font-family: sans-serif; line-height: 1.6;」
+    CARDの「style」にカードスタイルをDOM属性設定。
+
+    # タイトル部分
+    TITLE ＝「div」をDOM要素作成。
+    TITLEに「最新の津波予報情報」をテキスト設定。
+    TITLEの「style」に「font-size: 19.6px; font-weight: bold; color: #0056b3; margin-bottom: 18px; border-bottom: 2px solid #e0e0e0; padding-bottom: 9px;」をDOM属性設定。
+    CARDへTITLEをDOM子要素追加。
+
+    # 日時表示パーツの作成
+    TIME_BOX ＝「div」をDOM要素作成。
+    TIME_BOXの「style」に「font-size: 17px; color: #333333; margin-bottom: 17px;」をDOM属性設定。
+    
+    # 発表日付
+    DATE_LINE ＝「div」をDOM要素作成。
+    DATE_LINEの「style」に「margin-bottom: 8px;」をDOM属性設定。
+    L1 ＝「発表日付:」でラベル作成。
+    DATE_LINEへL1をDOM子要素追加。
+    T1 ＝「span」をDOM要素作成。
+    T1に「{日付}」をテキスト設定。
+    DATE_LINEへT1をDOM子要素追加。
+    TIME_BOXへDATE_LINEをDOM子要素追加。
+
+    # 発表時間
+    TIME_LINE ＝「div」をDOM要素作成。
+    L2 ＝「発表時間:」でラベル作成。
+    TIME_LINEへL2をDOM子要素追加。
+    T2 ＝「span」をDOM要素作成。
+    T2に「{時間}」をテキスト設定。
+    TIME_LINEへT2をDOM子要素追加。
+    TIME_BOXへTIME_LINEをDOM子要素追加。
+
+    CARDへTIME_BOXをDOM子要素追加。
+
+    # 状況・エリア情報の判定
+    もし、解除 ＝ 真ならば
+        STATUS ＝「div」をDOM要素作成。
+        STATUSに「状況: 全ての津波予報・警報が解除されました。」をテキスト設定。
+        STATUSの「style」に「padding: 15px 20px; background-color: #e2f0d9; color: #2d451c; border-radius: 10px; font-weight: bold; font-size: 17px; margin-top: 6px;」をDOM属性設定。
+        CARDへSTATUSをDOM子要素追加。
+    違えば
+        エリア一覧 ＝ データ["areas"]
+        エリア数 ＝ エリア一覧の要素数
+
+        STATUS ＝「div」をDOM要素作成。
+        L3 ＝「対象地域数:」でラベル作成。
+        STATUSへL3をDOM子要素追加。
+        T3 ＝「span」をDOM要素作成。
+        T3に「{エリア数} 地域」をテキスト設定。
+        STATUSへT3をDOM子要素追加。
+        STATUSの「style」に「padding: 10px 14px; background-color: #f8d7da; color: #721c24; border-radius: 6px; font-weight: bold; font-size: 15px; margin-bottom: 12px;」をDOM属性設定。
+        CARDへSTATUSをDOM子要素追加。
+
+        # 主な対象地域の表示（最大10件）
+        表示件数 ＝ エリア数
+        もし、表示件数 ＞ 10ならば、表示件数 ＝ 10
+
+        AREA_TITLE ＝「div」をDOM要素作成。
+        AREA_TITLEに「--- 主な対象地域 ---」をテキスト設定。
+        AREA_TITLEの「style」に「font-size: 13px; color: #666666; margin-top: 12px; margin-bottom: 6px; font-weight: bold;」をDOM属性設定。
+        CARDへAREA_TITLEをDOM子要素追加。
+
+        Ｉを0から(表示件数 - 1)まで繰り返す
+            対象エリア ＝ エリア一覧[Ｉ]
+            地域名 ＝ 対象エリア["name"]
+            警報種別 ＝ 対象エリア["grade"]
+
+            種別文字 ＝「津波情報」
+            もし、警報種別 ＝「MajorWarning」ならば、種別文字 ＝「大津波警報」
+            もし、警報種別 ＝「Warning」ならば、種別文字 ＝「津波警報」
+            もし、警報種別 ＝「Advisory」ならば、種別文字 ＝「津波注意報」
+            もし、警報種別 ＝「Unknown」ならば、種別文字 ＝「津波予報」
+
+            ITEM ＝「div」をDOM要素作成。
+            ITEMに「・{地域名}（{種別文字}）」をテキスト設定。
+            ITEMの「style」に「font-size: 14px; color: #222222; margin-top: 6px; padding-left: 8px;」をDOM属性設定。
+            CARDへITEMをDOM子要素追加。
+        ここまで。
+    ここまで。
+
+    # 画面にカードを追加
+    DOM親要素へCARDをDOM子要素追加。
+    CARDで戻る。
+ここまで。
+
+# =========================================================
+# メイン処理
+# =========================================================
+
+# APIのURLを設定する
+URLは「https://api.p2pquake.net/v2/history?codes=552&limit=1」
+
+URLにAJAX送信。
+データはそれをJSONデコード。
+件数はデータの要素数。
+
+もし、件数 ＞ 0ならば
+    最新津波はデータ[0]
+
+    # 発表時刻を取得して整形
+    元時刻は最新津波["time"]
+    時刻リストは元時刻を「 」で区切る
+    発生日付は時刻リスト[0]
+    発生時間は時刻リスト[1]
+
+    時間リストは発生時間を「:」で区切る
+    時は時間リスト[0]
+    分は時間リスト[1]
+    生秒は時間リスト[2]
+
+    秒リストは生秒を「.」で区切る
+    秒は秒リスト[0]
+
+    日本語時間情報は「」＆時＆「時」＆分＆「分」＆秒＆「秒」
+
+    # 津波予報の解除フラグ（cancelled）を確認
+    解除フラグは最新津波["cancelled"]
+
+    # --- 津波情報カードの生成 ---
+    カード作成(発生日付, 日本語時間情報, 解除フラグ, 最新津波)
+違えば
+    「津波予報情報が取得できませんでした。」と表示。
+ここまで。

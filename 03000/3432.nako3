@@ -1,0 +1,235 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3432
+### タイトル=ポンドとキログラムを相互に変換
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=ポンドとキログラムを相互変換し、よく使われる重さの項目をクリックすれば、その項目が変換項目に表示されます。
+### 対象バージョン=3.7.22
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-26 11:01:26
+###
+
+// =========================================================
+// ラベルを作成する共通関数
+// =========================================================
+●（テキストで）ラベル作成
+    L ＝「span」をDOM要素作成。
+    Lにテキストをテキスト設定。
+    Lの「style」に「font-weight: bold; color: #64748b; margin-right: 6px; font-size: 14px;」をDOM属性設定。
+    Lで戻る。
+ここまで。
+
+
+// =========================================================
+// 画面構築関数（なでしこ表示レイアウト）
+// =========================================================
+●画面構築
+    # 外枠カードの作成
+    CARD ＝「div」をDOM要素作成。
+    カードスタイル ＝「display: block; max-width: 650px; margin: 16px 0; padding: 20px; background-color: #ffffff; border: 2px solid #3b82f6; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); font-family: sans-serif; line-height: 1.6; color: #0f172a;」
+    CARDの「style」にカードスタイルをDOM属性設定。
+
+    # タイトル部分
+    TITLE ＝「div」をDOM要素作成。
+    TITLEに「ポンド・キログラム 相互変換ツール」をテキスト設定。
+    TITLEの「style」に「font-size: 18px; font-weight: bold; color: #2563eb; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;」をDOM属性設定。
+    CARDへTITLEをDOM子要素追加。
+
+    # -----------------------------------------------------
+    # 1. 相互入力エリア
+    # -----------------------------------------------------
+    INFO_BOX ＝「div」をDOM要素作成。
+    
+    // キログラム入力
+    LINE1 ＝「div」をDOM要素作成。
+    LINE1の「style」に「margin-bottom: 10px; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;」をDOM属性設定。
+    L1 ＝「キログラム (kg):」でラベル作成。
+    LINE1へL1をDOM子要素追加。
+    T1 ＝「input」をDOM要素作成。
+    T1の「type」に「number」をDOM属性設定。
+    T1の「id」に「kg_input」をDOM属性設定。
+    T1の「placeholder」に「数値を入力」をDOM属性設定。
+    T1の「style」に「width: 160px; padding: 6px 10px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace;」をDOM属性設定。
+    LINE1へT1をDOM子要素追加。
+    INFO_BOXへLINE1をDOM子要素追加。
+
+    // ポンド入力
+    LINE2 ＝「div」をDOM要素作成。
+    LINE2の「style」に「margin-bottom: 16px; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;」をDOM属性設定。
+    L2 ＝「ポンド (lb):」でラベル作成。
+    LINE2へL2をDOM子要素追加。
+    T2 ＝「input」をDOM要素作成。
+    T2の「type」に「number」をDOM属性設定。
+    T2の「id」に「lb_input」をDOM属性設定。
+    T2の「placeholder」に「数値を入力」をDOM属性設定。
+    T2の「style」に「width: 160px; padding: 6px 10px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace;」をDOM属性設定。
+    LINE2へT2をDOM子要素追加。
+    INFO_BOXへLINE2をDOM子要素追加。
+
+    CARDへINFO_BOXをDOM子要素追加。
+
+    # -----------------------------------------------------
+    # 2. よく使われる重さ（プリセットボタン）
+    # -----------------------------------------------------
+    PRESET_TITLE ＝「div」をDOM要素作成。
+    PRESET_TITLEに「よく使われる重さ」をテキスト設定。
+    PRESET_TITLEの「style」に「font-weight: bold; color: #1e293b; margin-bottom: 8px; font-size: 15px;」をDOM属性設定。
+    CARDへPRESET_TITLEをDOM子要素追加。
+
+    PRESET_BOX ＝「div」をDOM要素作成。
+    PRESET_BOXの「style」に「display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;」をDOM属性設定。
+
+    P1 ＝ 「1ポンド|基本単位|1」
+    P2 ＝ 「ボウリング球 (14lb)|レギュラー|14」
+    P3 ＝ 「手荷物制限 (50lb)|多くの航空会社|50」
+    P4 ＝ 「1ストーン (14lb)|英国の体重単位|14」
+    P5 ＝ 「UFC フライ級|≈56.7 kg|125」
+    P6 ＝ 「UFC ライト級|≈70.3 kg|155」
+    P7 ＝ 「UFC ウェルター級|≈77.1 kg|170」
+    P8 ＝ 「UFC ヘビー級|≈120.2 kg|265」
+
+    プリセットリスト ＝ [P1, P2, P3, P4, P5, P6, P7, P8]
+
+    プリセットリストを反復
+        要素データ ＝ 対象を「|」で区切る
+        P_NAME ＝ 要素データ[0]
+        P_SUB ＝ 要素データ[1]
+        P_VAL ＝ 要素データ[2]
+
+        BTN ＝「button」をDOM要素作成。
+        # クラス名とデータ属性を付与してJSからイベントを拾えるようにする
+        BTNの「className」に「preset-btn」をDOM属性設定。
+        BTNの「data-val」にP_VALをDOM属性設定。
+        BTNの「style」に「flex: 1 1 calc(25% - 8px); min-width: 120px; padding: 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; text-align: left; cursor: pointer;」をDOM属性設定。
+        
+        BTN_MAIN ＝「div」をDOM要素作成。
+        BTN_MAINにP_NAMEをテキスト設定。
+        BTN_MAINの「style」に「font-weight: bold; font-size: 13px; color: #0f172a;」をDOM属性設定。
+        BTNへBTN_MAINをDOM子要素追加。
+
+        BTN_SUB ＝「div」をDOM要素作成。
+        BTN_SUBにP_SUBをテキスト設定。
+        BTN_SUBの「style」に「font-size: 11px; color: #64748b;」をDOM属性設定。
+        BTNへBTN_SUBをDOM子要素追加。
+
+        PRESET_BOXへBTNをDOM子要素追加。
+    ここまで
+
+    CARDへPRESET_BOXをDOM子要素追加。
+
+    # -----------------------------------------------------
+    # 3. 換算テーブル（1〜200ポンド）
+    # -----------------------------------------------------
+    TABLE_TITLE ＝「div」をDOM要素作成。
+    TABLE_TITLEに「ポンド→キログラム 換算テーブル（1〜200ポンド）」をテキスト設定。
+    TABLE_TITLEの「style」に「font-weight: bold; color: #1e293b; margin-bottom: 8px; font-size: 15px;」をDOM属性設定。
+    CARDへTABLE_TITLEをDOM子要素追加。
+
+    TABLE_CONTAINER ＝「div」をDOM要素作成。
+    TABLE_CONTAINERの「style」に「max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;」をDOM属性設定。
+
+    TABLE_ELEM ＝「table」をDOM要素作成。
+    TABLE_ELEMの「style」に「width: 100%; border-collapse: collapse; font-size: 14px;」をDOM属性設定。
+
+    THEAD ＝「thead」をDOM要素作成。
+    THEADの「style」に「position: sticky; top: 0; background: #f1f5f9; color: #334155; font-weight: bold; border-bottom: 2px solid #cbd5e1;」をDOM属性設定。
+    
+    TH_TR ＝「tr」をDOM要素作成。
+    TH1 ＝「th」をDOM要素作成。
+    TH1に「ポンド (lb)」をテキスト設定。
+    TH1の「style」に「padding: 8px 12px; text-align: left;」をDOM属性設定。
+    TH_TRへTH1をDOM子要素追加。
+
+    TH2 ＝「th」をDOM要素作成。
+    TH2に「キログラム (kg)」をテキスト設定。
+    TH2の「style」に「padding: 8px 12px; text-align: right;」をDOM属性設定。
+    TH_TRへTH2をDOM子要素追加。
+
+    THEADへTH_TRをDOM子要素追加。
+    TABLE_ELEMへTHEADをDOM子要素追加。
+
+    TBODY ＝「tbody」をDOM要素作成。
+    
+    Iを1から200まで繰り返す
+        TR_ELEM ＝「tr」をDOM要素作成。
+        TR_ELEMの「style」に「border-bottom: 1px solid #f1f5f9;」をDOM属性設定。
+
+        TD1 ＝「td」をDOM要素作成。
+        TD1に(I)をテキスト設定。
+        TD1の「style」に「padding: 6px 12px; text-align: left; font-family: monospace;」をDOM属性設定。
+        TR_ELEMへTD1をDOM子要素追加。
+
+        CALC_KG ＝ 『Math.round(』＆I＆『 * 0.45359237 * 100) / 100』をJS実行
+        TD2 ＝「td」をDOM要素作成。
+        TD2に(CALC_KG)をテキスト設定。
+        TD2の「style」に「padding: 6px 12px; text-align: right; font-family: monospace;」をDOM属性設定。
+        TR_ELEMへTD2をDOM子要素追加。
+
+        TBODYへTR_ELEMをDOM子要素追加。
+    ここまで
+
+    TABLE_ELEMへTBODYをDOM子要素追加。
+    TABLE_CONTAINERへTABLE_ELEMをDOM子要素追加。
+    CARDへTABLE_CONTAINERをDOM子要素追加。
+
+    DOM親要素へCARDをDOM子要素追加。
+ここまで。
+
+
+// =========================================================
+// メイン処理 & 変換ロジック（JavaScript実装）
+// =========================================================
+画面構築
+
+『
+const kgInput = document.getElementById("kg_input");
+const lbInput = document.getElementById("lb_input");
+
+let isUpdating = false;
+
+kgInput.addEventListener("input", function() {
+    if (isUpdating) return;
+    isUpdating = true;
+    const val = kgInput.value;
+    if (val === "") {
+        lbInput.value = "";
+    } else {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+            const lb = num * 2.20462262;
+            lbInput.value = Math.round(lb * 10000) / 10000;
+        }
+    }
+    isUpdating = false;
+});
+
+lbInput.addEventListener("input", function() {
+    if (isUpdating) return;
+    isUpdating = true;
+    const val = lbInput.value;
+    if (val === "") {
+        kgInput.value = "";
+    } else {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+            const kg = num * 0.45359237;
+            kgInput.value = Math.round(kg * 10000) / 10000;
+        }
+    }
+    isUpdating = false;
+});
+
+// プリセットボタンすべてにクリックイベントをJavaScript側から安全に一括登録
+document.querySelectorAll(".preset-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+        const val = this.getAttribute("data-val");
+        const targetLb = document.getElementById("lb_input");
+        if (targetLb) {
+            targetLb.value = val;
+            targetLb.dispatchEvent(new Event("input"));
+        }
+    });
+});
+』をJS実行

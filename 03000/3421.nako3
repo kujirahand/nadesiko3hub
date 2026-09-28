@@ -1,0 +1,190 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3421
+### タイトル=Wikipedia　Japanese＆English　version
+### 作者=Aris(user_id=565)
+### ライセンス=BSD
+### 説明=Wikipedia APIを使用したWikipediaのなでしこ版　日本語版と英語版のWikipediaが使えます
+### 対象バージョン=3.7.22
+### URL=
+### 種類=wnako
+### タグ=Wikipedia
+### 更新日時=2026-08-21 16:29:55
+###
+
+//カバー画像　Wikimedia Foundation - Wikimedia Foundation, CC 表示-継承 3.0, https://commons.wikimedia.org/w/index.php?curid=10310282による
+
+
+// 1. 画面に入力エリア（エディタ）、言語選択、ボタンを作成
+🌴---------------------------------------------------------------------------------------------------------------🌴のラベル作成。
+
+改行作成。
+
+🌴言語: 🌴のラベル作成。
+それの🌴文字サイズ🌴に🌴18px🌴をDOMスタイル設定。
+
+// ラジオボタン1: 日本語
+ラジオJP＝🌴input🌴をDOM要素作成。
+ラジオJPの🌴type🌴に🌴radio🌴をDOM属性設定。
+ラジオJPの🌴name🌴に🌴lang_select🌴をDOM属性設定。
+ラジオJPの🌴value🌴に🌴ja🌴をDOM属性設定。
+ラジオJPの🌴checked🌴に🌴true🌴をDOM属性設定。
+ラジオJPの🌴style🌴に🌴transform: scale(1.3); margin-left: 8px; margin-right: 4px; cursor: pointer;🌴をDOM属性設定。
+DOM親要素へラジオJPをDOM子要素追加。
+
+ラベルJP＝「span」をDOM要素作成。
+ラベルJPに「日本語 (ja)」をテキスト設定。
+ラベルJPの「style」に「font-size: 16px; margin-right: 16px; cursor: pointer;」をDOM属性設定。
+DOM親要素へラベルJPをDOM子要素追加。
+
+// ラジオボタン2: 英語
+ラジオEN＝「input」をDOM要素作成。
+ラジオENの「type」に「radio」をDOM属性設定。
+ラジオENの「name」に「lang_select」をDOM属性設定。
+ラジオENの「value」に「en」をDOM属性設定。
+ラジオENの「style」に「transform: scale(1.3); margin-right: 4px; cursor: pointer;」をDOM属性設定。
+DOM親要素へラジオENをDOM子要素追加。
+
+ラベルEN＝「span」をDOM要素作成。
+ラベルENに「英語 (en)」をテキスト設定。
+ラベルENの「style」に「font-size: 16px; margin-right: 16px; cursor: pointer;」をDOM属性設定。
+DOM親要素へラベルENをDOM子要素追加。
+
+改行作成。
+
+「---------------------------------------------------------------------------------------------------------------」のラベル作成。
+
+改行作成。
+
+「検索キーワード:」のラベル作成。
+それの「文字サイズ」に「18px」をDOMスタイル設定。
+改行作成。
+
+入力欄＝空のエディタ作成。
+それの「幅」に「350px」をDOMスタイル設定。
+それの「高さ」に「27px」をDOMスタイル設定。
+それの「placeholder」に「検索ワードを入力...」をDOM属性設定。
+それの「文字サイズ」に「17.4px」をDOMスタイル設定。
+
+検索ボタン＝「検索」のボタン作成。
+それの「高さ」に「40px」をDOMスタイル設定。
+それの「幅」に「50px」をDOMスタイル設定。
+それの「文字サイズ」に「16px」をDOMスタイル設定。
+
+改行作成。
+
+「---------------------------------------------------------------------------------------------------------------」のラベル作成。
+
+// カードを描画するための親エリアを作成し、画面に追加
+カード表示エリア＝「div」をDOM要素作成。
+DOM親要素へカード表示エリアをDOM子要素追加。
+
+// =========================================================
+// Wikipedia全文カードを作成・描画する関数
+// =========================================================
+●（タイトル, 全文章テキスト, ページURLで）Wikipedia全文カード作成
+    CARD ＝「div」をDOM要素作成。
+    カードスタイル ＝「max-width: 600px; margin: 16px 0; padding: 10px; background-color: #F9F5F0; border: 2.5px solid #4a90e2; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); font-family: sans-serif; line-height: 1.6;」
+    CARDの「style」にカードスタイルをDOM属性設定。
+
+    TITLE_LINE ＝「div」をDOM要素作成。
+    TITLE_LINEの「style」に「font-size: 20px; font-weight: bold; color: #1a365d; border-bottom: 2px solid #4a90e2; padding-bottom: 4px; margin-bottom: 10px;」をDOM属性設定。
+    TITLE_LINEに「{タイトル}」をテキスト設定。
+    CARDへTITLE_LINEをDOM子要素追加。
+
+    // 記事の全文章を表示するエリア
+    FULLTEXT_BOX ＝「div」をDOM要素作成。
+    FULLTEXT_BOXに全文章テキストをテキスト設定。
+    FULLTEXT_BOXの「style」に「font-size: 17px; color: #2d3748; background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; max-height: 480px; overflow-y: auto; white-space: pre-wrap; line-height: 1.7; margin-bottom: 16px; word-break: break-all;」をDOM属性設定。
+    CARDへFULLTEXT_BOXをDOM子要素追加。
+
+    もし、ページURL≠未定義かつページURL≠「」ならば
+        PAGE_LINE ＝「div」をDOM要素作成。
+        PAGE_LINEの「style」に「font-size: 14px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: right;」をDOM属性設定。
+        
+        PAGE_LINK ＝「a」をDOM要素作成。
+        PAGE_LINKに「 Wikipediaで元のページを開く ➔」をテキスト設定。
+        PAGE_LINKの「href」にページURLをDOM属性設定。
+        PAGE_LINKの「target」に「_blank」をDOM属性設定。
+        PAGE_LINKの「rel」に「noopener noreferrer」をDOM属性設定。
+        PAGE_LINKの「onclick」に「window.open('{ページURL}', '_blank'); return false;」をDOM属性設定。
+        PAGE_LINKの「style」に「color: #3182ce; font-weight: bold; text-decoration: none; cursor: pointer;」をDOM属性設定。
+        
+        PAGE_LINEへPAGE_LINKをDOM子要素追加。
+        CARDへPAGE_LINEをDOM子要素追加。
+    ここまで
+
+    カード表示エリアへCARDをDOM子要素追加。
+    CARDで戻る。
+ここまで。
+
+// =========================================================
+// 2. ボタンがクリックされた時の検索処理
+// =========================================================
+検索ボタンをクリックした時には
+    検索語＝入力欄のテキスト取得
+    もし、検索語が「」ならば、終わる。
+    
+    // どちらのラジオボタンがチェックされているか判定
+    選ばれた言語＝「ja」
+    isEN＝DOM属性取得(ラジオEN, 「checked」)
+    もし、isEN＝「true」またはisEN＝真ならば
+        選ばれた言語＝「en」
+    ここまで
+    
+    カード表示エリアに「『{検索語}』([{選ばれた言語}]) Wikipediaから取得中...」をテキスト設定。
+    
+    エンコード語＝検索語をURLエンコード
+    
+    // 選ばれた言語サブドメイン (ja / en) のAPIエンドポイントを動的に作成
+    URL＝「https://{選ばれた言語}.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&explaintext=1&titles={エンコード語}&formatversion=2&origin=*」
+    
+    URLにAJAX送信。
+    データ＝それをJSONデコード。
+    
+    カード表示エリアに「」をテキスト設定。
+    
+    // データの抽出
+    もし、データ[「query」]≠未定義ならば
+        ページリスト＝データ[「query」][「pages」]
+        
+        もし、要素数(ページリスト) ＞ 0 ならば
+            ページ情報＝ページリスト[0]
+            
+            // 記事が存在しない場合（missingフラグがある場合）
+            もし、ページ情報[「missing」]≠未定義ならば
+                カード表示エリアに「該当するWikipedia記事が見つかりませんでした。」をテキスト設定。
+            違えば
+                タイトル＝ページ情報[「title」]
+                全文章テキスト＝ページ情報[「extract」]
+                ページURL＝「https://{選ばれた言語}.wikipedia.org/wiki/{エンコード語}」
+                
+                Wikipedia全文カード作成(タイトル, 全文章テキスト, ページURL)
+            ここまで
+        ここまで
+    違えば
+        カード表示エリアに「データの取得に失敗しました。」をテキスト設定。
+    ここまで
+ここまで
+
+
+●(txtでURLの)リンク作成
+    ELとは変数＝「a」のDOM要素作成。
+    ELの「href」にURLをDOM属性設定。
+    ELの「target」に「_blank」をDOM属性設定。
+    ELの「style」に「margin-right: 15px;」をDOMスタイル設定。
+    ELにtxtをテキスト設定。
+    DOM親要素へELをDOM子要素追加。
+    ELで戻る。
+ここまで。
+改行作成。
+「---------------------------------------------------------------------------------------------------------------」のラベル作成。
+改行作成。
+
+// 日本語版と英語版の両方のリンクを作成
+「Wikipedia日本語版(Japanese)」で「https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8」のリンク作成。
+改行作成。
+改行作成。
+
+「Wikipedia英語版 (English)」で「https://en.wikipedia.org/wiki/Main_Page」のリンク作成。
+改行作成。
+「---------------------------------------------------------------------------------------------------------------」のラベル作成。

@@ -1,0 +1,166 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3379
+### タイトル=地震情報を表示します。
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=P2P 地震情報APIによって最新の地震情報を取得する。　UIが見やすくなかったら、コメントで報告をください。
+### 対象バージョン=3.7.22
+### URL=https://www.p2pquake.net/
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-04 10:48:47
+###
+
+/*----------------------------------------------------------------------------------------------------
+Copyright <2026/7/29> <Aris>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+----------------------------------------------------------------------------------------------------*/
+
+//ver 2.3
+//使用しているAPIのバージョンを最新にしました
+# ラベル（「発生日付:」等）を作る関数
+●（テキストで）ラベル作成
+    L ＝「span」をDOM要素作成。
+    Lにテキストをテキスト設定。
+    Lの「style」に「font-weight: bold; color: #000000; background-color: #fda3f7; padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-size: 14px;」をDOM属性設定。
+    Lで戻る。
+ここまで。
+
+# 地震情報カードを作成する関数
+●（日付, 時間, 震源地, 震度, マグニチュードで）カード作成
+    # 外枠カードの作成（全方向 2px の青線）
+    CARD ＝「div」をDOM要素作成。
+    カードスタイル ＝「display: block; max-width: 440px; margin: 12px 0; padding: 16px; background-color: #d9d5ff; border: 3px solid #6af98b; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); font-family: sans-serif; line-height: 1.6;」
+    CARDの「style」にカードスタイルをDOM属性設定。
+
+    # タイトル部分
+    TITLE ＝「div」をDOM要素作成。
+    TITLEに「最新の地震情報」をテキスト設定。
+    TITLEの「style」に「font-size: 20px; font-weight: bold; color: #404ba2; margin-bottom: 12px; border-bottom: 1.5px solid #e0e0e0; padding-bottom: 6px;」をDOM属性設定。
+    CARDへTITLEをDOM子要素追加。
+
+    # 情報表示エリア
+    INFO_BOX ＝「div」をDOM要素作成。
+    INFO_BOXの「style」に「font-size: 18px; color: #1f2b8b;」をDOM属性設定。
+    
+    # 1. 発生日付
+    LINE1 ＝「div」をDOM要素作成。
+    LINE1の「style」に「margin-bottom: 9px;」をDOM属性設定。
+    L1 ＝「発生日付:」でラベル作成。
+    LINE1へL1をDOM子要素追加。
+    T1 ＝「span」をDOM要素作成。
+    T1に「{日付}」をテキスト設定。
+    LINE1へT1をDOM子要素追加。
+    INFO_BOXへLINE1をDOM子要素追加。
+
+    # 2. 発生時間
+    LINE2 ＝「div」をDOM要素作成。
+    LINE2の「style」に「margin-bottom: 20px;」をDOM属性設定。
+    L2 ＝「発生時間:」でラベル作成。
+    LINE2へL2をDOM子要素追加。
+    T2 ＝「span」をDOM要素作成。
+    T2に「{時間}」をテキスト設定。
+    LINE2へT2をDOM子要素追加。
+    INFO_BOXへLINE2をDOM子要素追加。
+
+    # 3. 震源地
+    LINE3 ＝「div」をDOM要素作成。
+    LINE3の「style」に「margin-bottom: 4px;」をDOM属性設定。
+    L3 ＝「震源地:」でラベル作成。
+    LINE3へL3をDOM子要素追加。
+    T3 ＝「span」をDOM要素作成。
+    T3に「{震源地}」をテキスト設定。
+    LINE3へT3をDOM子要素追加。
+    INFO_BOXへLINE3をDOM子要素追加。
+
+    # 4. 最大震度
+    LINE4 ＝「div」をDOM要素作成。
+    LINE4の「style」に「margin-bottom: 15px;」をDOM属性設定。
+    L4 ＝「最大震度:」でラベル作成。
+    LINE4へL4をDOM子要素追加。
+    T4 ＝「span」をDOM要素作成。
+    T4に「震度 {震度}」をテキスト設定。
+    LINE4へT4をDOM子要素追加。
+    INFO_BOXへLINE4をDOM子要素追加。
+
+    # 5. マグニチュード
+    LINE5 ＝「div」をDOM要素作成。
+    L5 ＝「マグニチュード:」でラベル作成。
+    LINE5へL5をDOM子要素追加。
+    T5 ＝「span」をDOM要素作成。
+    T5に「M{マグニチュード}」をテキスト設定。
+    LINE5へT5をDOM子要素追加。
+    INFO_BOXへLINE5をDOM子要素追加。
+
+    CARDへINFO_BOXをDOM子要素追加。
+
+    # 画面（DOM親要素）にカードを追加
+    DOM親要素へCARDをDOM子要素追加。
+    CARDで戻る。
+ここまで。
+
+# =========================================================
+# メイン処理
+# =========================================================
+
+# APIのURLを設定する（地震情報: 551）
+URLは「https://api.p2pquake.net/v2/history?codes=551&limit=1」
+
+URLにAJAX送信。
+データはそれをJSONデコード。
+件数はデータの要素数。
+
+# データが取得できているか確認
+もし、件数 ＞ 0ならば
+    最新地震はデータ[0]
+    
+    # 発生時刻を日付と時間に分ける
+    元時刻は最新地震["earthquake"]["time"]
+    時刻リストは元時刻を「 」で区切る
+    発生日付は時刻リスト[0]
+    発生時間は時刻リスト[1]
+    
+    # 時間を変換する
+    時間リストは発生時間を「:」で区切る
+    時は時間リスト[0]
+    分は時間リスト[1]
+    生秒は時間リスト[2]
+    
+    # 秒数に小数点が含まれている場合、整数部分を取り出す
+    秒リストは生秒を「.」で区切る
+    秒は秒リスト[0]
+    
+    日本語時間情報は「」＆時＆「時」＆分＆「分」＆秒＆「秒」
+    
+    # 震度データを変換する
+    生震度は最新地震["earthquake"]["maxScale"]
+    震度文字は「不明」
+    もし、生震度 ＝ 10ならば、震度文字は「1」
+    もし、生震度 ＝ 20ならば、震度文字は「2」
+    もし、生震度 ＝ 30ならば、震度文字は「3」
+    もし、生震度 ＝ 40ならば、震度文字は「4」
+    もし、生震度 ＝ 45ならば、震度文字は「5弱」
+    もし、生震度 ＝ 50ならば、震度文字は「5強」
+    もし、生震度 ＝ 55ならば、震度文字は「6弱」
+    もし、生震度 ＝ 60ならば、震度文字は「6強」
+    もし、生震度 ＝ 70ならば、震度文字は「7」
+    
+    震源地名 ＝ 最新地震["earthquake"]["hypocenter"]["name"]
+    マグニチュード ＝ 最新地震["earthquake"]["hypocenter"]["magnitude"]
+    
+    # --- 地震情報カードの生成 ---
+    カード作成(発生日付, 日本語時間情報, 震源地名, 震度文字, マグニチュード)
+違えば
+    「地震情報が取得できませんでした。」を表示。
+ここまで。

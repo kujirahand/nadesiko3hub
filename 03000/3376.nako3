@@ -1,0 +1,45 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3376
+### タイトル=カラーコード表を作ろう
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=CC0
+### 説明=マイナビ連載で作ったカラーコード表を作る回のプログラムです。
+### 対象バージョン=3.7.20
+### URL=https://news.mynavi.jp/techplus/article/nadeshiko-91/
+### 種類=wnako
+### タグ=
+### 更新日時=2026-07-15 22:52:05
+###
+
+# HTMLカラーコード作成
+# [解説がこちら](https://news.mynavi.jp/techplus/article/nadeshiko-91/)
+# 色の混ぜ具合を指定 --- (※1)
+混ぜ具合=["FF", "CC", "99", "66", "33", "00"]
+H=「<h3>カラーコード</h3><table>」
+# 光の三原色を作成 --- (※2)
+Rで混ぜ具合を反復：
+　Gで混ぜ具合を反復：
+　　　H=H&「<tr>」
+　　　Bで混ぜ具合を反復：
+　　　　C=「#{R}{G}{B}」を大文字変換
+　　　　文字色=「#000000」
+　　　　L=明度計算(R,G,B) # --- (※3)
+　　　　もし、L<0.5ならば：
+　　　　　　文字色=「#FFFFFF」。
+　　　　H=H&「<td style="background-color:{C}; color:{文字色}">」
+　　　　H=H&「{C}</td>」
+　　　H=H&「</tr>」&改行
+H=H&「</table>」
+HH=Hのラベル作成。
+HH$文字サイズ=13px
+
+●(RR,GG,BBで)明度計算とは：
+　　# 数値に戻す
+　　R=INT(「0x{RR}」) ÷ 255
+　　G=INT(「0x{GG}」) ÷ 255
+　　B=INT(「0x{BB}」) ÷ 255
+　　# 明度計算
+　　CMAX=MAX(R,G,B)
+　　CMIN=MIN(R,G,B)
+　　L=(CMAX+CMIN)÷2
+　　Lを戻す

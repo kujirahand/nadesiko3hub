@@ -1,0 +1,138 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3441
+### タイトル=ネタバレ隠し
+### 作者=みけCAT(user_id=398)
+### ライセンス=CC0
+### 説明=最初から表示する「説明」と、ボタンを押すと表示する「ネタバレ」を設定し、それらを表示するページを作成します。
+### 対象バージョン=3.7.22
+### URL=https://note.com/mi_ke_cat/n/n8733fff08dde
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-30 23:33:10
+###
+
+●(Sを)BASE64URLエンコードとは
+  SをBASE64エンコード。
+  それの「+」を「-」に置換。
+  それの「/」を「_」に置換。
+  それの「=」を空に置換。
+  それを戻す。
+ここまで。
+
+●(Sを)BASE64URLデコードとは
+  Sの「-」を「+」に置換。
+  それの「_」を「/」に置換。
+  それをBASE64デコード。
+  それを戻す。
+ここまで。
+
+暗号化関数は『() => {
+  const te = new TextEncoder();
+  const td = new TextDecoder();
+  const getKey = async (keyStr) => {
+    const pbkdf2Key = await crypto.subtle.importKey(
+      "raw",
+      te.encode(keyStr),
+      "PBKDF2",
+      false,
+      ["deriveKey"],
+    );
+    return await crypto.subtle.deriveKey(
+      {
+        "name": "PBKDF2",
+        "hash": "SHA-256",
+        "salt": te.encode("ネタバレ隠し"),
+        "iterations": 10000,
+      },
+      pbkdf2Key,
+      {
+        "name": "AES-CBC",
+        "length": 128,
+      },
+      false,
+      ["encrypt", "decrypt"],
+    );
+  };
+
+  const encrypt = async (keyStr, plainStr) => {
+    const iv = new Uint8Array(16);
+    crypto.getRandomValues(iv);
+    const ct = new Uint8Array(await crypto.subtle.encrypt(
+      {
+        "name": "AES-CBC",
+        "iv": iv,
+      },
+      await getKey(keyStr),
+      te.encode(plainStr),
+    ));
+    const merged = new Uint8Array(iv.length + ct.length);
+    merged.set(iv, 0);
+    merged.set(ct, iv.length);
+    return merged.toBase64({ "alphabet": "base64url", "omitPadding": true });
+  };
+
+  const decrypt = async(keyStr, encryptedStr) => {
+    const encrypted = Uint8Array.fromBase64(encryptedStr, { "alphabet": "base64url" });
+    const iv = new Uint8Array(encrypted.buffer, encrypted.byteOffset, 16);
+    const ct = new Uint8Array(encrypted.buffer, encrypted.byteOffset + 16, encrypted.length - 16);
+    const plain = await crypto.subtle.decrypt(
+      {
+        "name": "AES-CBC",
+        "iv": iv,
+      },
+      await getKey(keyStr),
+      encrypted,
+    );
+    return td.decode(new Uint8Array(plain, 16, plain.byteLength - 16));
+  };
+
+  return { encrypt, decrypt };
+}』を[]でJS関数実行。
+
+●(KでSを)暗号化とは
+  暗号化関数$encryptを[K, S]でAWAIT実行して戻す。
+ここまで。
+
+●(KでSを)復号とは
+  暗号化関数$decryptを[K, S]でAWAIT実行して戻す。
+ここまで。
+
+「() => location.hash.replace(/^#/, "")」を[]でJS関数実行。
+それを「,」で区切る。
+引数はそれ。
+もし、引数の要素数が2と等しいならば
+  説明は引数@0をBASE64URLデコード。
+  ネタバレデータは引数@1。
+  それのラベル作成。
+  それの「white-space」に「pre-wrap」をDOMスタイル設定。
+  改行作成。
+  ネタバレオープンボタンは「ネタバレを見る」のボタン作成。
+  改行作成。
+  ネタバレラベルは空のラベル作成。
+  それの「white-space」に「pre-wrap」をDOMスタイル設定。
+
+  ネタバレオープンボタンのクリックされた時には
+    説明でネタバレデータを復号。
+    ネタバレラベルにそれをテキスト設定。
+    ネタバレオープンボタンにオフをDOM有効設定。
+  ここまで。
+違えば
+  「説明 (最初から見える)：」のラベル作成。
+  改行作成。
+  説明欄は空のテキストエリア作成。
+  改行作成。
+  「ネタバレ (ボタンを押すと見える)：」のラベル作成。
+  改行作成。
+  ネタバレ欄は空のテキストエリア作成。
+  改行作成。
+  実行ボタンは「ページ作成 (新しいタブで開く)」のボタン作成。
+
+  実行ボタンのクリックされた時には
+    説明は説明欄のテキスト取得。
+    ネタバレはネタバレ欄のテキスト取得。
+    ネタバレ暗号は説明でネタバレを暗号化。
+    URLは「() => new URL(location.href)」を[]でJS関数実行。
+    URL$hashは「{説明をBASE64URLエンコード},{ネタバレ暗号}」。
+    「(url) => window.open(url, "_blank", "noopener")」を[URL$href]でJS関数実行。
+  ここまで。
+ここまで。

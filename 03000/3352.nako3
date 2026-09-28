@@ -1,0 +1,17 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3352
+### タイトル=ブラクラ（即時実行）
+### 作者=くぁｗせｄｒｆｔｇｙふじこｌｐ(user_id=0)
+### ライセンス=CC0
+### 説明=実行すると多分ブラウザが落ちます
+### 対象バージョン=3.7.20
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-07-15 11:30:34
+###
+
+「実行中」のラベル作成。
+永遠に繰り返す
+    「window.open("https://n3s-sandbox.nadesi.com/widget.php?3352&run=1&allow=1&nakotype=wnako","_blank","width=50000, height=50000,top=-100, left=-100,resizable=yes, scrollbars=yes");」をJS実行。
+ここまで。

@@ -1,0 +1,526 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3378
+### タイトル=search webpage
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=文字を入力するとその文字に対応するURLのリンクを表示。カタカナや省略名でもできます。
+### 対象バージョン=3.7.20
+### URL=
+### 種類=wnako
+### タグ=URL、リンク、Google、なでしこ、初音ミク、
+### 更新日時=2026-08-03 12:15:57
+###
+
+// ver 1.1 辞書にURLを追加
+// ver 1.3 辞書にURLを追加
+// ver 2.1 何も入力せずにOKまたはキャンセルした時に登録されてるURLがすべて表示される不具合の修正
+// ver 2.5 辞書にURLを大幅に追加
+// ver 2.7 辞書にゲーム関係のURLを追加
+// ver 3.4 プログラムコードを短くする修正,結果の表示方法を変更,日本語や省略名を入力しても表示できるように修正、辞書をサイトリストに変更
+// ver 3.6 サイトリストの数を追加
+
+# ▼ サイトデータ（表示名、URL、検索用キーワード）のリスト
+サイトリストは［
+  # --------------------------------------------------
+  # 【1】元からの基本・大手サイト & Big Tech
+  # --------------------------------------------------
+  ｛"名前": "なでしこ", "URL": "https://nadesi.com/", "キーワード": "なでしこ nadesiko"},
+  ｛"名前": "なでしこ Discord", "URL": "https://discord.com/invite/FAtjTQr3kk", "キーワード": "なでしこ discord ディスコード"},
+  ｛"名前": "Google", "URL": "https://www.google.com", "キーワード": "google グーグル"},
+  ｛"名前": "Google Map", "URL": "https://www.google.co.jp/maps", "キーワード": "google map グーグルマップ"},
+  ｛"名前": "Google Gemini", "URL": "https://gemini.google.com/", "キーワード": "google gemini ジェミニ"},
+  ｛"名前": "全国初音ミク支援協会", "URL": "http://hatsunemikusa.web.fc2.com/", "キーワード": "全国初音ミク支援協会 初音ミク ミク hatsune miku"},
+  ｛"名前": "初音ミク公式ブログ", "URL": "https://blog.piapro.net/", "キーワード": "初音ミク公式ブログ 初音ミク ミク ピアプロ piapro"},
+  ｛"名前": "Microsoft", "URL": "https://www.microsoft.com/ja-jp", "キーワード": "microsoft マイクロソフト ms"},
+  ｛"名前": "Intel", "URL": "https://www.intel.co.jp/", "キーワード": "intel インテル"},
+  ｛"名前": "AMD", "URL": "https://www.amd.com/ja", "キーワード": "amd エーエムディー"},
+  ｛"名前": "トヨタ自動車", "URL": "https://global.toyota/jp/", "キーワード": "トヨタ自動車 トヨタ toyota"},
+  ｛"名前": "ソニー", "URL": "https://www.sony.com/ja/", "キーワード": "ソニー sony SONY"},
+  ｛"名前": "任天堂", "URL": "https://www.nintendo.co.jp/", "キーワード": "任天堂 nintendo ニンテンドー"},
+  ｛"名前": "ソフトバンク", "URL": "https://www.softbank.jp/", "キーワード": "ソフトバンク softbank sb"},
+  ｛"名前": "Apple", "URL": "https://www.apple.com/jp/", "キーワード": "apple アップル"},
+  ｛"名前": "Meta", "URL": "https://about.meta.com/ja/", "キーワード": "meta メタ facebook フェイスブック"},
+  ｛"名前": "Amazon", "URL": "https://www.amazon.co.jp", "キーワード": "amazon アマゾン"},
+  ｛"名前": "Netflix", "URL": "https://www.netflix.com/jp/", "キーワード": "netflix ネットフリックス ネトフリ"},
+  ｛"名前": "Tesla", "URL": "https://www.tesla.com/ja_jp", "キーワード": "tesla テスラ"},
+  ｛"名前": "YouTube", "URL": "https://www.youtube.com", "キーワード": "youtube ユーチューブ yt"},
+  ｛"名前": "Wikipedia", "URL": "https://ja.wikipedia.org", "キーワード": "wikipedia ウィキペディア ウィキ wiki"},
+  ｛"名前": "X (旧Twitter)", "URL": "https://x.com", "キーワード": "x twitter ツイッター エックス"},
+  ｛"名前": "Yahoo! JAPAN", "URL": "https://www.yahoo.co.jp", "キーワード": "yahoo japan ヤフー"},
+  ｛"名前": "楽天市場", "URL": "https://www.rakuten.co.jp", "キーワード": "楽天市場 楽天 rakuten"},
+
+  # --------------------------------------------------
+  # 【2】大学・教育・研究機関
+  # --------------------------------------------------
+  ｛"名前": "東京大学", "URL": "https://www.u-tokyo.ac.jp/ja/index.html", "キーワード": "東京大学 東大 todai utokyo"},
+  ｛"名前": "京都大学", "URL": "https://www.kyoto-u.ac.jp/ja", "キーワード": "京都大学 京大 kyodai kyoto utokyo"},
+  ｛"名前": "ハーバード大学", "URL": "https://www.harvard.edu/", "キーワード": "ハーバード大学 harvard"},
+  ｛"名前": "MIT", "URL": "https://www.mit.edu/", "キーワード": "mit マサチューセッツ工科大学"},
+  ｛"名前": "大阪大学", "URL": "https://www.osaka-u.ac.jp/ja", "キーワード": "大阪大学 阪大 osaka university"},
+  ｛"名前": "東北大学", "URL": "https://www.tohoku.ac.jp/japanese/", "キーワード": "東北大学 tohoku university"},
+  ｛"名前": "名古屋大学", "URL": "https://www.nagoya-u.ac.jp/", "キーワード": "名古屋大学 名大 nagoya university"},
+  ｛"名前": "九州大学", "URL": "https://www.kyushu-u.ac.jp/ja/", "キーワード": "九州大学 九大 kyushu university"},
+  ｛"名前": "北海道大学", "URL": "https://www.hokudai.ac.jp/", "キーワード": "北海道大学 北大 hokkaido university"},
+  ｛"名前": "東京科学大学 (旧東工大・医科歯科大)", "URL": "https://www.isct.ac.jp/ja", "キーワード": "東京科学大学 東工大 医科歯科大 isct"},
+  ｛"名前": "早稲田大学", "URL": "https://www.waseda.jp/top/", "キーワード": "早稲田大学 早大 waseda"},
+  ｛"名前": "慶應義塾大学", "URL": "https://www.keio.ac.jp/ja/", "キーワード": "慶應義塾大学 慶応 keio"},
+  ｛"名前": "筑波大学", "URL": "https://www.tsukuba.ac.jp/", "キーワード": "筑波大学 tsukuba"},
+  ｛"名前": "神戸大学", "URL": "https://www.kobe-u.ac.jp/", "キーワード": "神戸大学 神大 kobe"},
+  ｛"名前": "一橋大学", "URL": "https://www.hit-u.ac.jp/", "キーワード": "一橋大学 hitotsubashi"},
+  ｛"名前": "明治大学", "URL": "https://www.meiji.ac.jp/", "キーワード": "明治大学 meiji"},
+  ｛"名前": "立命館大学", "URL": "https://www.ritsumei.ac.jp/", "キーワード": "立命館大学 ritsumeikan"},
+  ｛"名前": "同志社大学", "URL": "https://www.doshisha.ac.jp/", "キーワード": "同志社大学 doshisha"},
+  ｛"名前": "法政大学", "URL": "https://www.hosei.ac.jp/", "キーワード": "法政大学 hosei"},
+  ｛"名前": "中央大学", "URL": "https://www.chuo-u.ac.jp/", "キーワード": "中央大学 chuo"},
+  ｛"名前": "立教大学", "URL": "https://www.rikkyo.ac.jp/", "キーワード": "立教大学 rikkyo"},
+  ｛"名前": "青学 (青山学院大学)", "URL": "https://www.aoyama.ac.jp/", "キーワード": "青山学院大学 青学 aoyama"},
+  ｛"名前": "Stanford University", "URL": "https://www.stanford.edu/", "キーワード": "stanford スタンフォード大学"},
+  ｛"名前": "Oxford University", "URL": "https://www.ox.ac.uk/", "キーワード": "oxford オックスフォード大学"},
+  ｛"名前": "Cambridge University", "URL": "https://www.cam.ac.uk/", "キーワード": "cambridge ケンブリッジ大学"},
+
+  # --------------------------------------------------
+  # 【3】ゲームメディア・攻略・パブリッシャー
+  # --------------------------------------------------
+  ｛"名前": "ファミ通", "URL": "https://www.famitsu.com/", "キーワード": "ファミ通 famitsu"},
+  ｛"名前": "4Gamer", "URL": "https://www.4gamer.net/", "キーワード": "4gamer フォーゲーマー"},
+  ｛"名前": "電撃オンライン", "URL": "https://dengekionline.com/", "キーワード": "電撃オンライン 電撃 dengeki"},
+  ｛"名前": "IGN Japan", "URL": "https://jp.ign.com/", "キーワード": "ign japan アイジーエヌ"},
+  ｛"名前": "Steam", "URL": "https://store.steampowered.com/", "キーワード": "steam スチーム"},
+  ｛"名前": "Game8", "URL": "https://game8.jp/", "キーワード": "game8 ゲームエイト"},
+  ｛"名前": "GameWith", "URL": "https://gamewith.jp/", "キーワード": "gamewith ゲームウィズ"},
+  ｛"名前": "アルテマ", "URL": "https://altema.jp/", "キーワード": "アルテマ altema"},
+  ｛"名前": "電ファミニコゲーマー", "URL": "https://news.denfaminicogamer.jp/", "キーワード": "電ファミニコゲーマー 電ファミ denfaminico"},
+  ｛"名前": "極限攻略データベース", "URL": "https://kyokugen.info/", "キーワード": "極限攻略データベース 極限 kyokugen"},
+  ｛"名前": "AUTOMATON", "URL": "https://automaton-media.com/", "キーワード": "automaton オートマトン インディーゲーム"},
+  ｛"名前": "インサイド (INSIDE)", "URL": "https://www.inside-games.jp/", "キーワード": "インサイド inside ゲームニュース"},
+  ｛"名前": "Game*Spark", "URL": "https://www.gamespark.jp/", "キーワード": "gamespark ゲームスパーク"},
+  ｛"名前": "Epic Games Store", "URL": "https://store.epicgames.com/ja/", "キーワード": "epic games エピックゲームズ"},
+  ｛"名前": "GOG.com", "URL": "https://www.gog.com/", "キーワード": "gog ゴグ cd projekt"},
+  ｛"名前": "Roblox", "URL": "https://www.roblox.com/", "キーワード": "roblox ロブロックス"},
+  ｛"名前": "EA (Electronic Arts)", "URL": "https://www.ea.com/ja-jp", "キーワード": "ea エレクトロニックアーツ apex"},
+  ｛"名前": "Ubisoft", "URL": "https://www.ubisoft.com/ja-jp/", "キーワード": "ubisoft ユービーアイソフト アサクリ"},
+  ｛"名前": "Blizzard Entertainment", "URL": "https://www.blizzard.com/ja-jp/", "キーワード": "blizzard ブリザード overwatch"},
+  ｛"名前": "Riot Games", "URL": "https://www.riotgames.com/ja", "キーワード": "riot games ライアット lol valorant"},
+  ｛"名前": "バンダイナムコ", "URL": "https://www.bandainamcoent.co.jp/", "キーワード": "bandai namco バンダイナムコ バンナム"},
+  ｛"名前": "コーエーテクモ", "URL": "https://www.gamecity.ne.jp/", "キーワード": "コーエーテクモ koei tecmo 信長の野望 三國志"},
+  ｛"名前": "アークシステムワークス", "URL": "https://www.arcsystemworks.jp/", "キーワード": "アークシステムワークス arcsys ギルティギア"},
+  ｛"名前": "レベルファイブ", "URL": "https://www.level5.co.jp/", "キーワード": "レベルファイブ level5 イナズマイレブン"},
+  ｛"名前": "日本一ソフトウェア", "URL": "https://nippon1.jp/", "キーワード": "日本一ソフトウェア ディスガイア"},
+  ｛"名前": "マーベラス", "URL": "https://www.marv.jp/", "キーワード": "マーベラス marvelous 牧場物語"},
+
+  # --------------------------------------------------
+  # 【4】半導体・PCパーツ・ハードウェア
+  # --------------------------------------------------
+  ｛"名前": "NVIDIA", "URL": "https://www.nvidia.com/ja-jp/", "キーワード": "nvidia エヌビディア geforce"},
+  ｛"名前": "Qualcomm", "URL": "https://www.qualcomm.com/ja", "キーワード": "qualcomm クアルコム snapdragon"},
+  ｛"名前": "Broadcom", "URL": "https://www.broadcom.com/", "キーワード": "broadcom ブロードコム"},
+  ｛"名前": "TSMC", "URL": "https://www.tsmc.com/japanese", "キーワード": "tsmc ティーエスエムシー 台積電"},
+  ｛"名前": "ASML", "URL": "https://www.asml.com/en", "キーワード": "asml エーエスエムエル 露光装置"},
+  ｛"名前": "ARM", "URL": "https://www.arm.com/ja", "キーワード": "arm アーム CPU"},
+  ｛"名前": "Micron Technology", "URL": "https://jp.micron.com/", "キーワード": "micron マイクロン メモリ"},
+  ｛"名前": "SK Hynix", "URL": "https://www.skhynix.com/", "キーワード": "sk hynix ハイニックス"},
+  ｛"名前": "キオクシア (Kioxia)", "URL": "https://www.kioxia.com/ja-jp/top.html", "キーワード": "kioxia キオクシア 東芝メモリ"},
+  ｛"名前": "Razer", "URL": "https://www.razer.com/jp-jp", "キーワード": "razer レイザー ゲーミングPC ゲーミングデバイス"},
+  ｛"名前": "Logitech / ロジクール", "URL": "https://www.logicool.co.jp/ja-jp", "キーワード": "logicool ロジクール logitech マウス キーボード"},
+  ｛"名前": "Corsair", "URL": "https://www.corsair.com/ja/ja", "キーワード": "corsair コルセア PCパーツ"},
+  ｛"名前": "Cooler Master", "URL": "https://www.coolermaster.com/ja-jp/", "キーワード": "cooler master クーラーマスター"},
+  ｛"名前": "Anker", "URL": "https://www.ankerjapan.com/", "キーワード": "anker アンカー モバイルバッテリー 充電器"},
+  ｛"名前": "BenQ", "URL": "https://www.benq.com/ja-jp/index.html", "キーワード": "benq ベンキュー モニター"},
+  ｛"名前": "EIZO", "URL": "https://www.eizo.co.jp/", "キーワード": "eizo エイゾー ディスプレイ"},
+  ｛"名前": "エレコム (ELECOM)", "URL": "https://www.elecom.co.jp/", "キーワード": "elecom エレコム PC周辺機器"},
+  ｛"名前": "サンワサプライ", "URL": "https://www.sanwa.co.jp/", "キーワード": "sanwa supply サンワサプライ"},
+
+  # --------------------------------------------------
+  # 【5】AI・先端技術・Webサービス
+  # --------------------------------------------------
+  ｛"名前": "OpenAI", "URL": "https://openai.com/", "キーワード": "openai オープンエーアイ chatgpt"},
+  ｛"名前": "Anthropic", "URL": "https://www.anthropic.com/", "キーワード": "anthropic アンスロピック claude クロード"},
+  ｛"名前": "Perplexity", "URL": "https://www.perplexity.ai/", "キーワード": "perplexity パープレキシティ AI検索"},
+  ｛"名前": "Stability AI", "URL": "https://stability.ai/", "キーワード": "stability ai スタビリティ stable diffusion"},
+  ｛"名前": "DeepL 翻訳", "URL": "https://www.deepl.com/translator", "キーワード": "deepl ディープエル 翻訳 AI翻訳"},
+  ｛"名前": "Pika Labs", "URL": "https://pika.art/", "キーワード": "pika ピカ 動画生成AI"},
+  ｛"名前": "Sora (OpenAI)", "URL": "https://sora.com/", "キーワード": "sora ソラ 動画生成AI openai"},
+  ｛"名前": "Suno AI", "URL": "https://suno.com/", "キーワード": "suno スノ 音楽生成AI"},
+  ｛"名前": "Udio", "URL": "https://www.udio.com/", "キーワード": "udio ウディオ 音楽生成AI"},
+  ｛"名前": "ElevenLabs", "URL": "https://elevenlabs.io/", "キーワード": "elevenlabs イレブンラボ 音声合成AI"},
+  ｛"名前": "Civitai", "URL": "https://civitai.com/", "キーワード": "civitai シヴィタイ 画像生成モデル"},
+  ｛"名前": "GitHub Copilot", "URL": "https://github.com/features/copilot", "キーワード": "github copilot コパイロット コーディングAI"},
+  ｛"名前": "Cursor", "URL": "https://www.cursor.com/", "キーワード": "cursor カーソル AIエディタ エディタ"},
+
+  # --------------------------------------------------
+  # 【6】パソコンメーカー・BTOショップ
+  # --------------------------------------------------
+  ｛"名前": "Lenovo", "URL": "https://www.lenovo.com/jp/ja/", "キーワード": "lenovo レノボ thinkpad"},
+  ｛"名前": "HP", "URL": "https://www.hp.com/jp-ja/home.html", "キーワード": "hp ヒューレットパッカード エイチピー"},
+  ｛"名前": "Dell", "URL": "https://www.dell.com/ja-jp", "キーワード": "dell デル"},
+  ｛"名前": "ASUS", "URL": "https://www.asus.com/jp/", "キーワード": "asus エイスース アスース"},
+  ｛"名前": "Acer", "URL": "https://www.acer.com/jp-ja", "キーワード": "acer エイサー"},
+  ｛"名前": "MSI", "URL": "https://jp.msi.com/", "キーワード": "msi エムエスアイ"},
+  ｛"名前": "Dynabook", "URL": "https://dynabook.com/", "キーワード": "dynabook ダイナブック 東芝"},
+  ｛"名前": "VAIO", "URL": "https://vaio.com/", "キーワード": "vaio バイオ"},
+  ｛"名前": "ドスパラ (Dospara)", "URL": "https://www.dospara.co.jp/", "キーワード": "ドスパラ dospara galleria ガレリア BTO"},
+  ｛"名前": "パソコン工房", "URL": "https://www.pc-koubou.jp/", "キーワード": "パソコン工房 iiyama BTO"},
+  ｛"名前": "マウスコンピューター", "URL": "https://www.mouse-jp.co.jp/", "キーワード": "マウスコンピューター mouse G-Tune BTO"},
+  ｛"名前": "TSUKUMO (ツクモ)", "URL": "https://www.tsukumo.co.jp/", "キーワード": "tsukumo ツクモ g-gear BTO 自作PC"},
+  ｛"名前": "サイコム (Sycom)", "URL": "https://www.sycom.co.jp/", "キーワード": "sycom サイコム BTO 静音PC"},
+  ｛"名前": "SEVEN", "URL": "https://pc-seven.co.jp/", "キーワード": "pc seven セブン BTO"},
+  ｛"名前": "フロンティア (FRONTIER)", "URL": "https://www.frontier-direct.jp/", "キーワード": "frontier フロンティア BTOセール"},
+
+  # --------------------------------------------------
+  # 【7】アニメ・エンタメ・ゲームタイトル・VTuber
+  # --------------------------------------------------
+  ｛"名前": "ホロライブプロダクション", "URL": "https://hololivepro.com/", "キーワード": "hololive ホロライブ vtuber カバー"},
+  ｛"名前": "にじさんじ", "URL": "https://www.nijisanji.jp/", "キーワード": "にじさんじ nijisanji vtuber えにから Anycolor"},
+  ｛"名前": "ぶいすぽっ！", "URL": "https://vspo.jp/", "キーワード": "ぶいすぽ vspo vtuber eスポーツ"},
+  ｛"名前": "ななしいんく", "URL": "https://www.774.ai/", "キーワード": "ななしいんく 774inc vtuber"},
+  ｛"名前": "どっとライブ (.LIVE)", "URL": "https://dotlive.jp/", "キーワード": "どっとライブ dotlive vtuber 電脳少女シロ"},
+  ｛"名前": "VShojo", "URL": "https://www.vshojo.com/ja", "キーワード": "vshojo ブイショウジョ vtuber 海外"},
+  ｛"名前": "神椿スタジオ (KAMITSUBAKI STUDIO)", "URL": "https://kamitsubaki.jp/", "キーワード": "神椿 kamitsubaki 花譜 VWP"},
+  ｛"名前": "アニメイト", "URL": "https://www.animate.co.jp/", "キーワード": "アニメイト animate アニメグッズ"},
+  ｛"名前": "ゲーマーズ", "URL": "https://www.gamers.co.jp/", "キーワード": "ゲーマーズ gamers アニメグッズ声優"},
+  ｛"名前": "dアニメストア", "URL": "https://animestore.docomo.ne.jp/", "キーワード": "dアニメストア danime アニメサブスク"},
+  ｛"名前": "アニメ!アニメ!", "URL": "https://animeanime.jp/", "キーワード": "アニメアニメ アニメニュース"},
+  ｛"名前": "コミックナタリー", "URL": "https://natalie.mu/comic", "キーワード": "コミックナタリー 漫画ニュース"},
+  ｛"名前": "ジャンプ＋ (少年ジャンプ+)", "URL": "https://shonenjumpplus.com/", "キーワード": "少年ジャンププラス ジャンプ+ 漫画 Webマンガ"},
+  ｛"名前": "裏サンデー / マンガワン", "URL": "https://urasunday.com/", "キーワード": "裏サンデー マンガワン web漫画"},
+  ｛"名前": "コミックウォーカー (KADOKAWA)", "URL": "https://comic-walker.com/", "キーワード": "comic walker コミックウォーカー カドコミ"},
+  ｛"名前": "ピッコマ", "URL": "https://piccoma.com/", "キーワード": "ピッコマ piccoma 待てばゼロ円 漫画"},
+  ｛"名前": "LINEマンガ", "URL": "https://manga.line.me/", "キーワード": "lineマンガ 漫画"},
+  ｛"名前": "BookLive!", "URL": "https://booklive.jp/", "キーワード": "booklive ブックライブ 電子書籍"},
+  ｛"名前": "Kindle (Amazon)", "URL": "https://www.amazon.co.jp/kindle-dbs/storefront", "キーワード": "kindle キンドル 電子書籍"},
+
+  # --------------------------------------------------
+  # 【8】日本の公的機関・行政・地方自治体
+  # --------------------------------------------------
+  ｛"名前": "首相官邸", "URL": "https://www.kantei.go.jp/", "キーワード": "首相官邸 かんてい 日本政府 内閣"},
+  ｛"名前": "デジタル庁", "URL": "https://www.digital.go.jp/", "キーワード": "デジタル庁 digital agency"},
+  ｛"名前": "総務省", "URL": "https://www.soumu.go.jp/", "キーワード": "総務省 soumusho 郵便 電波"},
+  ｛"名前": "経済産業省", "URL": "https://www.meti.go.jp/", "キーワード": "経済産業省 経産省 meti"},
+  ｛"名前": "厚生労働省", "URL": "https://www.mhlw.go.jp/", "キーワード": "厚生労働省 厚労省 mhlw 医療 労働"},
+  ｛"名前": "文部科学省", "URL": "https://www.mext.go.jp/", "キーワード": "文部科学省 文科省 mext 教育 科学"},
+  ｛"名前": "財務省", "URL": "https://www.mof.go.jp/", "キーワード": "財務省 mof 予算 財政"},
+  ｛"名前": "外務省", "URL": "https://www.mofa.go.jp/mofaj/", "キーワード": "外務省 mofa パスポート 外交 海外安全"},
+  ｛"名前": "法務省", "URL": "https://www.moj.go.jp/", "キーワード": "法務省 moj 登記 司法"},
+  ｛"名前": "国土交通省", "URL": "https://www.mlit.go.jp/", "キーワード": "国土交通省 国交省 mlit 道路 建築"},
+  ｛"名前": "環境省", "URL": "https://www.env.go.jp/", "キーワード": "環境省 env 脱炭素 エコ"},
+  ｛"名前": "農林水産省", "URL": "https://www.maff.go.jp/", "キーワード": "農林水産省 農水省 maff 農業 食料"},
+  ｛"名前": "防衛省", "URL": "https://www.mod.go.jp/", "キーワード": "防衛省 mod 自衛隊"},
+  ｛"名前": "警察庁", "URL": "https://www.npa.go.jp/", "キーワード": "警察庁 npa 交通安全"},
+  ｛"名前": "金融庁", "URL": "https://www.fsa.go.jp/", "キーワード": "金融庁 fsa 投資 NISA 銀行"},
+  ｛"名前": "消費者庁", "URL": "https://www.caa.go.jp/", "キーワード": "消費者庁 caa クーリングオフ 相談"},
+  ｛"名前": "最高裁判所", "URL": "https://www.courts.go.jp/", "キーワード": "最高裁判所 裁判所 司法 判例"},
+  ｛"名前": "大阪府公式ウェブサイト", "URL": "https://www.pref.osaka.lg.jp/", "キーワード": "大阪府 府庁 osaka"},
+  ｛"名前": "神奈川県公式ウェブサイト", "URL": "https://www.pref.kanagawa.jp/", "キーワード": "神奈川県 県庁 kanagawa"},
+  ｛"名前": "愛知県公式ウェブサイト", "URL": "https://www.pref.aichi.jp/", "キーワード": "愛知県 県庁 aichi"},
+  ｛"名前": "北海道公式ウェブサイト", "URL": "https://www.pref.hokkaido.lg.jp/", "キーワード": "北海道 道庁 hokkaido"},
+  ｛"名前": "福岡県公式ウェブサイト", "URL": "https://www.pref.fukuoka.lg.jp/", "キーワード": "福岡県 県庁 fukuoka"},
+  ｛"名前": "兵庫県公式ウェブサイト", "URL": "https://web.pref.hyogo.lg.jp/", "キーワード": "兵庫県 県庁 hyogo"},
+  ｛"名前": "埼玉県公式ウェブサイト", "URL": "https://www.pref.saitama.lg.jp/", "キーワード": "埼玉県 県庁 saitama"},
+  ｛"名前": "千葉県公式ウェブサイト", "URL": "https://www.pref.chiba.lg.jp/", "キーワード": "千葉県 県庁 chiba"},
+  ｛"名前": "静岡県公式ホームページ", "URL": "https://www.pref.shizuoka.jp/", "キーワード": "静岡県 県庁 shizuoka"},
+  ｛"名前": "広島県公式ホームページ", "URL": "https://www.pref.hiroshima.lg.jp/", "キーワード": "広島県 県庁 hiroshima"},
+  ｛"名前": "宮城県公式ウェブサイト", "URL": "https://www.pref.miyagi.jp/", "キーワード": "宮城県 県庁 miyagi 仙台"},
+  ｛"名前": "京都府Webサイト", "URL": "https://www.pref.kyoto.jp/", "キーワード": "京都府 府庁 kyoto"},
+
+  # --------------------------------------------------
+  # 【9】鉄道・交通・航空・空港・運送
+  # --------------------------------------------------
+  ｛"名前": "JR東海", "URL": "https://jr-central.co.jp/", "キーワード": "jr東海 東海道新幹線 運行情報"},
+  ｛"名前": "JR九州", "URL": "https://www.jrkyushu.co.jp/", "キーワード": "jr九州 九州新幹線 運行情報"},
+  ｛"名前": "JR北海道", "URL": "https://www.jrhokkaido.co.jp/", "キーワード": "jr北海道 北海道新幹線 運行情報"},
+  ｛"名前": "JR四国", "URL": "https://www.jr-shikoku.co.jp/", "キーワード": "jr四国 運行情報"},
+  ｛"名前": "東京メトロ (東京地下鉄)", "URL": "https://www.tokyometro.jp/index.html", "キーワード": "東京メトロ 地下鉄 運行情報"},
+  ｛"名前": "都営地下鉄 (東京都交通局)", "URL": "https://www.kotsu.metro.tokyo.jp/", "キーワード": "都営地下鉄 都営交通 運行情報"},
+  ｛"名前": "阪急電鉄", "URL": "https://www.hankyu.co.jp/", "キーワード": "阪急電鉄 阪急 関西 運行情報"},
+  ｛"名前": "阪神電気鉄道", "URL": "https://www.hanshin.co.jp/", "キーワード": "阪神電車 阪神タイガース 関西 運行情報"},
+  ｛"名前": "京阪電気鉄道", "URL": "https://www.keihan.co.jp/", "キーワード": "京阪電車 京阪 関西 運行情報"},
+  ｛"名前": "南海電気鉄道", "URL": "https://www.nankai.co.jp/", "キーワード": "南海電車 南海 関空 運行情報"},
+  ｛"名前": "近畿日本鉄道 (近鉄)", "URL": "https://www.kintetsu.co.jp/", "キーワード": "近畿日本鉄道 近鉄 関西 運行情報"},
+  ｛"名前": "東急電鉄", "URL": "https://www.tokyu.co.jp/", "キーワード": "東急電鉄 東急 運行情報"},
+  ｛"名前": "小田急電鉄", "URL": "https://www.odakyu.jp/", "キーワード": "小田急電鉄 小田急 ロマンスカー 運行情報"},
+  ｛"名前": "京王電鉄", "URL": "https://www.keio.co.jp/", "キーワード": "京王電鉄 京王 運行情報"},
+  ｛"名前": "京浜急行電鉄 (京急)", "URL": "https://www.keikyu.co.jp/", "キーワード": "京急 京浜急行 羽田空港 運行情報"},
+  ｛"名前": "東武鉄道", "URL": "https://www.tobu.co.jp/", "キーワード": "東武鉄道 東武 日光 スカイツリー 運行情報"},
+  ｛"名前": "西武鉄道", "URL": "https://www.seibu-group.co.jp/railways/", "キーワード": "西武鉄道 西武 運行情報"},
+  ｛"名前": "相模鉄道 (相鉄)", "URL": "https://www.sotetsu.co.jp/", "キーワード": "相鉄 相模鉄道 運行情報"},
+  ｛"名前": "名鉄 (名古屋鉄道)", "URL": "https://www.meitetsu.co.jp/", "キーワード": "名鉄 名古屋鉄道 中部国際空港 運行情報"},
+  ｛"名前": "西日本鉄道 (西鉄)", "URL": "https://www.nishitetsu.jp/", "キーワード": "西鉄 西日本鉄道 福岡 運行情報"},
+  ｛"名前": "JAL (日本航空)", "URL": "https://www.jal.co.jp/jp/ja/", "キーワード": "jal 日本航空 飛行機 航空券 運航状況"},
+  ｛"名前": "ANA (全日本空輸)", "URL": "https://www.ana.co.jp/ja/jp/", "キーワード": "ana 全日空 全日本空輸 飛行機 航空券 運航状況"},
+  ｛"名前": "スカイマーク (Skymark)", "URL": "https://www.skymark.co.jp/ja/", "キーワード": "スカイマーク skymark 飛行機 lcc"},
+  ｛"名前": "Peach Aviation", "URL": "https://www.flypeach.com/", "キーワード": "peach ピーチ lcc 飛行機"},
+  ｛"名前": "Jetstar Japan", "URL": "https://www.jetstar.com/jp/ja/home", "キーワード": "jetstar ジェットスター lcc 飛行機"},
+  ｛"名前": "ソラシドエア", "URL": "https://www.solaseedair.jp/", "キーワード": "ソラシドエア solaseed 飛行機"},
+  ｛"名前": "スターフライヤー", "URL": "https://www.starflyer.jp/", "キーワード": "スターフライヤー starflyer 飛行機"},
+  ｛"名前": "AIRDO (エア・ドゥ)", "URL": "https://www.airdo.jp/", "キーワード": "airdo エアドゥ 北海道 飛行機"},
+  ｛"名前": "ZIPAIR", "URL": "https://www.zipair.net/ja", "キーワード": "zipair ジップエアー 国際線 lcc"},
+  ｛"名前": "羽田空港 (東京国際空港)", "URL": "https://tokyo-haneda.com/", "キーワード": "羽田空港 haneda airport 飛行機 フライト"},
+  ｛"名前": "成田国際空港", "URL": "https://www.narita-airport.jp/jp/", "キーワード": "成田空港 narita airport 飛行機 フライト"},
+  ｛"名前": "関西国際空港 (KIX)", "URL": "https://www.kansai-airport.or.jp/", "キーワード": "関西国際空港 関空 kix 飛行機 フライト"},
+  ｛"名前": "中部国際空港 (セントレア)", "URL": "https://www.centrair.jp/", "キーワード": "セントレア 中部国際空港 名古屋 飛行機"},
+  ｛"名前": "福岡空港", "URL": "https://www.fukuoka-airport.jp/", "キーワード": "福岡空港 fukuoka airport 飛行機"},
+  ｛"名前": "新千歳空港", "URL": "https://www.new-chitose-airport.jp/ja/", "キーワード": "新千歳空港 北海道 札幌 飛行機"},
+  ｛"名前": "ヤマト運輸 (クロネコヤマト)", "URL": "https://www.kuronekoyamato.co.jp/", "キーワード": "ヤマト運輸 クロネコヤマト 宅急便 荷物追跡 再配達"},
+  ｛"名前": "佐川急便", "URL": "https://www.sagawa-exp.co.jp/", "キーワード": "佐川急便 佐川 sagawa 飛脚宅配便 荷物追跡 再配達"},
+  ｛"名前": "福山通運", "URL": "https://corp.fukutsu.co.jp/", "キーワード": "福山通運 福通 荷物追跡 物流"},
+  ｛"名前": "西濃運輸 (カンガルー便)", "URL": "https://www.seino.co.jp/", "キーワード": "西濃運輸 セイノー カンガルー便 荷物追跡"},
+
+  # --------------------------------------------------
+  # 【10】金融・メガバンク・ネット銀行・証券
+  # --------------------------------------------------
+  ｛"名前": "三菱UFJ銀行", "URL": "https://www.bk.mufg.jp/", "キーワード": "三菱ufj銀行 mufg ネットバンキング"},
+  ｛"名前": "三井住友銀行 (SMBC)", "URL": "https://www.smbc.co.jp/", "キーワード": "三井住友銀行 smbc ネットバンキング"},
+  ｛"名前": "みずほ銀行", "URL": "https://www.mizuhobank.co.jp/", "キーワード": "みずほ銀行 mizuhu ネットバンキング"},
+  ｛"名前": "ゆうちょ銀行", "URL": "https://www.jp-bank.japanpost.jp/", "キーワード": "ゆうちょ銀行 郵便局 ネットサービス"},
+  ｛"名前": "楽天銀行", "URL": "https://www.rakuten-bank.co.jp/", "キーワード": "楽天銀行 rakuten ネット銀行"},
+  ｛"名前": "SBI住信ネット銀行", "URL": "https://www.netbk.co.jp/wps/portal/home", "キーワード": "sbi住信ネット銀行 住信sbi ネット銀行"},
+  ｛"名前": "PayPay銀行 (旧ジャパンネット銀行)", "URL": "https://www.paypay-bank.co.jp/", "キーワード": "paypay銀行 ペイペイ銀行 ネット銀行"},
+  ｛"名前": "ソニー銀行", "URL": "https://moneykit.net/", "キーワード": "ソニー銀行 moneykit ネット銀行 外貨"},
+  ｛"名前": "auじぶん銀行", "URL": "https://www.jibunbank.co.jp/", "キーワード": "auじぶん銀行 じぶん銀行 ネット銀行"},
+  ｛"名前": "SBI証券", "URL": "https://www.sbisec.co.jp/", "キーワード": "sbi証券 投資 NISA 株"},
+  ｛"名前": "楽天証券", "URL": "https://www.rakuten-sec.co.jp/", "キーワード": "楽天証券 rakuten 投資 NISA 株"},
+  ｛"名前": "マネックス証券", "URL": "https://www.monex.co.jp/", "キーワード": "マネックス証券 monex 投資 NISA"},
+  ｛"名前": "松井証券", "URL": "https://www.matsui.co.jp/", "キーワード": "松井証券 matsui 投資 株"},
+  ｛"名前": "野村證券", "URL": "https://www.nomura.co.jp/", "キーワード": "野村證券 野村証券 nomura 投資"},
+  ｛"名前": "大和証券", "URL": "https://www.daiwa.jp/", "キーワード": "大和証券 daiwa 投資"},
+
+  # --------------------------------------------------
+  # 【11】通信キャリア・格安SIM・ISP
+  # --------------------------------------------------
+  ｛"名前": "NTTドコモ", "URL": "https://www.docomo.ne.jp/", "キーワード": "nttドコモ docomo 携帯 スマホ ahamo"},
+  ｛"名前": "au (KDDI)", "URL": "https://www.au.com/", "キーワード": "au kddi 携帯 スマホ povo"},
+  ｛"名前": "UQ mobile", "URL": "https://www.uqwimax.jp/mobile/", "キーワード": "uqモバイル uq mobile 格安sim"},
+  ｛"名前": "Y!mobile (ワイモバイル)", "URL": "https://www.ymobile.jp/", "キーワード": "ymobile ワイモバイル 格安sim"},
+  ｛"名前": "楽天モバイル", "URL": "https://network.mobile.rakuten.co.jp/", "キーワード": "楽天モバイル rakuten mobile 格安sim"},
+  ｛"名前": "ahamo (アハモ)", "URL": "https://ahamo.com/", "キーワード": "ahamo アハモ ドコモ"},
+  ｛"名前": "povo 2.0", "URL": "https://povo.jp/", "キーワード": "povo ポヴォ au kddi"},
+  ｛"名前": "LINEMO (ラインモ)", "URL": "https://www.linemo.jp/", "キーワード": "linemo ラインモ ソフトバンク"},
+  ｛"名前": "mineo (マイネオ)", "URL": "https://mineo.jp/", "キーワード": "mineo マイネオ 格安sim 関西電力"},
+  ｛"名前": "IIJmio", "URL": "https://www.iijmio.jp/", "キーワード": "iijmio アイアイジェイ 格安sim"},
+  ｛"名前": "NURO光", "URL": "https://www.nuro.jp/", "キーワード": "nuro光 ヌーロ光 光回線 インターネット"},
+  ｛"名前": "SoftBank光", "URL": "https://www.softbank.jp/ybb/special/pb/", "キーワード": "softbank光 ソフトバンク光 光回線"},
+
+  # --------------------------------------------------
+  # 【12】生活・グルメ・旅行・不動産
+  # --------------------------------------------------
+  ｛"名前": "食べログ", "URL": "https://tabelog.com/", "キーワード": "食べログ グルメ 居酒屋 レストラン 予約"},
+  ｛"名前": "ホットペッパーグルメ", "URL": "https://www.hotpepper.jp/", "キーワード": "ホットペッパーグルメ 飲食店 予約 居酒屋"},
+  ｛"名前": "ぐるなび", "URL": "https://www.gnavi.co.jp/", "キーワード": "ぐるなび 飲食店 クーポン 予約"},
+  ｛"名前": "クックパッド (cookpad)", "URL": "https://cookpad.com/", "キーワード": "クックパッド cookpad 料理 レシピ"},
+  ｛"名前": "クラシル (kurashiru)", "URL": "https://www.kurashiru.com/", "キーワード": "クラシル kurashiru 料理 動画 レシピ"},
+  ｛"名前": "楽天トラベル", "URL": "https://travel.rakuten.co.jp/", "キーワード": "楽天トラベル ホテル 旅館 宿泊 予約"},
+  ｛"名前": "じゃらんnet", "URL": "https://www.jalan.net/", "キーワード": "じゃらん ホテル 旅行 温泉 予約"},
+  ｛"名前": "一休.com", "URL": "https://www.ikyu.com/", "キーワード": "一休 ikyu 高級ホテル レストラン 予約"},
+  ｛"名前": "Booking.com", "URL": "https://www.booking.com/", "キーワード": "bookingcom ブッキングドットコム 海外旅行 ホテル"},
+  ｛"名前": "Agoda (アゴダ)", "URL": "https://www.agoda.com/ja-jp/", "キーワード": "agoda アゴダ ホテル格安 予約"},
+  ｛"名前": "トリップアドバイザー", "URL": "https://www.tripadvisor.jp/", "キーワード": "tripadvisor トリップアドバイザー 口コミ 観光"},
+  ｛"名前": "SUUMO (スーモ)", "URL": "https://suumo.jp/", "キーワード": "suumo スーモ 賃貸 マンション 住宅 部屋探し"},
+  ｛"名前": "HOME'S (ライフルホームズ)", "URL": "https://www.homes.co.jp/", "キーワード": "homes ホームズ 賃貸 不動産"},
+  ｛"名前": "アットホーム (at home)", "URL": "https://www.athome.co.jp/", "キーワード": "athome アットホーム 賃貸 不動産"},
+  ｛"名前": "アパマンショップ", "URL": "https://www.apamanshop.com/", "キーワード": "アパマンショップ 賃貸 部屋探し"},
+
+  # --------------------------------------------------
+  # 【13】スポーツ・自動車・アウトドア
+  # --------------------------------------------------
+  ｛"名前": "スポーツナビ (Sponavi)", "URL": "https://sports.yahoo.co.jp/", "キーワード": "スポーツナビ スポナビ 野球 サッカー 大谷翔平速報"},
+  ｛"名前": "NPB.jp (日本野球機構)", "URL": "https://npb.jp/", "キーワード": "npb プロ野球 公式 戦績"},
+  ｛"名前": "J.LEAGUE Official Site", "URL": "https://www.jleague.jp/", "キーワード": "jリーグ サッカー 公式 日程"},
+  ｛"名前": "MLB.com (日本語)", "URL": "https://www.mlb.com/ja", "キーワード": "mlb メジャーリーグ 大谷翔平"},
+  ｛"名前": "carview! (カービュー)", "URL": "https://carview.yahoo.co.jp/", "キーワード": "carview カービュー 車 中古車 評価"},
+  ｛"名前": "カーセンサーnet", "URL": "https://www.carsensor.net/", "キーワード": "カーセンサー 中古車 買取 車探し"},
+  ｛"名前": "グーネット (Goo-net)", "URL": "https://www.goo-net.com/", "キーワード": "グーネット goonet 中古車 車探し"},
+  ｛"名前": "Honda (本田技研工業)", "URL": "https://www.honda.co.jp/", "キーワード": "honda ホンダ 車 バイク"},
+  ｛"名前": "日産自動車 (Nissan)", "URL": "https://www.nissan.co.jp/", "キーワード": "nissan 日産 ニッサン 車 GT-R"},
+  ｛"名前": "マツダ (MAZDA)", "URL": "https://www.mazda.co.jp/", "キーワード": "mazda マツダ 車 ロータリー"},
+  ｛"名前": "スバル (SUBARU)", "URL": "https://www.subaru.jp/", "キーワード": "subaru スバル 車 レヴォーグ"},
+  ｛"名前": "スズキ (SUZUKI)", "URL": "https://www.suzuki.co.jp/", "キーワード": "suzuki スズキ 軽自動車 軽トラック ジムニー"},
+  ｛"名前": "ダイハツ工業", "URL": "https://www.daihatsu.co.jp/", "キーワード": "daihatsu ダイハツ 軽自動車 タント"},
+  ｛"名前": "ヤマハ発動機", "URL": "https://global.yamaha-motor.com/jp/", "キーワード": "yamaha ヤマハ バイク 船外機"},
+  ｛"名前": "カワサキモータース", "URL": "https://www.kawasaki-motors.com/", "キーワード": "kawasaki カワサキ バイク ninja"},
+
+  # --------------------------------------------------
+  # 【14】サブスク・Webサービス・海外大手
+  # --------------------------------------------------
+  ｛"名前": "Amazon Prime Video", "URL": "https://www.amazon.co.jp/gp/video/storefront", "キーワード": "prime video プライムビデオ 映画 アニメ"},
+  ｛"名前": "Disney+ (ディズニープラス)", "URL": "https://www.disneyplus.com/ja-jp", "キーワード": "disney ディズニープラス マーベル スターウォーズ"},
+  ｛"名前": "U-NEXT", "URL": "https://video.unext.jp/", "キーワード": "unext ユーネクスト 映画 アニメ 見放題"},
+  ｛"名前": "Hulu Japan", "URL": "https://www.hulu.jp/", "キーワード": "hulu フールー ドラマ 海外ドラマ"},
+  ｛"名前": "Apple TV+", "URL": "https://tv.apple.com/jp", "キーワード": "apple tv アップルTV ドラマ 映画"},
+  ｛"名前": "Twitch (ツイッチ)", "URL": "https://www.twitch.tv/", "キーワード": "twitch ツイッチ ゲーム配信 ライブ"},
+  ｛"名前": "SteamDB", "URL": "https://steamdb.info/", "キーワード": "steamdb スチームデータベース 割引 セール"},
+  ｛"名前": "VRChat", "URL": "https://hello.vrchat.com/", "キーワード": "vrchat ブイアールチャット メタバース VR"},
+  ｛"名前": "Dropbox", "URL": "https://www.dropbox.com/ja/", "キーワード": "dropbox ドロップボックス クラウド保存"},
+  ｛"名前": "Google Drive", "URL": "https://drive.google.com/", "キーワード": "google drive ドライブ クラウド"},
+  ｛"名前": "OneDrive", "URL": "https://onedrive.live.com/", "キーワード": "onedrive ワンドライブ マイクロソフト"},
+  ｛"名前": "Evernote", "URL": "https://evernote.com/ja-jp", "キーワード": "evernote エバーノート メモ整理"},
+  ｛"名前": "DeepL Pro", "URL": "https://www.deepl.com/pro", "キーワード": "deepl pro 翻訳 高度"},
+
+  # --------------------------------------------------
+  # 【15】IT技術・開発・オープンソース・ホスティング
+  # --------------------------------------------------
+  ｛"名前": "MDN Web Docs", "URL": "https://developer.mozilla.org/ja/", "キーワード": "mdn html css javascript リファレンス"},
+  ｛"名前": "W3Schools", "URL": "https://www.w3schools.com/", "キーワード": "w3schools プログラミング 学習"},
+  ｛"名前": "PyPI (Python Package Index)", "URL": "https://pypi.org/", "キーワード": "pypi パイピアイル python pip パッケージ"},
+  ｛"名前": "npmjs (Node Package Manager)", "URL": "https://www.npmjs.com/", "キーワード": "npm npmjs node.js javascript パッケージ"},
+  ｛"名前": "Crates.io (Rust)", "URL": "https://crates.io/", "キーワード": "crates.io クレーツ rust パッケージ"},
+  ｛"名前": "Docker Hub", "URL": "https://hub.docker.com/", "キーワード": "docker hub ドッカーハブ コンテナ イメージ"},
+  ｛"名前": "AtCoder", "URL": "https://atcoder.jp/?lang=ja", "キーワード": "atcoder アットコーダー 競技プログラミング 競プロ"},
+  ｛"名前": "LeetCode", "URL": "https://leetcode.com/", "キーワード": "leetcode リートコード アルゴリズム 面接対策"},
+  ｛"名前": "Kaggle", "URL": "https://www.kaggle.com/", "キーワード": "kaggle カグル データサイエンス 機械学習 コンペ"},
+  ｛"名前": "さくらのレンタルサーバ", "URL": "https://www.sakura.ad.jp/", "キーワード": "さくらインターネット さくらのレンタルサーバ ホスティング サーバー"},
+  ｛"名前": "ConoHa WING", "URL": "https://www.conoha.jp/wing/", "キーワード": "conoha wing コノハウィング レンタルサーバー wordpress"},
+  ｛"名前": "エックスサーバー (Xserver)", "URL": "https://www.xserver.ne.jp/", "キーワード": "xserver エックスサーバー レンタルサーバー"},
+  ｛"名前": "Vercel", "URL": "https://vercel.com/", "キーワード": "vercel バーセル next.js デプロイ"},
+  ｛"名前": "Netlify", "URL": "https://www.netlify.com/", "キーワード": "netlify ネットリファイ 静的サイト デプロイ"},
+  ｛"名前": "Cloudflare", "URL": "https://www.cloudflare.com/ja-jp/", "キーワード": "cloudflare クラウドフレア cdn dns セキュリティ"},
+  ｛"名前": "Qiita Team", "URL": "https://teams.qiita.com/", "キーワード": "qiita team キータチーム 社内ナレッジ"},
+  ｛"名前": "Teratail (テラテイル)", "URL": "https://teratail.com/", "キーワード": "teratail テラテイル 質問 プログラミング"},
+  ｛"名前": "Paiza (パイザ)", "URL": "https://paiza.jp/", "キーワード": "paiza パイザ プログラミング学習 転職"},
+
+  # --------------------------------------------------
+  # 【16】ファッション・美容・生活用品
+  # --------------------------------------------------
+  ｛"名前": "アットコスメ (@cosme)", "URL": "https://www.cosme.net/", "キーワード": "atcosme アットコスメ コスメ 化粧品 口コミ"},
+  ｛"名前": "ホットペッパービューティー", "URL": "https://beauty.hotpepper.jp/", "キーワード": "ホットペッパービューティー 美容院 美容室 サロン 予約"},
+  ｛"名前": "WEAR (ウェアー)", "URL": "https://wear.jp/", "キーワード": "wear ウェアー コーディネート 服 ファッション"},
+  ｛"名前": "SHIN (SHEIN)", "URL": "https://jp.shein.com/", "キーワード": "shein シーイン ファッション 安いプチプラ"},
+  ｛"名前": "ZARA Japan", "URL": "https://www.zara.com/jp/", "キーワード": "zara ザラ 服 ファッション"},
+  ｛"名前": "H&M Japan", "URL": "https://www2.hm.com/ja_jp/index.html", "キーワード": "hm エイチアンドエム 服"},
+  ｛"名前": "ワークマン (WORKMAN)", "URL": "https://www.workman.co.jp/", "キーワード": "ワークマン workman ワークマンプラス 作業着 アウトドア"},
+  ｛"名前": "IKEA Japan (イケア)", "URL": "https://www.ikea.com/jp/ja/", "キーワード": "ikea イケア 北欧家具 インテリア 雑貨"},
+  ｛"名前": "カインズ (CAINZ)", "URL": "https://www.cainz.com/", "キーワード": "cainz カインズ ホームセンター DIY"},
+  ｛"名前": "コメリ (KOMERI)", "URL": "https://www.komeri.com/shop/default.aspx", "キーワード": "komeri コメリ ホームセンター 園芸 農業"},
+  ｛"名前": "コーナン", "URL": "https://www.hc-kohnan.com/", "キーワード": "コーナン ホームセンター DIY 日用品"},
+
+  # --------------------------------------------------
+  # 【17】エンタメ・出版社・動画・ポッドキャスト
+  # --------------------------------------------------
+  ｛"名前": "東映株式会社", "URL": "https://www.toei.co.jp/", "キーワード": "東映 toei 映画 仮面ライダー 戦隊"},
+  ｛"名前": "東宝株式会社", "URL": "https://www.toho.co.jp/", "キーワード": "東宝 toho 映画 ゴジラ アニメ映画"},
+  ｛"名前": "松竹株式会社", "URL": "https://www.shochiku.co.jp/", "キーワード": "松竹 shochiku 映画 歌舞伎"},
+  ｛"名前": "スタジオジブリ", "URL": "https://www.ghibli.jp/", "キーワード": "スタジオジブリ ジブリ ghibli 宮崎駿"},
+  ｛"名前": "京都アニメーション", "URL": "https://www.kyotoanimation.co.jp/", "キーワード": "京都アニメーション 京アニ kyoani"},
+  ｛"名前": "ufotable", "URL": "http://www.ufotable.com/", "キーワード": "ufotable ユーフォーテーブル 鬼滅の刃"},
+  ｛"名前": "MAPPA", "URL": "https://www.mappa.co.jp/", "キーワード": "mappa マッパ 呪術廻戦 チェンソーマン"},
+  ｛"名前": "小学館", "URL": "https://www.shogakukan.co.jp/", "キーワード": "小学館 shogakukan コロコロ サンデー"},
+  ｛"名前": "白泉社", "URL": "https://www.hakusensha.co.jp/", "キーワード": "白泉社 hakusensha 花とゆめ 少女漫画"},
+  ｛"名前": "秋田書店", "URL": "https://www.akitashoten.co.jp/", "キーワード": "秋田書店 チャンピオン 漫画"},
+  ｛"名前": "スクウェア・エニックス マンガ", "URL": "https://magazine.jp.square-enix.com/", "キーワード": "ガンガン スクエニ マンガ 漫画"},
+  ｛"名前": "宝島社", "URL": "https://tkj.jp/", "キーワード": "宝島社 雑誌 ムック本 ブランドムック"},
+
+  # --------------------------------------------------
+  # 【18】ポータル・辞書・百科事典・学習
+  # --------------------------------------------------
+  ｛"名前": "goo (グー)", "URL": "https://www.goo.ne.jp/", "キーワード": "goo グー ポータル 辞書 ニュース"},
+  ｛"名前": "Infoseek (インフォシーク)", "URL": "https://www.infoseek.co.jp/", "キーワード": "infoseek インフォシーク 楽天"},
+  ｛"名前": "BIGLOBE (ビッグローブ)", "URL": "https://www.biglobe.ne.jp/", "キーワード": "biglobe ビッグローブ プロバイダ ポータル"},
+  ｛"名前": "So-net (ソネット)", "URL": "https://www.so-net.ne.jp/", "キーワード": "sonet ソネット プロバイダ"},
+  ｛"名前": "@nifty (ニフティ)", "URL": "https://www.nifty.com/", "キーワード": "nifty ニフティ プロバイダ ポータル"},
+  ｛"名前": "Weblio辞書", "URL": "https://www.weblio.jp/", "キーワード": "weblio ウェブリオ 辞書 類語 英和 和英"},
+  ｛"名前": "goo辞書", "URL": "https://dictionary.goo.ne.jp/", "キーワード": "goo辞書 国語辞書 英和 国語"},
+  ｛"名前": "コトバンク (kotobank)", "URL": "https://kotobank.jp/", "キーワード": "kotobank コトバンク 事典 用語集"},
+  ｛"名前": "Duolingo (デュオリンゴ)", "URL": "https://ja.duolingo.com/", "キーワード": "duolingo デュオリンゴ 語学学習 英語"},
+  ｛"名前": "スタディサプリ (スタサプ)", "URL": "https://studysapuri.jp/", "キーワード": "スタディサプリ スタサプ 受験 勉強 リクルート"},
+  ｛"名前": "Udemy (ユーデミー)", "URL": "https://www.udemy.com/ja/", "キーワード": "udemy ユーデミー オンライン動画講座 プログラミング"},
+
+  # --------------------------------------------------
+  # 【19】クリエイター・画像・デザイン・素材サイト
+  # --------------------------------------------------
+  ｛"名前": "いらすとや", "URL": "https://www.irasutoya.com/", "キーワード": "いらすとや フリー素材 イラスト かわいい"},
+  ｛"名前": "イラストAC", "URL": "https://www.ac-illust.com/", "キーワード": "イラストac フリーイラスト 素材"},
+  ｛"名前": "写真AC", "URL": "https://www.photo-ac.com/", "キーワード": "写真ac フリー写真 素材"},
+  ｛"名前": "PAKUTASO (ぱくたそ)", "URL": "https://www.pakutaso.com/", "キーワード": "pakutaso ぱくたそ フリー写真 高画質"},
+  ｛"名前": "Unsplash", "URL": "https://unsplash.com/", "キーワード": "unsplash アンスプラッシュ フリー写真 海外"},
+  ｛"名前": "Pexels", "URL": "https://www.pexels.com/ja-jp/", "キーワード": "pexels ペクセルズ フリー素材 動画"},
+  ｛"名前": "PIXTA (ピクスタ)", "URL": "https://pixta.jp/", "キーワード": "pixta ピクスタ ストックフォト 有料素材"},
+  ｛"名前": "Shutterstock", "URL": "https://www.shutterstock.com/ja/", "キーワード": "shutterstock シャッターストック 素材"},
+  ｛"名前": " Behance", "URL": "https://www.behance.net/", "キーワード": "behance ビーハンス ポートフォリオ デザイン adobe"},
+  ｛"名前": "ArtStation", "URL": "https://www.artstation.com/", "キーワード": "artstation アートステーション CG 3D クリエイター"},
+  ｛"名前": "DOVA-SYNDROME", "URL": "https://dova-s.jp/", "キーワード": "dova syndrome ドーヴァ フリーBGM 音楽素材"},
+  ｛"名前": "魔王魂", "URL": "https://maou.audio/", "キーワード": "魔王魂 まおうだましい フリーBGM 音楽素材"},
+  ｛"名前": "効果音ラボ", "URL": "https://soundeffect-lab.info/", "キーワード": "効果音ラボ フリー効果音 SE"},
+
+  # --------------------------------------------------
+  # 【20】その他個人サイト・古典Web・コミュニティ
+  # --------------------------------------------------
+  ｛"名前": "はるかのひとりごと", "URL": "https://lovelive.city/", "キーワード": "はるかのひとりごと はるか 個人サイト ブログ"},
+  ｛"名前": "あみたろの声素材工房", "URL": "https://amitaro.net/", "キーワード": "あみたろの声素材工房 あみたろ 声素材 音声素材 フリー素材 ボイス utau"},
+  ｛"名前": "阿部寛のホームページ", "URL": "http://abehiroshi.la.coocan.jp/", "キーワード": "阿部寛のホームページ 阿部寛 あべひろし abe hiroshi"},
+  ｛"名前": "侍魂", "URL": "https://www.samuraidamasii.com/", "キーワード": "侍魂 さむらいだましい 健 侍"},
+  ｛"名前": "テキストサイト「僕の見た秩序。」", "URL": "https://www.paps.jp/", "キーワード": "僕の見た秩序 ヨシナガ 秩序"},
+  ｛"名前": "デイリーポータルZ", "URL": "https://dailyportalz.jp/", "キーワード": "デイリーポータルz dpz 林雄司 個人メディア"},
+  ｛"名前": "Zenn (個人開発・技術ブログ)", "URL": "https://zenn.dev/", "キーワード": "zenn ゼン 技術ブログ 個人開発"},
+  ｛"名前": "Qiita (技術情報共有)", "URL": "https://qiita.com/", "キーワード": "qiita キータ プログラミング 技術ブログ"},
+  ｛"名前": "虚構新聞", "URL": "https://kyoko-np.net/", "キーワード": "虚構新聞 きょこうしんぶん 嘘ニュース ネット文化"},
+  ｛"名前": "オルタナティブ・ブログ (ITmedia)", "URL": "https://blogs.itmedia.co.jp/", "キーワード": "オルタナティブブログ 個人ITブログ"},
+  ｛"名前": "うきわ亭 (ゲーム系個人サイト)", "URL": "http://www.ukiwatei.com/", "キーワード": "うきわ亭 個人サイト ゲーム レトロ"},
+  ｛"名前": "暗黒通信団", "URL": "https://ankokudan.org/", "キーワード": "暗黒通信団 素数 同人 円周率"},
+  ｛"名前": "ネタフル (Netafull)", "URL": "https://netafull.net/", "キーワード": "ネタフル コグレマサト 個人メディア"},
+  ｛"名前": "わかったブログ", "URL": "https://www.waka77.com/", "キーワード": "わかったブログ ライフハック ブログ"},
+  ｛"名前": "男子ハック", "URL": "https://www.danshihack.com/", "キーワード": "男子ハック ガジェット ニュース ブログ"},
+  ｛"名前": "すまほん!!", "URL": "https://smhn.info/", "キーワード": "すまほん スマホ ガジェット 個人メディア"},
+  ｛"名前": "ケータイ Watch", "URL": "https://ktai.watch.impress.co.jp/", "キーワード": "ケータイwatch インプレス スマホ 携帯"},
+  ｛"名前": "PC Watch", "URL": "https://pc.watch.impress.co.jp/", "キーワード": "pc watch インプレス パソコン 自作PC"},
+  ｛"名前": "AV Watch", "URL": "https://av.watch.impress.co.jp/", "キーワード": "av watch オーディオ テレビ イヤホン"},
+  ｛"名前": "GAME Watch", "URL": "https://game.watch.impress.co.jp/", "キーワード": "game watch ゲームウォッチ インプレス"},
+  ｛"名前": "窓の杜", "URL": "https://forest.watch.impress.co.jp/", "キーワード": "窓の杜 まどのもり フリーソフト フリーウェア Windows"},
+  ｛"名前": "Vector (ベクター)", "URL": "https://www.vector.co.jp/", "キーワード": "vector ベクター フリーソフト ダウンロード"},
+  ｛"名前": "Web屋のぽんた (ポートフォリオ例)", "URL": "https://ponta.web.fc2.com/", "キーワード": "個人サイト ポートフォリオ Web制作"},
+  ｛"名前": "FC2ブログ", "URL": "https://blog.fc2.com/", "キーワード": "fc2ブログ 個人ブログ 無料ブログ"},
+  ｛"名前": "ライブドアブログ", "URL": "https://blog.livedoor.com/", "キーワード": "livedoorブログ ライブドア まとめブログ 個人ブログ"},
+  ｛"名前": "Hatena Blog (はてなブログ)", "URL": "https://hatenablog.com/", "キーワード": "hatena blog はてなブログ 個人ブログ"}
+］
+
+入力文字は、「調べたいサイト名を入力してください」と尋ねる。
+
+もし、入力文字＝「」ならば
+    「キャンセルされました。」と表示。
+違えば
+    見つかった件数 ＝ 0
+    検索ワード小文字 ＝ 小文字変換(入力文字)
+
+    # リストの中身を1つずつチェックする
+    サイトリストを反復
+        データ ＝ 対象
+        別名リスト小文字 ＝ 小文字変換(データ［"キーワード"］)
+        表示名 ＝ データ［"名前"］
+        URL ＝ データ［"URL"］
+        
+        # 「キーワード」の中に、入力した文字が含まれているか調べる
+        位置 ＝ 何文字目(別名リスト小文字, 検索ワード小文字)
+        
+        もし、位置が0超ならば
+            見つかった件数 ＝ 見つかった件数 ＋ 1
+            カード作成(URL, 表示名, 見つかった件数)
+        ここまで。
+    ここまで。
+
+    もし、見つかった件数が0ならば
+        「『{入力文字}』に対応するサイトは見つかりませんでした。」と表示。
+    違えば
+        「合計 {見つかった件数} 件のサイトが見つかりました。」と表示。
+    ここまで。
+ここまで。
+
+●（URL, 単語, 番号で）カード作成
+    CARD ＝「a」をDOM要素作成。
+    CARDの「href」にURLをDOM属性設定。
+    CARDの「target」に「_blank」をDOM属性設定。
+    
+    スタイル ＝ 「display: block; margin: 10px 0; padding: 12px 16px; background-color: #ffffff; border: 1px solid #e0e0e0; border-left: 5px solid #4a90e2; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-decoration: none; transition: all 0.2s ease;」
+    CARDの「style」にスタイルをDOM属性設定。
+
+    TITLE ＝「div」をDOM要素作成。
+    TITLEに「{番号}. {単語}」をテキスト設定。
+    TITLEの「style」に「font-size: 16px; font-weight: bold; color: #333333; margin-bottom: 4px;」をDOM属性設定。
+    
+    URL_TXT ＝「div」をDOM要素作成。
+    URL_TXTにURLをテキスト設定。
+    URL_TXTの「style」に「font-size: 12px; color: #888888; word-break: break-all;」をDOM属性設定。
+
+    CARDへTITLEをDOM子要素追加。
+    CARDへURL_TXTをDOM子要素追加。
+    DOM親要素へCARDをDOM子要素追加。
+    
+    CARDで戻る。
+ここまで。

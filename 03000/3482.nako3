@@ -1,0 +1,145 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3482
+### タイトル=時計と天気予報
+### 作者=クジラ飛行机(user_id=1)
+### ライセンス=MIT
+### 説明=HTML/JSで作った時計と天気予報のガジェットです
+### 対象バージョン=3.8.7
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2026-09-22 11:56:59
+###
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>時計と天気予報</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #111;
+  color: #fff;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+main {
+  width: 94%;
+  text-align: center;
+}
+#clock {
+  font-size: 18vw;
+  line-height: 1;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+}
+#date {
+  margin-top: 20px;
+  font-size: 4vw;
+}
+#weather {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.weather-item {
+  flex: 1;
+  max-width: 180px;
+  padding: 20px 10px;
+  border-radius: 16px;
+  background: #222;
+}
+.weather-date {
+  font-size: 1.5em;
+}
+.weather-forecast {
+  margin: 12px 0;
+  font-size: 1.3em;
+}
+.weather-temp {
+  font-size: 1.1em;
+}
+#error {
+  margin-top: 20px;
+}
+</style>
+</head>
+<body>
+<main>
+  <!-- ここがメイン画面を定義しているところ (※1) -->
+  <div id="clock">--:--:--</div>
+  <div id="date"></div>
+  <div id="weather"></div>
+  <div id="error"></div>
+</main>
+<script>
+// 時計を更新 --- (※2)
+function updateClock() {
+  const now = new Date();
+  // 時間を分かりやすい形式で取得
+  const time = now.toLocaleTimeString("ja-JP", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+  // 日付を分かりやすい形式で取得
+  const date = now.toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long"
+  });
+  // HTMLに差し込む
+  document.querySelector("#clock").textContent = time;
+  document.querySelector("#date").textContent = date;
+}
+
+// 天気予報を取得 --- (※3)
+async function updateWeather() {
+  const url =
+    "https://api.aoikujira.com/tenki/week.php?fmt=json&city=319";
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    const forecasts = data["319"];
+    const weather = document.querySelector("#weather");
+    weather.innerHTML = "";
+    // 先頭から5日分を表示
+    for (const item of forecasts.slice(0, 5)) {
+      const div = document.createElement("div");
+      div.className = "weather-item";
+      div.innerHTML = `
+        <div class="weather-date">${item.date}</div>
+        <div class="weather-forecast">${item.forecast}</div>
+        <div class="weather-temp">
+          ${item.mintemp}℃ / ${item.maxtemp}℃
+        </div>
+      `;
+      weather.appendChild(div);
+    }
+  } catch (e) {
+    document.querySelector("#error").textContent =
+      "天気予報を取得できませんでした";
+  }
+}
+
+// 時計は1秒ごとに更新 --- (※4)
+updateClock();
+setInterval(updateClock, 1000);
+// 天気予報を取得
+updateWeather();
+// 1時間ごとに天気予報を更新
+setInterval(updateWeather, 60 * 60 * 1000);
+</script>
+</body>
+</html>

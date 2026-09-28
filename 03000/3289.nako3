@@ -1,0 +1,22 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3289
+### タイトル=宝箱を開けたらゲーム
+### 作者=sakuraelbow(user_id=512)
+### ライセンス=CC0
+### 説明=宝箱を開けたら何が出るでしょうか？
+### 対象バージョン=3.7.16
+### URL=
+### 種類=html
+### タグ=
+### 更新日時=2026-03-09 15:50:20
+###
+
+<!DOCTYPE html>
+<meta charset="UTF8">
+<script type ="module" src="https:pyscript.net/releases/2025.8.1/core.js"></script>
+<script type="mpy">
+    import js
+    import random
+    image_url = random.choice(["https://n3s.nadesi.com/image.php?f=648.png","https://n3s.nadesi.com/image.php?f=649.png"])
+    js.document.write(f"<img src='{image_url}'>")
+</script>

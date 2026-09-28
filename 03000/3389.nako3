@@ -1,0 +1,437 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3389
+### タイトル=検索した場所の地図を表示
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=OpenStreetMapとzipcloud API、Nominatim API、各種地図タイルを使用して、地図を表示してます。検索した場所を表示することも可能です。
+### 対象バージョン=3.7.20
+### URL=
+### 種類=html
+### タグ=地図
+### 更新日時=2026-08-19 10:27:51
+###
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenStreetMap スタイルビューアー</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        #map {
+            width: 100%;
+            height: 460px;
+            min-height: 460px;
+        }
+
+        .custom-marker-pin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #2563eb;
+            border: 2px solid #ffffff;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .custom-marker-pin::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white text-slate-800 font-sans flex flex-col">
+
+    <header class="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white">
+        
+        <div class="lg:col-span-5 flex flex-col gap-5">
+            
+            <div class="border border-slate-200 bg-white rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-slate-700">
+                        場所を選ぶ
+                    </h2>
+                    <span id="display-coords" class="text-[10px] text-slate-500 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                        35.68124, 139.76713
+                    </span>
+                </div>
+
+                <form id="search-form" class="flex gap-2">
+                    <div class="relative flex-1">
+                        <input
+                            id="search-input"
+                            type="text"
+                            placeholder="地名、住所、または郵便番号を入力"
+                            class="w-full border border-slate-300 bg-white rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 transition"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        id="btn-search"
+                        class="bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold px-4 py-2 rounded-xl text-xs transition shrink-0 flex items-center gap-1"
+                    >
+                        検索
+                    </button>
+                </form>
+
+                <div id="search-results" class="hidden border border-slate-200 bg-white rounded-xl divide-y divide-slate-100 max-h-40 overflow-y-auto shadow-sm"></div>
+                <div id="search-error" class="hidden text-[11px] text-rose-500"></div>
+            </div>
+
+            <div class="border border-slate-200 bg-white rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                <h2 class="text-sm font-semibold text-slate-700">
+                    地図スタイルを選ぶ
+                </h2>
+
+                <div class="flex flex-col gap-2">
+                    <select id="style-select" class="w-full border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 transition cursor-pointer">
+                        <option value="0">OpenStreetMap 標準 (標準)</option>
+                        <option value="1">Carto Light (シンプル)</option>
+                        <option value="2">Carto Dark (ダーク)</option>
+                        <option value="3">OpenTopoMap (地形・登山)</option>
+                        <option value="4">Esri Satellite (航空写真)</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-7 flex flex-col">
+            <div class="border border-slate-200 bg-white rounded-2xl p-5 shadow-sm flex flex-col gap-3 flex-1 h-full min-h-[460px]">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
+                        </span>
+                        <h3 class="font-bold text-sm text-slate-800">プレビュー & マップ操作</h3>
+                    </div>
+                    <span class="text-xs text-slate-500">
+                        スタイル: <strong id="display-style-name" class="text-blue-600 font-medium">OpenStreetMap 標準</strong>
+                    </span>
+                </div>
+
+                <div class="relative w-full flex-1 rounded-xl overflow-hidden border border-slate-200 bg-white">
+                    <div id="map" class="z-10"></div>
+
+                    <div class="absolute top-3 right-3 z-20 flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                        <button id="btn-zoom-in" type="button" aria-label="地図を拡大" class="p-2.5 text-slate-700 hover:bg-slate-100 transition border-b border-slate-200 font-bold bg-white">
+                            +
+                        </button>
+                        <button id="btn-zoom-out" type="button" aria-label="地図を縮小" class="p-2.5 text-slate-700 hover:bg-slate-100 transition font-bold bg-white">
+                            -
+                        </button>
+                    </div>
+
+                    <div id="display-zoom" class="absolute bottom-3 left-3 z-25 border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-mono text-slate-600 shadow-sm bg-white">
+                        Zoom: 15
+                    </div>
+                </div>
+
+                <p class="text-[11px] text-slate-500">
+                    ドラッグで範囲移動、スクロールで拡大縮小できます。クリックやピンのドラッグで位置移動が可能です。
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const TILE_PROVIDERS = [
+            {
+                name: 'OpenStreetMap 標準',
+                url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c'],
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            },
+            {
+                name: 'Carto Light (明るい)',
+                url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c', 'd'],
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap &copy; CARTO'
+            },
+            {
+                name: 'Carto Dark (ダーク)',
+                url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c', 'd'],
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap &copy; CARTO'
+            },
+            {
+                name: 'OpenTopoMap (地形図)',
+                url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c'],
+                maxZoom: 17,
+                attribution: 'Map data: &copy; OpenStreetMap contributors | Style: &copy; OpenTopoMap'
+            },
+            {
+                name: 'Esri Satellite (衛星写真)',
+                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                subdomains: [],
+                maxZoom: 18,
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS'
+            }
+        ];
+
+        let map, currentTileLayer, marker;
+        let currentProviderIdx = 0;
+
+        function updateCoordsDisplay(lat, lng, zoom) {
+            const coordsElem = document.getElementById('display-coords');
+            const zoomElem = document.getElementById('display-zoom');
+            if (coordsElem) coordsElem.textContent = lat.toFixed(5) + ', ' + lng.toFixed(5);
+            if (zoomElem) zoomElem.textContent = 'Zoom: ' + zoom;
+        }
+
+        function createTileLayer(provider) {
+            const options = {
+                maxZoom: provider.maxZoom,
+                attribution: provider.attribution,
+                crossOrigin: true
+            };
+            if (provider.subdomains && provider.subdomains.length > 0) {
+                options.subdomains = provider.subdomains;
+            }
+            return L.tileLayer(provider.url, options);
+        }
+
+        function initMap() {
+            if (typeof L === 'undefined') {
+                setTimeout(initMap, 100);
+                return;
+            }
+
+            if (map) {
+                map.invalidateSize();
+                return;
+            }
+
+            const initialLat = 35.681236;
+            const initialLng = 139.767125;
+            const initialZoom = 15;
+
+            map = L.map('map', {
+                center: [initialLat, initialLng],
+                zoom: initialZoom,
+                zoomControl: false
+            });
+
+            currentTileLayer = createTileLayer(TILE_PROVIDERS[0]).addTo(map);
+
+            const customIcon = L.divIcon({
+                className: 'custom-leaflet-marker',
+                html: '<div class="custom-marker-pin"></div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 36]
+            });
+
+            marker = L.marker([initialLat, initialLng], {
+                icon: customIcon,
+                draggable: true
+            }).addTo(map);
+
+            marker.on('dragend', (e) => {
+                const pos = e.target.getLatLng();
+                updateCoordsDisplay(pos.lat, pos.lng, map.getZoom());
+            });
+
+            map.on('moveend', () => {
+                const center = map.getCenter();
+                const zoom = map.getZoom();
+                updateCoordsDisplay(center.lat, center.lng, zoom);
+            });
+
+            map.on('click', (e) => {
+                marker.setLatLng(e.latlng);
+                updateCoordsDisplay(e.latlng.lat, e.latlng.lng, map.getZoom());
+            });
+
+            const mapContainer = document.getElementById('map');
+            if (window.ResizeObserver && mapContainer) {
+                const resizeObserver = new ResizeObserver(() => {
+                    if (map) map.invalidateSize();
+                });
+                resizeObserver.observe(mapContainer);
+            }
+
+            setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+            setTimeout(() => { if (map) map.invalidateSize(); }, 800);
+        }
+
+        function setupEventListeners() {
+            initMap();
+
+            const btnZoomIn = document.getElementById('btn-zoom-in');
+            const btnZoomOut = document.getElementById('btn-zoom-out');
+            if (btnZoomIn) btnZoomIn.addEventListener('click', () => map && map.zoomIn());
+            if (btnZoomOut) btnZoomOut.addEventListener('click', () => map && map.zoomOut());
+
+            const styleSelect = document.getElementById('style-select');
+
+            if (styleSelect) {
+                styleSelect.addEventListener('change', (e) => {
+                    const idx = parseInt(e.target.value);
+                    if (idx === currentProviderIdx || !map) return;
+
+                    currentProviderIdx = idx;
+                    const provider = TILE_PROVIDERS[idx];
+
+                    map.removeLayer(currentTileLayer);
+                    currentTileLayer = createTileLayer(provider).addTo(map);
+
+                    const styleNameElem = document.getElementById('display-style-name');
+                    if (styleNameElem) styleNameElem.textContent = provider.name;
+                });
+            }
+
+            const searchForm = document.getElementById('search-form');
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            const searchError = document.getElementById('search-error');
+
+            if (searchForm) {
+                searchForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const rawQuery = searchInput.value.trim();
+                    const query = rawQuery.replace(/[-\s]/g, '');
+                    if (!query) return;
+
+                    searchError.classList.add('hidden');
+                    searchResults.classList.add('hidden');
+                    searchResults.innerHTML = '';
+
+                    try {
+                        if (/^\d{3,7}$/.test(query)) {
+                            const zipCode = query.padEnd(7, '0').slice(0, 7);
+                            const zipRes = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zipCode);
+                            
+                            let fullAddress = '';
+                            if (zipRes.ok) {
+                                const zipData = await zipRes.json();
+                                if (zipData.results && zipData.results.length > 0) {
+                                    const item = zipData.results[0];
+                                    fullAddress = (item.address1 || '') + (item.address2 || '') + (item.address3 || '');
+                                }
+                            }
+
+                            if (!fullAddress) {
+                                searchError.textContent = '該当する郵便番号が見つかりませんでした。';
+                                searchError.classList.remove('hidden');
+                                return;
+                            }
+
+                            const geoRes = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(fullAddress) + '&limit=1&accept-language=ja');
+                            if (!geoRes.ok) throw new Error();
+                            const geoData = await geoRes.json();
+
+                            if (geoData.length === 0) {
+                                searchError.textContent = '郵便番号の位置情報の取得に失敗しました。';
+                                searchError.classList.remove('hidden');
+                                return;
+                            }
+
+                            const itemBtn = document.createElement('button');
+                            itemBtn.type = 'button';
+                            itemBtn.className = 'w-full text-left p-2.5 text-xs text-slate-700 hover:bg-slate-50 transition truncate block';
+                            itemBtn.textContent = '〒' + rawQuery + ' (' + fullAddress + ')';
+                            itemBtn.addEventListener('click', () => {
+                                const lat = parseFloat(geoData[0].lat);
+                                const lng = parseFloat(geoData[0].lon);
+                                if (map) {
+                                    map.setView([lat, lng], 16);
+                                    marker.setLatLng([lat, lng]);
+                                    updateCoordsDisplay(lat, lng, 16);
+                                }
+                                searchResults.classList.add('hidden');
+                                searchInput.value = '';
+                            });
+                            searchResults.appendChild(itemBtn);
+                            searchResults.classList.remove('hidden');
+                            return;
+                        }
+
+                        const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(rawQuery) + '&limit=5&accept-language=ja');
+                        if (!res.ok) throw new Error();
+
+                        const data = await res.json();
+                        if (data.length === 0) {
+                            searchError.textContent = '該当する場所が見つかりませんでした。';
+                            searchError.classList.remove('hidden');
+                            return;
+                        }
+
+                        data.forEach(item => {
+                            const itemBtn = document.createElement('button');
+                            itemBtn.type = 'button';
+                            itemBtn.className = 'w-full text-left p-2.5 text-xs text-slate-700 hover:bg-slate-50 transition truncate block';
+                            itemBtn.textContent = item.display_name;
+                            itemBtn.addEventListener('click', () => {
+                                const lat = parseFloat(item.lat);
+                                const lng = parseFloat(item.lon);
+                                if (map) {
+                                    map.setView([lat, lng], 15);
+                                    marker.setLatLng([lat, lng]);
+                                    updateCoordsDisplay(lat, lng, 15);
+                                }
+
+                                searchResults.classList.add('hidden');
+                                searchInput.value = '';
+                            });
+                            searchResults.appendChild(itemBtn);
+                        });
+
+                        searchResults.classList.remove('hidden');
+                    } catch (err) {
+                        searchError.textContent = '位置情報の取得に失敗しました。';
+                        searchError.classList.remove('hidden');
+                    }
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupEventListeners);
+        } else {
+            setupEventListeners();
+        }
+
+        window.addEventListener('load', () => {
+            if (map) {
+                map.invalidateSize();
+            }
+        });
+    </script>
+</body>
+</html>

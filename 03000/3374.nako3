@@ -1,0 +1,189 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3374
+### タイトル=現在時刻表示
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=クジラWeb APIの時間APIを使って時間をリアルタイムで表示します　時間表示を日本標準時とできるだけ合わせました。　負荷を減らすためにAPIとの同期を最低10分からにしています。※一部にgemini canvasを使用しています。
+### 対象バージョン=3.7.20
+### URL=https://api.aoikujira.com/index.php
+### 種類=html
+### タグ=
+### 更新日時=2026-07-15 09:20:15
+###
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リアルタイム時刻同期</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Noto+Sans+JP:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-white text-black min-h-screen p-6 sm:p-10 flex flex-col justify-between max-w-xl mx-auto space-y-6">
+
+    <main class="space-y-6">
+        <div class="pt-2"></div>
+
+        <div class="space-y-3">
+            <h1 class="text-3xl font-bold tracking-tight">リアルタイム時刻同期</h1>
+            <p class="text-sm">オンライン時間同期・自動更新</p>
+        </div>
+
+        <!-- システム状態 -->
+        <div class="text-sm space-y-1">
+            <div><span id="status_text" class="text-black">同期完了</span></div>
+        </div>
+
+        <!-- 時刻表示セクション -->
+        <div class="space-y-3 pt-2">
+            <div id="time_display" class="mono text-2xl sm:text-3xl tracking-wide pl-1">取得中...</div>
+        </div>
+
+        <!-- コントロールセクション -->
+        <div class="space-y-4 pt-4">
+            <div class="text-2xl font-bold">
+                <h2>モニター制御</h2>
+            </div>
+
+            <div class="space-y-1">
+                <p class="text-sm">更新頻度（リクエスト間隔）</p>
+                <div class="flex items-center gap-3">
+                    <input id="interval_range" type="range" min="10" max="60" step="5" value="10" class="w-48 h-1 bg-slate-200 rounded appearance-none cursor-pointer accent-blue-600">
+                    <span id="interval_val" class="mono text-sm">10分</span>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-1">
+                <!-- 一時停止・再開ボタン -->
+                <button id="btn_toggle" class="border border-slate-400 px-3 py-1.5 rounded text-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
+                    <svg class="w-4 h-4 stroke-[1.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg>
+                    <span id="btn_toggle_text">一時停止</span>
+                </button>
+                <!-- 手動更新ボタン -->
+                <button id="btn_manual" class="border border-slate-400 px-3 py-1.5 rounded text-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
+                    <svg class="w-4 h-4 stroke-[1.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    <span>手動更新</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- フッター -->
+    <footer class="pt-10 text-xs">
+        <p>リアルタイム時刻同期システム</p>
+    </footer>
+
+    <script>
+        const API_URL = "https://api.aoikujira.com/time/get.php";
+        let isRunning = true;
+        let timerId = null;
+        let currentDate = null;
+        let secondsSinceLastSync = 0;
+
+        let syncIntervalSeconds = parseInt(interval_range.value) * 60;
+
+        async function fetchTime() {
+            if (!navigator.onLine) {
+                status_text.textContent = "オフライン";
+                return;
+            }
+            status_text.textContent = "通信中...";
+            try {
+                const res = await fetch(`${API_URL}?t=${Date.now()}&nocache=${Math.random()}`);
+                if (!res.ok) throw 1;
+                const rawText = (await res.text()).trim();
+                const sanitized = rawText.replace(/-/g, '/');
+                const tempDate = new Date(sanitized);
+                if (!isNaN(tempDate.getTime())) {
+                    tempDate.setMilliseconds(tempDate.getMilliseconds() + 920);
+                    currentDate = tempDate;
+                    secondsSinceLastSync = 0;
+                    updateDisplay();
+                    updateStatusMessage();
+                } else {
+                    throw 2;
+                }
+            } catch {
+                status_text.textContent = "通信エラー";
+            }
+        }
+
+        function updateDisplay() {
+            if (currentDate) {
+                time_display.textContent = currentDate.toLocaleString('sv');
+            }
+        }
+
+        function updateStatusMessage() {
+            if (!isRunning) {
+                status_text.textContent = "一時停止中";
+                return;
+            }
+            const remaining = syncIntervalSeconds - secondsSinceLastSync;
+            if (remaining <= 0) {
+                status_text.textContent = "自動同期中...";
+            } else {
+                const min = String(Math.floor(remaining / 60)).padStart(2, '0');
+                const sec = String(remaining % 60).padStart(2, '0');
+                status_text.textContent = `同期完了 (次同期まで ${min}:${sec})`;
+            }
+        }
+
+        function tick() {
+            if (currentDate) {
+                currentDate.setSeconds(currentDate.getSeconds() + 1);
+                updateDisplay();
+            }
+            if (isRunning) {
+                secondsSinceLastSync++;
+                updateStatusMessage();
+                if (secondsSinceLastSync >= syncIntervalSeconds) {
+                    fetchTime();
+                }
+            }
+        }
+
+        const startTimer = () => {
+            clearInterval(timerId);
+            timerId = setInterval(tick, 1000);
+        };
+
+        interval_range.oninput = () => {
+            const minutes = parseInt(interval_range.value);
+            interval_val.textContent = `${minutes}分`;
+            syncIntervalSeconds = minutes * 60;
+            if (secondsSinceLastSync >= syncIntervalSeconds) {
+                fetchTime();
+            } else {
+                updateStatusMessage();
+            }
+        };
+
+        btn_toggle.onclick = () => {
+            isRunning = !isRunning;
+            btn_toggle_text.textContent = isRunning ? "一時停止" : "自動更新 開始";
+            btn_toggle.querySelector('svg').innerHTML = isRunning 
+                ? `<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>`
+                : `<polygon points="5 3 19 12 5 21 5 3"/>`;
+            if (isRunning) fetchTime();
+            updateStatusMessage();
+        };
+
+        btn_manual.onclick = fetchTime;
+
+        (() => {
+            const initDate = new Date();
+            initDate.setMilliseconds(initDate.getMilliseconds() + 920);
+            currentDate = initDate;
+            updateDisplay();
+            startTimer();
+            fetchTime();
+        })();
+    </script>
+</body>
+</html>

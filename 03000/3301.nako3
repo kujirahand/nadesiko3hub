@@ -1,0 +1,69 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3301
+### タイトル=●(urlから|urlの|urlを)HTTPヘッダ取得
+### 作者=TKI(user_id=273)
+### ライセンス=CC0
+### 説明=なでしこv1の命令「HTTPヘッダ取得」のリメイク
+### 対象バージョン=3.7.16
+### URL=
+### 種類=cnako
+### タグ=プラグイン
+### 更新日時=2026-03-28 18:06:36
+###
+
+//●(urlから|urlの|urlを)HTTPヘッダ取得
+//なでしこv1にあった命令のリメイク。　オブジェクトを返す。
+//ファイルをダウンロードせず、サーバーにファイルサイズや圧縮形式などを問うときに使う
+
+//参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Reference/Headers
+//OK　res.ok　成功したらtrueが入る
+//content-type　ファイルタイプ（MIME タイプ）　text/html; charset=utf-8 など
+//content-length　ファイルサイズ。バイト数。
+//content-encoding　圧縮形式　"gzip"など　どの形式で圧縮されているか
+
+//URLからヘッダを取得して内容を返す
+●(urlから|urlの|urlを)HTTPヘッダ取得
+　ASYNC
+　変数　getHeadInfoJS=『(
+async function getHeadInfo(url) {
+  const res = await fetch(url, { method: "HEAD" });
+  
+  return {
+    // 日本語キー
+    "OK": res.ok,
+    "ステータス": res.status,
+    "ファイルサイズ": res.headers.get("content-length"),
+    "ファイルタイプ": res.headers.get("content-type"),
+    "最終更新日": res.headers.get("last-modified"),
+    "ETag": res.headers.get("etag"),
+    "サーバー": res.headers.get("server"),
+    "接続方式": res.headers.get("connection"),
+    "キャッシュ制御": res.headers.get("cache-control"),
+    "有効期限": res.headers.get("expires"),
+    "圧縮形式": res.headers.get("content-encoding"),
+    "言語": res.headers.get("content-language"),
+    
+    //英語キー
+    res: res,
+    ok : res.ok,
+    status: res.status,
+    contentLength: res.headers.get("content-length"),
+    contentType: res.headers.get("content-type"),
+    lastModified: res.headers.get("last-modified"),
+    etag: res.headers.get("etag"),
+    acceptRanges: res.headers.get("accept-ranges"),
+    "Accept-Ranges": res.headers.get("accept-ranges"),
+    server: res.headers.get("server"),
+    connection: res.headers.get("connection"),
+    cacheControl: res.headers.get("cache-control"),
+    expires: res.headers.get("expires"),
+    contentEncoding: res.headers.get("content-encoding"),
+    contentLanguage: res.headers.get("content-language"),
+
+  };
+}
+
+)』をJS実行
+　getHeadInfoJSを[url]でAWAIT実行
+　それを戻す
+ここまで

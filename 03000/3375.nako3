@@ -1,0 +1,54 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3375
+### タイトル=入力された文字をGoogleフォントに変換します
+### 作者=Aris(user_id=565)
+### ライセンス=MIT
+### 説明=入力された文字をGoogleフォントに変換するプログラムです。　※一部にAIを使用しています　　英語のみ対応してます　　(https://n3s.nadesi.com/id.php?377)をもとに作成
+### 対象バージョン=3.7.22
+### URL=https://n3s.nadesi.com/id.php?377
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-04 16:30:55
+###
+
+#2026/7/15
+
+
+
+
+
+# 1. HTMLとCSSの設定
+「<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap" rel="stylesheet">
+<input type="text" id="入力欄" placeholder="文字を入力">
+<button id="変換ボタン">変換</button>
+<div id="表示するもの">　　　　　　　　</div>」をDOM親要素にHTML設定
+
+# 2. スタイルの適用
+「#表示するもの」に{「font-family」：「'Imperial Script', cursive」、「font-size」：「30px」、「padding」：「20px」}をDOMスタイル一括設定
+
+# 3. ボタンを押したときに実行する関数を定義
+●ボタンクリック処理とは
+   
+    入力値＝「#入力欄」の「value」をDOM属性取得
+ 
+    「#表示するもの」に入力値をDOMテキスト設定
+ここまで
+
+
+「#変換ボタン」の「click」に「ボタンクリック処理」をDOMイベント追加
+
+/*メモ
+・Google フォント「Imperial Script」
+　https://fonts.google.com/specimen/Imperial+Script?categoryFilters=Feeling:%2FExpressive%2FFancy
+*/
+●(txtでURLの)リンク作成
+　　ELとは変数＝「a」のDOM要素作成。
+　　ELの「href」にURLをDOM属性設定。
+　　ELの「target」に「_blank」をDOM属性設定。
+　　ELにtxtをテキスト設定。
+　　DOM親要素へELをDOM子要素追加。
+　　ELで戻る。
+ここまで。
+「使用したGoogleフォントのサイト」のラベル作成。改行作成。
+「Imperial Script」で「https://fonts.google.com/specimen/Imperial+Script?categoryFilters=Feeling:%2FExpressive%2FFancy」のリンク作成。

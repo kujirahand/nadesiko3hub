@@ -1,0 +1,130 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3423
+### タイトル=リアルタイムISS位置情報
+### 作者=Aris(user_id=565)
+### ライセンス=BSD
+### 説明=リアルタイムでISS（国際宇宙ステーション）の位置を取得　APIの制限を回避するため1.2秒ごとに自動で更新　AI使用
+### 対象バージョン=3.7.22
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-08-21 10:58:29
+###
+
+// 1. 画面にタイトルと更新状態表示を作成
+「---------------------------------------------------------------------------------------------------------------」のラベル作成。
+
+改行作成。
+
+「国際宇宙ステーション (ISS) リアルタイム位置情報」のラベル作成。
+それの「文字サイズ」に「20px」をDOMスタイル設定。
+それの「style」に「font-weight: bold; color: #1a365d;」をDOMスタイル設定。
+
+改行作成。改行作成。
+
+状態表示＝「📡 1.2秒ごとに自動更新中...」のラベル作成。
+状態表示の「文字サイズ」に「16px」をDOMスタイル設定。
+状態表示の「style」に「color: #2b6cb0; font-weight: bold;」をDOMスタイル設定。
+
+改行作成。改行作成。
+
+「---------------------------------------------------------------------------------------------------------------」のラベル作成。
+
+// カードを描画するための親エリアを作成し、画面に追加
+カード表示エリア＝「div」をDOM要素作成。
+DOM親要素へカード表示エリアをDOM子要素追加。
+
+// =========================================================
+// UIの初期枠組み（カード）を一度だけ作成する
+// =========================================================
+CARD ＝「div」をDOM要素作成。
+カードスタイル ＝「max-width: 600px; margin: 16px 0; padding: 16px; background-color: #5872ab; border: 2.5px solid #38bdf8; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-family: sans-serif; color: white;」
+CARDの「style」にカードスタイルをDOM属性設定。
+
+TITLE_LINE ＝「div」をDOM要素作成。
+TITLE_LINEの「style」に「font-size: 20px; font-weight: bold; color: #38bdf8; border-bottom: 2px solid #38bdf8; padding-bottom: 6px; margin-bottom: 12px;」をDOM属性設定。
+TITLE_LINEに「🛰️ ISS 現在位置データ」をテキスト設定。
+CARDへTITLE_LINEをDOM子要素追加。
+
+// データを動的に書き換えるための要素
+POS_BOX ＝「div」をDOM要素作成。
+POS_BOXの「style」に「font-size: 18px; margin-bottom: 12px; line-height: 1.8;」をDOM属性設定。
+POS_BOXに「データを取得中...」をテキスト設定。
+CARDへPOS_BOXをDOM子要素追加。
+
+PAGE_LINE ＝「div」をDOM要素作成。
+PAGE_LINEの「style」に「font-size: 14px; border-top: 1px solid #334155; padding-top: 10px; text-align: right;」をDOM属性設定。
+
+PAGE_LINK ＝「a」をDOM要素作成。
+PAGE_LINKに「🌍 Google Mapsで位置を確認 ➔」をテキスト設定。
+PAGE_LINKの「target」に「_blank」をDOM属性設定。
+PAGE_LINKの「rel」に「noopener noreferrer」をDOM属性設定。
+
+PAGE_LINKの「style」に「color: #38bdf8; font-weight: bold; text-decoration: none; cursor: pointer; background-color: #38bdf8; padding: 6px 12px; border-radius: 6px; border: 1px solid #38bdf8; display: inline-block;」をDOMスタイル設定。
+
+PAGE_LINEへPAGE_LINKをDOM子要素追加。
+CARDへPAGE_LINEをDOM子要素追加。
+
+カード表示エリアへCARDをDOM子要素追加。
+
+// =========================================================
+// ISSデータ取得＆画面テキストのみ更新する関数
+// =========================================================
+●ISS位置取得処理
+    URL＝「https://api.wheretheiss.at/v1/satellites/25544」
+    
+    URLにAJAX送信。
+    データ＝それをJSONデコード。
+    
+    // データの抽出
+    もし、データ[「latitude」]≠未定義ならば
+        緯度＝データ[「latitude」]
+        経度＝データ[「longitude」]
+        
+        高度km＝データ[「altitude」]
+        速度kmh＝データ[「velocity」]
+        
+        高度mi＝高度km * 0.621371
+        速度mph＝速度kmh * 0.621371
+        
+        // APIから取得したタイムスタンプ（秒）をミリ秒単位に変換
+        TS＝データ[「timestamp」] * 1000
+        
+        // なでしこの { 誤判定を回避するため CHR(123) と CHR(125) を使用
+        JS_JST＝「new Date(」＆TS＆「).toLocaleString('ja-JP', 」＆CHR(123)＆「timeZone:'Asia/Tokyo'」＆CHR(125)＆「)」
+        JS_PDT＝「new Date(」＆TS＆「).toLocaleString('en-US', 」＆CHR(123)＆「timeZone:'America/Los_Angeles'」＆CHR(125)＆「)」
+        
+        JST_STR＝JS_JSTをJS実行
+        PDT_STR＝JS_PDTをJS実行
+        
+        // 既存の要素のHTML・属性のみを上書き更新
+        POS_BOXに「北緯/南緯 (緯度): {緯度}度<br>東経/西経 (経度): {経度}度<br>高度: {高度km} km ({高度mi} mi)<br>移動速度: {速度kmh} km/h ({速度mph} mph)<br><hr style='border:0; border-top:1px dashed #334155; margin:8px 0;'>🕒 日本時間 (JST): {JST_STR}<br>🕒 太平洋夏時間 (PDT): {PDT_STR}」をHTML設定。
+        
+        MAP_URL＝「https://www.google.com/maps?q={緯度},{経度}」
+        PAGE_LINKの「href」にMAP_URLをDOM属性設定。
+        PAGE_LINKの「onclick」に「window.open('{MAP_URL}', '_blank'); return false;」をDOM属性設定。
+    ここまで
+ここまで
+
+// =========================================================
+// 1.2秒ごとの自動更新処理
+// =========================================================
+// 初回実行
+ISS位置取得処理
+
+// 1.2秒ごとに最新データを取得して表示を更新
+1.2秒毎には
+    ISS位置取得処理
+ここまで
+
+●(txtでURLの)リンク作成
+    ELとは変数＝「a」のDOM要素作成。
+    ELの「href」にURLをDOM属性設定。
+    ELの「target」に「_blank」をDOM属性設定。
+    ELの「style」に「margin-right: 15px;」をDOMスタイル設定。
+    ELにtxtをテキスト設定。
+    DOM親要素へELをDOM子要素追加。
+    ELで戻る。
+ここまで。
+
+「Where the ISS at? API」で「https://wheretheiss.at/w/developer」のリンク作成。

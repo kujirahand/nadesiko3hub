@@ -1,0 +1,45 @@
+### [作品情報]
+### 掲載URL=https://n3s.nadesi.com/id.php?3484
+### タイトル=簡易的なログインフォームみたいなもの
+### 作者=粉ぁぁ雪ぃぃ(user_id=0)
+### ライセンス=CC0
+### 説明=ハッシュを使ってパスワードがプログラム内で分からないようにしています。パスワードはnadesiko
+### 対象バージョン=3.7.2
+### URL=
+### 種類=wnako
+### タグ=
+### 更新日時=2026-09-25 11:43:11
+###
+
+貯蔵庫=「貯蔵庫に戻る」のボタン作成。
+それの「非表示」にオンをDOM属性設定
+HASHPASS=「266a50278b8df72c919e7c95da622a09cb9797e8bcec9e3a0c39a69015096376」
+LABEL1=「ユーザー名」のラベル作成。
+INPUTUSERNAME=空のエディタ作成。
+改行作成
+LABEL2=「パスワード」のラベル作成。
+INPUT=空のパスワード入力エディタ作成。
+LOGIN=「ログイン」のボタン作成。
+それの「文字サイズ」に「17px」をDOMスタイル設定
+LOGINをクリックした時には
+    USERNAME=INPUTUSERNAMEのテキスト取得
+    INPUTPASS=INPUTのテキスト取得。
+    INPUTHASHPASS=INPUTPASSを「SHA-256」でハッシュ値計算。
+    もし(INPUTHASHPASS=HASHPASS)ならば
+        INPUTのDOM部品削除
+        LOGINのDOM部品削除
+        INPUTUSERNAMEのDOM部品削除
+        USERNAMEのDOM部品削除。
+        LABEL1のDOM部品削除
+        LABEL2のDOM部品削除
+        「おかえりなさい、{USERNAME}さん!」と言う。
+        貯蔵庫の「非表示」にオフをDOM属性設定。
+    ここまで
+    もし(INPUTHASHPASS!=HASHPASS)ならば
+        「パスワードが違います」と言う。
+        INPUTに空をテキスト設定
+    ここまで
+ここまで
+貯蔵庫をクリックした時には
+    「https://n3s.nadesi.com」にブラウザ移動
+ここまで

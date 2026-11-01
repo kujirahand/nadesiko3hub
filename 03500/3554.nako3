@@ -3,12 +3,12 @@
 ### タイトル=Swift Playgrounds × なでしこ 3 (Swiftpmファイル作成ツール)
 ### 作者=rebooter-nako3(user_id=636)
 ### ライセンス=MIT
-### 説明=nako3swiftpm - Swift Playgroundsで日本語プログラミングなでしこ3が実行可能な swiftpmファイルを作成するCLIツール（Python 3.9以上）
+### 説明=GitHub(https://github.com/rebooter-nako3/nako3swiftpm)にも同じものがあります。 nako3swiftpm - Swift Playgroundsで日本語プログラミングなでしこ3が実行可能な swiftpmファイルを作成するCLIツール（Python 3.9以上）
 ### 対象バージョン=3.8.9
 ### URL=
 ### 種類=text
 ### タグ=
-### 更新日時=2026-10-27 21:41:11
+### 更新日時=2026-11-01 11:11:12
 ###
 
 #!/usr/bin/env python3
